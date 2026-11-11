@@ -171,3 +171,12 @@
     10px 62px;
   background-repeat: no-repeat;
 }
+
+@utility no-scrollbar {
+  /* 스크롤은 되지만 스크롤바는 안 보이게 */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
