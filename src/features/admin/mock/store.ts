@@ -1,5 +1,6 @@
 import * as seed from '@/features/admin/mock/data'
 import type {
+  AdminUser,
   InviteCode,
   Member,
   ProjectCategory,
@@ -12,6 +13,7 @@ import type {
  * 백엔드가 붙으면 api.ts 의 함수 안쪽만 fetch 로 바꾸고 이 파일은 지워요.
  */
 type State = {
+  me: AdminUser
   journals: ReviewJournal[]
   projects: ProjectCategory[]
   members: Member[]
@@ -22,6 +24,7 @@ type State = {
 const clone = <T>(value: T): T => structuredClone(value)
 
 export const store: State = {
+  me: clone(seed.adminUser),
   journals: clone(seed.journals),
   projects: clone(seed.projects),
   members: clone(seed.members),
@@ -33,4 +36,3 @@ let seq = 100
 export const nextId = (prefix: string) => `${prefix}-${++seq}`
 
 export const today = () => seed.MOCK_TODAY
-export const adminUser = seed.adminUser

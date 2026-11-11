@@ -34,6 +34,7 @@ export const MAJOR_EVENT_TYPES: EventType[] = ['IDEATHON', 'HACKATHON', 'MIDTERM
 export type AdminUser = {
   id: string
   name: string
+  email: string
   cohort: number
 }
 

@@ -1,4 +1,4 @@
-import { adminUser, nextId, store, today } from '@/features/admin/mock/store'
+import { nextId, store, today } from '@/features/admin/mock/store'
 import {
   MAJOR_EVENT_TYPES,
   type AdminUser,
@@ -28,7 +28,19 @@ const notFound = (what: string) => new Error(`${what}을(를) 찾을 수 없어�
 
 export async function getMe(): Promise<AdminUser> {
   await delay(80)
-  return clone(adminUser)
+  return clone(store.me)
+}
+
+/** 이름·닉네임 바꾸기. 멤버 목록의 내 이름도 같이 바뀌어요 */
+export async function updateMe(input: { name: string }): Promise<AdminUser> {
+  await delay(250)
+  const name = input.name.trim()
+  if (!name) throw new Error('이름이나 닉네임을 적어 주세요')
+  if (name.length > 30) throw new Error('30자 안으로 적어 주세요')
+  store.me.name = name
+  const mine = store.members.find((m) => m.id === store.me.id)
+  if (mine) mine.name = name
+  return clone(store.me)
 }
 
 export async function getReviewSummary(): Promise<ReviewSummary> {
@@ -135,7 +147,7 @@ export async function createProject(input: {
     title,
     shortName,
     kind: input.kind,
-    cohort: adminUser.cohort,
+    cohort: store.me.cohort,
   }
   store.projects.push(project)
   return clone(project)

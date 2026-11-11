@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 
 import appIcon from '@/assets/brand/app-icon.png'
 import logo from '@/assets/brand/logo.svg'
@@ -14,24 +14,27 @@ export function AdminLogoHeader() {
   const { data: me } = useQuery(meQuery())
   return (
     <header className="flex h-[46px] w-full items-center gap-2 px-5 pt-1.5 pb-1">
-      <img src={appIcon} alt="" width={30} height={30} className="size-[30px] shrink-0" />
-      <img
-        src={logo}
-        alt="멋사수첩"
-        width={58}
-        height={35}
-        className="h-[35px] w-[58px] shrink-0"
-      />
+      <Link to="/admin/review" aria-label="홈으로" className="flex items-center gap-2">
+        <img src={appIcon} alt="" width={30} height={30} className="size-[30px] shrink-0" />
+        <img
+          src={logo}
+          alt="멋사수첩"
+          width={58}
+          height={35}
+          className="h-[35px] w-[58px] shrink-0"
+        />
+      </Link>
       <Pill tone="orange" size="sm">
         운영진
       </Pill>
       <div className="flex-1" />
-      <div
-        aria-label={me ? `${me.name} 운영진` : undefined}
-        className="bg-card text-ink shadow-card flex size-9 shrink-0 items-center justify-center rounded-full text-[14px] font-bold"
+      <Link
+        to="/admin/profile"
+        aria-label="프로필 설정"
+        className="bg-card text-ink shadow-card flex size-9 shrink-0 items-center justify-center rounded-full text-[14px] font-bold active:brightness-95"
       >
         {me?.name.charAt(0)}
-      </div>
+      </Link>
     </header>
   )
 }

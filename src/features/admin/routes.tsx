@@ -3,6 +3,7 @@ import { Navigate, type RouteObject } from 'react-router'
 import { AdminDetailLayout, AdminLayout } from '@/features/admin/components/AdminLayout'
 import { MembersPage } from '@/features/admin/pages/MembersPage'
 import { OpsPage } from '@/features/admin/pages/OpsPage'
+import { ProfilePage } from '@/features/admin/pages/ProfilePage'
 import { ReviewDetailPage } from '@/features/admin/pages/ReviewDetailPage'
 import { ReviewHomePage } from '@/features/admin/pages/ReviewHomePage'
 import { ComingSoonPage } from '@/pages/ComingSoonPage'
@@ -27,6 +28,9 @@ export const adminRoutes: RouteObject[] = [
   },
   {
     element: <AdminDetailLayout />,
-    children: [{ path: 'admin/review/:id', element: <ReviewDetailPage /> }],
+    children: [
+      { path: 'admin/review/:id', element: <ReviewDetailPage /> },
+      { path: 'admin/profile', element: <ProfilePage /> },
+    ],
   },
 ]

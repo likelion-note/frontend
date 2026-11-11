@@ -4,6 +4,7 @@ import { createPortal } from 'react-dom'
 import { CloseIcon } from '@/components/icons'
 import { Illust, type IllustName } from '@/components/ui/Illust'
 import { cn } from '@/lib/cn'
+import { getFrameElement } from '@/lib/frame'
 
 type Props = {
   open: boolean
@@ -34,19 +35,14 @@ export function BottomSheet({
       if (e.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', onKey)
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = prev
-    }
+    return () => document.removeEventListener('keydown', onKey)
   }, [open, onClose])
 
   if (!open) return null
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex justify-center">
-      <div className="max-w-mobile relative h-full w-full">
+    <div className="absolute inset-0 z-50">
+      <div className="relative h-full w-full">
         <button
           type="button"
           aria-label="닫기"
@@ -78,6 +74,6 @@ export function BottomSheet({
         </div>
       </div>
     </div>,
-    document.body,
+    getFrameElement(),
   )
 }
