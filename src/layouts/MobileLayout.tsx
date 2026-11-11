@@ -17,13 +17,10 @@ export function MobileLayout() {
       <div
         id="mobile-frame"
         style={scale < 1 ? { zoom: scale } : undefined}
-        className="max-w-mobile bg-paper border-ink relative mx-auto flex h-dvh w-full flex-col overflow-hidden sm:h-[844px] sm:w-[390px] sm:rounded-[40px] sm:border-2"
+        className="max-w-mobile bg-paper paper-grid border-ink relative mx-auto flex h-dvh w-full flex-col overflow-hidden sm:h-[844px] sm:w-[390px] sm:rounded-[40px] sm:border-2"
       >
-        {/* 상태바 자리. 폰에서는 OS 가 그리고, PC 프레임에서는 피그마처럼 44px 비워 둬요 */}
-        <div
-          aria-hidden
-          className="bg-paper h-[env(safe-area-inset-top)] w-full shrink-0 sm:h-11"
-        />
+        {/* 상태바 자리. 폰에서는 OS 가 그리고, PC 프레임에서는 피그마처럼 44px 비워 둬요. 배경은 프레임의 모눈이 이어져요 */}
+        <div aria-hidden className="h-[env(safe-area-inset-top)] w-full shrink-0 sm:h-11" />
         <div className="flex min-h-0 flex-1 flex-col">
           <Outlet />
         </div>
