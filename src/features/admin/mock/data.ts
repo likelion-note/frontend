@@ -10,7 +10,12 @@ import type {
 /** 목 모드의 오늘. 피그마 예시(중간발표 D-12)와 맞추기 위해 고정해요 */
 export const MOCK_TODAY = '2026-10-27'
 
-export const adminUser: AdminUser = { id: 'admin-1', name: '하린', cohort: 14 }
+export const adminUser: AdminUser = {
+  id: 'admin-1',
+  name: '하린',
+  email: 'harin.lion14@gmail.com',
+  cohort: 14,
+}
 
 export const journals: ReviewJournal[] = [
   {
