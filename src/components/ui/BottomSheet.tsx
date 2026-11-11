@@ -10,6 +10,7 @@ type Props = {
   onClose: () => void
   title: string
   illust?: IllustName
+  illustSize?: number
   /** 제목 아래 한 줄 설명 */
   description?: ReactNode
   children: ReactNode
@@ -22,6 +23,7 @@ export function BottomSheet({
   onClose,
   title,
   illust,
+  illustSize = 36,
   description,
   children,
   className,
@@ -64,7 +66,7 @@ export function BottomSheet({
             <div className="bg-handle h-1 w-10 rounded-sm" />
           </div>
           <div className="flex w-full items-center gap-2">
-            {illust && <Illust name={illust} size={36} />}
+            {illust && <Illust name={illust} size={illustSize} />}
             <h2 className="text-ink text-[20px] leading-tight font-bold">{title}</h2>
             <div className="flex-1" />
             <button type="button" aria-label="닫기" onClick={onClose} className="shrink-0 p-0.5">

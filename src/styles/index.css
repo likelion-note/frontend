@@ -44,6 +44,8 @@
   --color-tab-line: #f1dfd6;
   --color-handle: #e3d3c2;
   --color-rule: #ebd9c4;
+  --color-input-line: #d7bfa4;
+  --color-placeholder: #bba996;
 
   /* 노란 안내 카드, 본문 하이라이트, 세그먼트 */
   --color-note: #fdf0d2;
