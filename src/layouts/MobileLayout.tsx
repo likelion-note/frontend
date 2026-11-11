@@ -6,8 +6,11 @@ import { Outlet } from 'react-router'
  */
 export function MobileLayout() {
   return (
-    <div className="min-h-dvh bg-neutral-100">
-      <div className="max-w-mobile relative mx-auto flex min-h-dvh w-full flex-col bg-white shadow-sm">
+    <div className="min-h-dvh">
+      <div
+        id="mobile-frame"
+        className="max-w-mobile bg-paper relative mx-auto flex min-h-dvh w-full flex-col shadow-sm"
+      >
         <Outlet />
       </div>
     </div>

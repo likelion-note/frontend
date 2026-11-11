@@ -1,35 +1,96 @@
 @import 'tailwindcss';
 
 /*
- * 공통 테마 토큰. 색상은 디자인 확정 후 여기에 추가해요.
- * 타이포는 피그마 디자인 시스템(Pretendard) 기준이에요.
+ * 공통 테마 토큰. 피그마 03-1 운영진 초안 기준이에요.
  */
 @theme {
   --font-sans:
-    'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto,
-    'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Apple SD Gothic Neo',
+    'Malgun Gothic', sans-serif;
 
   /* 모바일 프레임 폭 */
   --container-mobile: 390px;
 
-  /* Display 32/Bold · Title1 24/Bold · Title2 20/SemiBold · Headline 17/SemiBold
-     Body1 16/Regular · Body2 14/Regular · Button 15/SemiBold · Caption 12/Medium */
-  --text-display: 2rem;
-  --text-display--line-height: 1.3;
-  --text-title1: 1.5rem;
-  --text-title1--line-height: 1.3;
-  --text-title2: 1.25rem;
-  --text-title2--line-height: 1.3;
-  --text-headline: 1.0625rem;
-  --text-headline--line-height: 1.4;
-  --text-body1: 1rem;
-  --text-body1--line-height: 1.5;
-  --text-body2: 0.875rem;
-  --text-body2--line-height: 1.5;
-  --text-button: 0.9375rem;
-  --text-button--line-height: 1.4;
-  --text-caption: 0.75rem;
-  --text-caption--line-height: 1.4;
+  /* 바탕 */
+  --color-paper: #fffcf7;
+  --color-card: #fffdf8;
+  --color-unassigned: #fff4ec;
+
+  /* 글자 */
+  --color-ink: #3b2614;
+  --color-ink-2: #5d4632;
+  --color-muted: #97836e;
+  --color-icon-muted: #c6b4a0;
+
+  /* 포인트 (주황) */
+  --color-accent: #f07a1e;
+  --color-accent-deep: #b4520a;
+  --color-accent-soft: #ffefdf;
+
+  /* 베이지 필 */
+  --color-beige: #f3eadf;
+  --color-beige-ink: #7a5f48;
+
+  /* 붉은 필 (태그, 돌려보냄) */
+  --color-rose: #fce3d8;
+  --color-rose-ink: #b0553f;
+  --color-rose-2: #fbe3d8;
+  --color-danger: #c2502c;
+
+  /* 선 */
+  --color-line: #efe2d3;
+  --color-border: #f0e0cb;
+  --color-header-line: #efd3c8;
+  --color-tab-line: #f1dfd6;
+  --color-handle: #e3d3c2;
+  --color-rule: #ebd9c4;
+
+  /* 노란 안내 카드, 본문 하이라이트, 세그먼트 */
+  --color-note: #fdf0d2;
+  --color-note-ink: #7a5512;
+  --color-highlight: #fcebd6;
+  --color-segment: #f7eee7;
+
+  /* 딤, 형광펜 */
+  --color-dim: rgba(59, 38, 20, 0.38);
+  --color-marker: rgba(240, 122, 30, 0.22);
+
+  --shadow-card: 0 6px 14px -4px rgba(115, 77, 38, 0.08), 0 1px 2px 0 rgba(115, 77, 38, 0.06);
+  --shadow-segment: 0 1px 4px 0 rgba(77, 51, 26, 0.1);
+  --shadow-knob: 0 1px 2px rgba(77, 51, 26, 0.2);
+
+  --animate-sheet-up: sheet-up 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-toast-in: toast-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+
+  @keyframes sheet-up {
+    from {
+      transform: translateY(24px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes toast-in {
+    from {
+      transform: translateY(8px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
 }
 
 @layer base {
@@ -39,11 +100,69 @@
   }
 
   body {
-    @apply bg-neutral-100 font-sans text-neutral-900 antialiased;
+    @apply text-ink bg-[#f3ede6] font-sans antialiased;
     word-break: keep-all;
   }
 
   button {
     @apply cursor-pointer;
   }
+
+  input,
+  textarea {
+    @apply font-sans;
+  }
+}
+
+@utility paper-grid {
+  /* 색연필 모눈 배경. 피그마 에셋을 세로로 반복해요 */
+  background-image: url('../assets/brand/grid-bg.svg');
+  background-size: 390px auto;
+  background-repeat: repeat-y;
+  background-position: top center;
+}
+
+@utility marker-underline {
+  /* 제목 아래 형광펜 밑줄 */
+  position: relative;
+  z-index: 0;
+  &::after {
+    content: '';
+    position: absolute;
+    left: -2px;
+    right: -1px;
+    bottom: -2px;
+    height: 7px;
+    border-radius: 3px;
+    background: var(--color-marker);
+    z-index: -1;
+  }
+}
+
+@utility marker-underline-lg {
+  position: relative;
+  z-index: 0;
+  &::after {
+    content: '';
+    position: absolute;
+    left: -1px;
+    right: 0;
+    bottom: -1px;
+    height: 9px;
+    border-radius: 3px;
+    background: var(--color-marker);
+    z-index: -1;
+  }
+}
+
+@utility ruled-lines {
+  /* 입력칸 안의 공책 줄 */
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 25px,
+    var(--color-rule) 25px,
+    var(--color-rule) 26px
+  );
+  background-position: 0 11px;
 }
