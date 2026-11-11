@@ -1,6 +1,8 @@
 import { useCallback, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 
 import { ToastContext } from '@/components/ui/toast-context'
+import { getFrameElement } from '@/lib/frame'
 
 type ToastState = { id: number; message: string } | null
 
@@ -18,17 +20,19 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={show}>
       {children}
-      {toast && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-[104px] z-[60] flex justify-center">
-          <div
-            key={toast.id}
-            role="status"
-            className="animate-toast-in bg-ink shadow-card rounded-full px-4 py-2.5 text-[13px] font-medium text-white"
-          >
-            {toast.message}
-          </div>
-        </div>
-      )}
+      {toast &&
+        createPortal(
+          <div className="pointer-events-none absolute inset-x-0 bottom-[96px] z-[60] flex justify-center">
+            <div
+              key={toast.id}
+              role="status"
+              className="animate-toast-in bg-ink shadow-card rounded-full px-4 py-2.5 text-[13px] font-medium text-white"
+            >
+              {toast.message}
+            </div>
+          </div>,
+          getFrameElement(),
+        )}
     </ToastContext.Provider>
   )
 }
