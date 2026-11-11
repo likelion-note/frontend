@@ -11,7 +11,7 @@ export function MobileLayout() {
     <div className="h-dvh w-full sm:flex sm:items-center sm:justify-center sm:px-4 sm:py-6">
       <div
         id="mobile-frame"
-        className="max-w-mobile bg-paper sm:shadow-phone relative mx-auto flex h-dvh w-full flex-col overflow-hidden sm:h-[min(844px,calc(100dvh-48px))] sm:rounded-[32px] sm:ring-1 sm:ring-black/5"
+        className="max-w-mobile bg-paper border-ink relative mx-auto flex h-dvh w-full flex-col overflow-hidden sm:h-[min(844px,calc(100dvh-48px))] sm:rounded-[40px] sm:border-2"
       >
         <Outlet />
       </div>

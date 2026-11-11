@@ -6,7 +6,7 @@ import { AdminTabBar } from '@/features/admin/components/AdminTabBar'
 export function AdminLayout() {
   return (
     <div className="bg-paper flex h-full min-h-0 flex-col">
-      <div className="paper-grid flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
+      <div className="paper-grid no-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
         <Outlet />
       </div>
       <AdminTabBar />
@@ -17,7 +17,7 @@ export function AdminLayout() {
 /** 탭 없는 상세 화면 틀 (일지 검토, 프로필 설정) */
 export function AdminDetailLayout() {
   return (
-    <div className="paper-grid bg-paper flex h-full min-h-0 flex-col overflow-y-auto overscroll-contain">
+    <div className="paper-grid bg-paper no-scrollbar flex h-full min-h-0 flex-col overflow-y-auto overscroll-contain">
       <Outlet />
     </div>
   )

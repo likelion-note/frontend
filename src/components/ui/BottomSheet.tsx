@@ -54,7 +54,7 @@ export function BottomSheet({
           aria-modal="true"
           aria-label={title}
           className={cn(
-            'animate-sheet-up bg-paper absolute inset-x-0 bottom-0 flex max-h-[92%] flex-col gap-3.5 overflow-y-auto rounded-t-3xl px-5 pt-3 pb-[34px]',
+            'animate-sheet-up bg-paper no-scrollbar absolute inset-x-0 bottom-0 flex max-h-[92%] flex-col gap-3.5 overflow-y-auto rounded-t-3xl px-5 pt-3 pb-[34px]',
             className,
           )}
         >
