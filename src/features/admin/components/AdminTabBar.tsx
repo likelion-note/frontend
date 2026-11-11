@@ -34,7 +34,7 @@ export function AdminTabBar() {
   return (
     <nav
       aria-label="운영진 메뉴"
-      className="border-tab-line bg-paper z-20 flex w-full shrink-0 border-t pt-2.5 pb-[calc(10px+env(safe-area-inset-bottom))]"
+      className="border-tab-line bg-paper z-20 flex w-full shrink-0 border-t pt-2.5 pb-[26px]"
     >
       {tabs.map(({ to, label, Icon }) => (
         <NavLink
