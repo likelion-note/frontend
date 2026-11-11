@@ -157,12 +157,14 @@
 
 @utility ruled-lines {
   /* 입력칸 안의 공책 줄 */
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent 0,
-    transparent 25px,
-    var(--color-rule) 25px,
-    var(--color-rule) 26px
-  );
-  background-position: 0 11px;
+  background-image:
+    linear-gradient(var(--color-rule), var(--color-rule)),
+    linear-gradient(var(--color-rule), var(--color-rule));
+  background-size:
+    calc(100% - 20px) 1px,
+    calc(100% - 20px) 1px;
+  background-position:
+    10px 36px,
+    10px 62px;
+  background-repeat: no-repeat;
 }
