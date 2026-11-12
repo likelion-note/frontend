@@ -1,0 +1,70 @@
+import type { HomeData } from '@/features/home/types'
+
+export const homeMockData: HomeData = {
+  mode: 'project-active',
+  user: { initial: '데', cohortLabel: '14기 아기사자', part: 'PM', team: '멋사수첩팀' },
+  project: {
+    dateLabel: '10월 27일 화요일',
+    week: 2,
+    daysUntilPresentation: 12,
+    presentationLabel: '중간발표',
+    nextSession: '다음 정기 세션 10/29 (목) · 협업 툴',
+  },
+  returnedJournal: {
+    count: 1,
+    description: '운영진이 남긴 한 줄을 보고 다시 내 주세요',
+    action: { label: '고치기 ›' },
+  },
+  todos: [
+    { id: 'availability', title: '팀원 가능 시간 모으기', isCompleted: true, dueLabel: '월' },
+    { id: 'topics', title: '주제 후보 정리하기', isCompleted: true, dueLabel: '월' },
+    {
+      id: 'meeting',
+      title: '아이디어 회의 열기',
+      isCompleted: false,
+      dueLabel: '오늘',
+      isDueToday: true,
+      action: { label: '회의 도우미로 시작 ›' },
+    },
+    {
+      id: 'proposal',
+      title: '기획서 초안 공유',
+      isCompleted: false,
+      dueLabel: '금',
+      action: { label: '작년 기획서 3개 보기 ›' },
+    },
+  ],
+  todosAction: { label: '전체 보기' },
+  staffMessage: {
+    week: 2,
+    text: '규칙부터 먼저 정해 두면\n회의가 훨씬 빨라져요.',
+    helpfulCount: 24,
+    isHelpful: false,
+  },
+  journalAction: { label: '이번 주 성장일지 쓰기' },
+  noteStats: { cohort: 14, readCount: 23, helpfulCount: 10, publicCount: 2 },
+  archiveAction: { label: '더 보기' },
+  archiveNotes: [
+    {
+      id: 'changed-topic',
+      context: '같은 PM · 중간발표 1~2주 전',
+      title: '주제를 중간에 바꿨던 3주차 이야기',
+      author: '지난 기수 B팀 · PM',
+      excerpt: '일주일 미룬 게 제일 아까웠어요.',
+      handwritten: true,
+      readCount: 41,
+      helpfulCount: 17,
+      tag: '#주제 변경',
+    },
+    {
+      id: 'meeting-rules',
+      context: '같은 PM · #회의 진행',
+      title: '회의가 계속 길어져서 정한 규칙 3가지',
+      author: '지난 기수 D팀 · PM · 정기 세션 2주 이상 전',
+      excerpt: '회의 시작 전에 안건을 슬랙에 먼저 올리기로 했더니 회의가 절반으로 줄었어요.',
+      readCount: 33,
+      helpfulCount: 21,
+      tag: '#회의 진행',
+    },
+  ],
+}
