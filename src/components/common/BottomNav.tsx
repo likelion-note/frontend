@@ -1,6 +1,8 @@
-import { NavLink } from 'react-router'
+import { NavLink, useLocation } from 'react-router'
 
-import homeIcon from '@/assets/home/nav-home.svg'
+import activeHomeIcon from '@/assets/home/nav-home.svg'
+import homeIcon from '@/assets/meeting/nav-home.svg'
+import activeMeetIcon from '@/assets/meeting/nav-meet.svg'
 import meetIcon from '@/assets/home/nav-meet.svg'
 import notesIcon from '@/assets/home/nav-notes.svg'
 import recordIcon from '@/assets/home/nav-record.svg'
@@ -16,13 +18,20 @@ export interface BottomNavItem {
 }
 
 const memberNavItems: readonly BottomNavItem[] = [
-  { id: 'home', label: '홈', icon: homeIcon, to: '/home' },
-  { id: 'meet', label: '회의', icon: meetIcon },
+  { id: 'home', label: '홈', icon: homeIcon, activeIcon: activeHomeIcon, to: '/home' },
+  { id: 'meet', label: '회의', icon: meetIcon, activeIcon: activeMeetIcon, to: '/meeting' },
   { id: 'notes', label: '노트', icon: notesIcon },
   { id: 'record', label: '내 기록', icon: recordIcon },
 ]
 
-export function BottomNav({ items = memberNavItems }: { items?: readonly BottomNavItem[] }) {
+export function BottomNav({
+  items = memberNavItems,
+  meetingAvailable = true,
+}: {
+  items?: readonly BottomNavItem[]
+  meetingAvailable?: boolean
+}) {
+  const location = useLocation()
   const content = (item: BottomNavItem, active: boolean) => (
     <>
       <img
@@ -48,10 +57,10 @@ export function BottomNav({ items = memberNavItems }: { items?: readonly BottomN
       className="border-border z-20 flex w-full shrink-0 border bg-white pt-2.5 pb-[max(26px,env(safe-area-inset-bottom))]"
     >
       {items.map((item) =>
-        item.to ? (
+        item.to && (item.id !== 'meet' || meetingAvailable) ? (
           <NavLink
             key={item.id}
-            to={item.to}
+            to={{ pathname: item.to, search: location.search }}
             end
             className="focus-visible:outline-accent flex min-w-0 flex-1 flex-col items-center gap-[3px] rounded focus-visible:outline-2"
           >

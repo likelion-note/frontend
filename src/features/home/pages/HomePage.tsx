@@ -27,7 +27,7 @@ export function HomePage() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       {renderHome()}
-      <BottomNav />
+      <BottomNav meetingAvailable={mode === 'project-active'} />
     </div>
   )
 }
