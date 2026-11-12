@@ -81,14 +81,17 @@ export function MeetingHistoryCard({
               {record.decisions.map((decision, index) => (
                 <p
                   key={`${record.id}-decision-${index}`}
-                  className="text-[14px] leading-[17px] font-medium"
+                  className="text-[14px] leading-[17px] font-medium [overflow-wrap:anywhere] whitespace-pre-wrap"
                 >
                   {decision}
                 </p>
               ))}
               <h3 className="text-muted text-[12px] leading-[14px] font-bold">누가 언제까지</h3>
               {record.actionItems.map((item) => (
-                <p key={item.id} className="text-[14px] leading-[17px] font-medium">
+                <p
+                  key={item.id}
+                  className="text-[14px] leading-[17px] font-medium [overflow-wrap:anywhere] whitespace-pre-wrap"
+                >
                   {formatActionItem(item)}
                 </p>
               ))}

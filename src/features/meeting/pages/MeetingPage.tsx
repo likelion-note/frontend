@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, Navigate, useLocation } from 'react-router'
+import { Link, Navigate, useLocation, useNavigate } from 'react-router'
 import grid from '@/assets/meeting/grid-bg.svg'
 import { BottomNav } from '@/components/common/BottomNav'
 import { Button } from '@/components/ui/Button'
@@ -13,17 +13,33 @@ import { MeetingTimePicker } from '@/features/meeting/components/MeetingTimePick
 import { meetingDefinitions, meetingMeta } from '@/features/meeting/mock/data'
 import type { SituationId } from '@/features/meeting/types'
 import { useMeeting } from '@/features/meeting/useMeeting'
+import { startMeetingSummary } from '@/features/meeting/recordStore'
+import { useToast } from '@/hooks/useToast'
 import { useMeetingRecords } from '@/features/meeting/useMeetingRecords'
 import { useMeetingSwipe } from '@/features/meeting/useMeetingSwipe'
 export function MeetingPage({ onFinish }: { onFinish?: () => void }) {
   const mode = useHomeMode()
   const location = useLocation()
+  const navigate = useNavigate()
+  const toast = useToast()
   const meeting = useMeeting()
   const records = useMeetingRecords(mode === 'project-active')
   const swipe = useMeetingSwipe(meeting.moveType)
   const [helpOpen, setHelpOpen] = useState(false)
   const [situationId, setSituationId] = useState<SituationId>('consensus')
   if (mode !== 'project-active') return <Navigate to={`/home${location.search}`} replace />
+  function finish() {
+    if (onFinish) {
+      onFinish()
+      return
+    }
+    try {
+      const draft = startMeetingSummary(meeting.draft.type, meeting.draft.time)
+      navigate('/meeting/summary/' + draft.id + location.search)
+    } catch (error) {
+      toast(error instanceof Error ? error.message : '회의 정리를 시작하지 못했어요.')
+    }
+  }
   function openHelp(id: SituationId) {
     setSituationId(id)
     setHelpOpen(true)
@@ -74,12 +90,7 @@ export function MeetingPage({ onFinish }: { onFinish?: () => void }) {
         />
         <MeetingHelpSection onSelect={openHelp} />
         <div aria-hidden="true" className="h-2" />
-        <Button
-          onClick={onFinish}
-          disabled={!onFinish}
-          title={onFinish ? undefined : '회의 정리 기능 준비 중'}
-          className="shrink-0 leading-[22px] disabled:opacity-100"
-        >
+        <Button onClick={finish} className="shrink-0 leading-[22px] disabled:opacity-100">
           회의 마치고 정리하기
         </Button>
       </main>

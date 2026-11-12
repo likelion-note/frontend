@@ -39,7 +39,8 @@ export interface MeetingActionItem {
   id: string
   assignee: string
   task: string
-  dueDate: string
+  dueDate?: string
+  dueDay?: Weekday | null
 }
 
 export interface MeetingRecord {
@@ -47,6 +48,25 @@ export interface MeetingRecord {
   type: MeetingType
   title: string
   date: string
+  time?: string
+  createdAt?: string
+  updatedAt?: string
   decisions: string[]
   actionItems: MeetingActionItem[]
+}
+
+export type Weekday = '월' | '화' | '수' | '목' | '금' | '토' | '일'
+export interface SummaryActionItem {
+  id: string
+  assignee: string
+  task: string
+  dueDay: Weekday | null
+}
+export interface MeetingSummaryDraft {
+  id: string
+  type: MeetingType
+  date: string
+  time?: string
+  decisionsText: string
+  actionItems: SummaryActionItem[]
 }
