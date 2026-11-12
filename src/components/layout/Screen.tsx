@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { CSSProperties, ReactNode } from 'react'
 import { Outlet, useNavigate } from 'react-router'
 
 import { BackIcon } from '@/components/icons'
@@ -17,12 +17,15 @@ export function ScreenLayout() {
 export function ScreenContent({
   children,
   className,
+  style,
 }: {
   children: ReactNode
   className?: string
+  style?: CSSProperties
 }) {
   return (
     <main
+      style={style}
       className={cn(
         'no-scrollbar flex min-h-0 w-full flex-1 flex-col gap-3.5 overflow-y-auto overscroll-contain px-5 pt-3 pb-7 [&>*]:shrink-0',
         className,
@@ -38,10 +41,11 @@ type BackHeaderProps = {
   right?: ReactNode
   /** 뒤로 갈 곳. 없으면 브라우저 뒤로 가기 */
   backTo?: string
+  backIcon?: ReactNode
 }
 
 /** 뒤로 가기 + 제목 + 오른쪽 글자 */
-export function BackHeader({ title, right, backTo }: BackHeaderProps) {
+export function BackHeader({ title, right, backTo, backIcon }: BackHeaderProps) {
   const navigate = useNavigate()
   const goBack = () => {
     if (backTo) navigate(backTo)
@@ -51,7 +55,7 @@ export function BackHeader({ title, right, backTo }: BackHeaderProps) {
   return (
     <header className="border-header-line flex h-[52px] w-full shrink-0 items-center gap-1.5 border-b pr-5 pl-3">
       <button type="button" aria-label="뒤로" onClick={goBack} className="shrink-0">
-        <BackIcon />
+        {backIcon ?? <BackIcon />}
       </button>
       <h1 className="text-ink flex-1 text-[18px] leading-tight font-bold">
         <span className="marker-underline">{title}</span>

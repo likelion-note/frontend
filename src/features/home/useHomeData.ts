@@ -1,16 +1,13 @@
 import { useState } from 'react'
-import { useSearchParams } from 'react-router'
 
 import { homeMockData } from '@/features/home/mock/data'
-import { beforePartMockData, inactiveMockData, mockHomeState } from '@/features/home/mock/states'
-import { readPreviewState, resolveHomeMode } from '@/features/home/state'
+import { beforePartMockData, inactiveMockData } from '@/features/home/mock/states'
+import { useHomeMode } from '@/features/home/useHomeMode'
 
 /** API 연결 지점. 현재 변경 사항은 이 화면을 떠날 때 초기화되는 Mock 상태예요. */
 export function useHomeData() {
-  const [params] = useSearchParams()
   const [data, setData] = useState(() => structuredClone(homeMockData))
-  const state = import.meta.env.DEV ? readPreviewState(params, mockHomeState) : mockHomeState
-  const mode = resolveHomeMode(state)
+  const mode = useHomeMode()
 
   function toggleTodo(id: string) {
     setData((current) => ({
