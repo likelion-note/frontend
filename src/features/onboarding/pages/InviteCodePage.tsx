@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query'
 import { useEffect, useState } from 'react'
-import { Navigate, useLocation, useNavigate } from 'react-router'
+import { Navigate, useNavigate } from 'react-router'
 
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { Button } from '@/components/ui/Button'
@@ -14,8 +14,7 @@ const CODE_LENGTH = 6
 /** SCR-ONB-02 초대코드 입력 */
 export function InviteCodePage() {
   const navigate = useNavigate()
-  const location = useLocation() as { state?: { email?: string } }
-  const email = location.state?.email ?? getDraft()?.email
+  const [draft] = useState(getDraft)
   const [code, setCode] = useState('')
   const [error, setError] = useState<string | null>(null)
 
@@ -36,7 +35,8 @@ export function InviteCodePage() {
     if (next.length < CODE_LENGTH) verify.reset()
   }
 
-  if (!email) return <Navigate to="/onboarding" replace />
+  // 구글 로그인을 거치지 않고 들어오면 처음으로
+  if (!draft) return <Navigate to="/onboarding" replace />
 
   const result = verify.data
   const ready = Boolean(result) && code.length === CODE_LENGTH && !error
@@ -44,7 +44,7 @@ export function InviteCodePage() {
 
   const next = () => {
     if (!result) return
-    setDraft({ email, cohort: result.cohort, userType: result.userType, code })
+    setDraft({ ...draft, cohort: result.cohort, userType: result.userType, code })
     navigate('/onboarding/profile')
   }
 

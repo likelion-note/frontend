@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
+import { GOOGLE_CLIENT_ID, USE_MOCK } from '@/api/client'
 import appIcon from '@/assets/brand/app-icon.png'
 import logo from '@/assets/brand/logo.svg'
 import { GoogleIcon } from '@/components/icons'
@@ -10,8 +11,12 @@ import { Button } from '@/components/ui/Button'
 import { Illust } from '@/components/ui/Illust'
 import * as api from '@/features/onboarding/api'
 import { AccountSelectSheet } from '@/features/onboarding/components/AccountSelectSheet'
+import { GoogleSignInButton } from '@/features/onboarding/components/GoogleSignInButton'
 import { homePathFor, setDraft, setSession } from '@/features/onboarding/session'
 import { useToast } from '@/hooks/useToast'
+
+/** 실제 구글 로그인은 목이 아니고 클라이언트 ID 가 있을 때만 */
+const REAL_GOOGLE_LOGIN = !USE_MOCK && GOOGLE_CLIENT_ID.length > 0
 
 /** SCR-ONB-01 시작 · 구글 로그인 */
 export function StartPage() {
@@ -20,21 +25,16 @@ export function StartPage() {
   const [picking, setPicking] = useState(false)
 
   const login = useMutation({
-    mutationFn: (accountId: string) => api.loginWithGoogle(accountId),
+    mutationFn: (input: api.LoginInput) => api.loginWithGoogle(input),
     onSuccess: (result) => {
       setPicking(false)
-      if (result.isNew) {
-        setDraft(null)
-        navigate('/onboarding/code', { state: { email: result.email } })
+      if (result.status === 'NEED_SIGNUP') {
+        setDraft({ email: result.email, signupToken: result.signupToken })
+        navigate('/onboarding/code')
         return
       }
-      setSession({
-        name: result.name,
-        email: result.email,
-        cohort: result.cohort,
-        userType: result.userType,
-      })
-      navigate(homePathFor(result.userType), { replace: true })
+      setSession(result.session)
+      navigate(homePathFor(result.session.user.userType), { replace: true })
     },
     onError: (e: Error) => toast(e.message),
   })
@@ -65,26 +65,38 @@ export function StartPage() {
 
         <div className="flex-1" />
 
-        <Button
-          variant="ghost"
-          className="gap-2"
-          disabled={login.isPending}
-          onClick={() => setPicking(true)}
-        >
-          <GoogleIcon />
-          Google 계정으로 계속하기
-        </Button>
+        {REAL_GOOGLE_LOGIN ? (
+          <GoogleSignInButton
+            disabled={login.isPending}
+            onCredential={(idToken) => login.mutate({ idToken })}
+            onError={(message) => toast(message)}
+          />
+        ) : (
+          <Button
+            variant="ghost"
+            className="gap-2"
+            disabled={login.isPending}
+            onClick={() => setPicking(true)}
+          >
+            <GoogleIcon />
+            Google 계정으로 계속하기
+          </Button>
+        )}
         <p className="text-muted text-center text-[12px] leading-normal">
-          처음이면 운영진에게 받은 초대코드를 한 번 입력해요
+          {login.isPending
+            ? '로그인하고 있어요…'
+            : '처음이면 운영진에게 받은 초대코드를 한 번 입력해요'}
         </p>
       </ScreenContent>
 
-      <AccountSelectSheet
-        open={picking}
-        onClose={() => setPicking(false)}
-        onSelect={(account) => login.mutate(account.id)}
-        busy={login.isPending}
-      />
+      {!REAL_GOOGLE_LOGIN && (
+        <AccountSelectSheet
+          open={picking}
+          onClose={() => setPicking(false)}
+          onSelect={(account) => login.mutate({ mockAccountId: account.id })}
+          busy={login.isPending}
+        />
+      )}
     </>
   )
 }

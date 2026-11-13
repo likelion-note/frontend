@@ -9,7 +9,8 @@ const parts: AssignedPart[] = ['PM', 'DESIGN', 'FRONTEND', 'BACKEND']
 /** URL 미리보기는 개발용 Mock 표시에만 적용하고 원본 쿼리 캐시는 변경하지 않아요. */
 export function useMyAssignment() {
   const [params] = useSearchParams()
-  const userKey = getSession()?.email ?? 'mock-member'
+  const sessionUser = getSession()?.user
+  const userKey = sessionUser?.email ?? (sessionUser ? String(sessionUser.id) : 'mock-member')
   const query = useQuery({
     queryKey: ['my-assignment', userKey],
     queryFn: getMyAssignment,
