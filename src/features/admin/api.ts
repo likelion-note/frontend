@@ -13,6 +13,7 @@ import {
   type ScheduleEvent,
   type UserType,
 } from '@/features/admin/types'
+import { getSession, setSession } from '@/lib/authStorage'
 import { daysBetween } from '@/lib/date'
 import { delay } from '@/lib/delay'
 
@@ -26,8 +27,18 @@ const notFound = (what: string) => new Error(`${what}을(를) 찾을 수 없어�
 
 /* ---------- 공통 ---------- */
 
+/** 로그인한 사용자. 실제 로그인 세션이 있으면 그 정보, 없으면 목 운영진(하린) */
 export async function getMe(): Promise<AdminUser> {
   await delay(80)
+  const session = getSession()
+  if (session) {
+    return {
+      id: String(session.user.id),
+      name: session.user.name,
+      email: session.user.email ?? '',
+      cohort: session.user.cohort,
+    }
+  }
   return clone(store.me)
 }
 
@@ -40,6 +51,16 @@ export async function updateMe(input: { name: string }): Promise<AdminUser> {
   store.me.name = name
   const mine = store.members.find((m) => m.id === store.me.id)
   if (mine) mine.name = name
+  const session = getSession()
+  if (session) {
+    setSession({ ...session, user: { ...session.user, name } })
+    return {
+      id: String(session.user.id),
+      name,
+      email: session.user.email ?? '',
+      cohort: session.user.cohort,
+    }
+  }
   return clone(store.me)
 }
 
