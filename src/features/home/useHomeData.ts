@@ -1,3 +1,6 @@
+import { PART_LABEL } from '@/features/admin/types'
+import { useMyAssignment } from '@/features/assignment/useMyAssignment'
+import type { HomeUser } from '@/features/home/types'
 import { useState } from 'react'
 import { useLocation } from 'react-router'
 
@@ -13,6 +16,17 @@ import { useToast } from '@/hooks/useToast'
 export function useHomeData() {
   const [data, setData] = useState(() => structuredClone(homeMockData))
   const mode = useHomeMode()
+  const assignment = useMyAssignment()
+  const assigned = assignment.data?.assignmentStatus === 'ASSIGNED' ? assignment.data : null
+  const user: HomeUser = {
+    initial: data.user.initial,
+    cohortLabel: assignment.data
+      ? `${assignment.data.cohort}기 ${assignment.data.userType === 'ADMIN' ? '운영진' : '아기사자'}`
+      : '',
+    part: assigned ? PART_LABEL[assigned.part] : null,
+    team: assigned ? assigned.teamName : null,
+    assignmentLabel: '파트 배정 전',
+  }
   const context = useGuideContext()
   const location = useLocation()
   const toast = useToast()
@@ -46,8 +60,8 @@ export function useHomeData() {
     mode,
     data: {
       ...data,
-      mode,
-      user: { ...data.user, part: context.partLabel },
+      mode: mode ?? data.mode,
+      user,
       todosAction: { ...data.todosAction, to: `/guide${search}` },
       todos: completion.tasks.map((task) => ({
         ...task,
@@ -62,8 +76,8 @@ export function useHomeData() {
           : undefined,
       })),
     },
-    beforePartData: beforePartMockData,
-    inactiveData: inactiveMockData,
+    beforePartData: { ...beforePartMockData, user },
+    inactiveData: { ...inactiveMockData, user },
     toggleTodo,
     toggleHelpful,
   }

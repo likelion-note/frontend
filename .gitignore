@@ -10,6 +10,8 @@ dist-ssr
 .env
 .env.*
 !.env.example
+# Public development fixture selector (no credentials).
+!.env.development
 
 # logs
 logs

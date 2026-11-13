@@ -31,7 +31,7 @@ export interface ArchiveNote {
 
 export interface HomeData {
   mode: HomeMode
-  user: { initial: string; cohortLabel: string; part: string; team: string }
+  user: HomeUser
   project: {
     dateLabel: string
     week: number
