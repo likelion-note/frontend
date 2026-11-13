@@ -1,7 +1,13 @@
 import { EVENT_TYPE_LABEL, PART_LABEL } from '@/features/admin/types'
 import type { AssignedPart } from '@/features/assignment/types'
 import { phaseLabel } from '@/features/note/noteFilters'
-import type { JournalEventType, JournalPhase, MyJournal, MyProject } from '@/features/journal/types'
+import type {
+  JournalEventType,
+  JournalPhase,
+  MyJournal,
+  MyProject,
+  PortfolioFormat,
+} from '@/features/journal/types'
 import { formatMonthDay } from '@/lib/date'
 
 export const journalEventTypes: JournalEventType[] = [
@@ -75,3 +81,10 @@ export function anonymousLabel(journal: MyJournal) {
       : null
   return [who, journal.part && partLabel(journal.part), when].filter(Boolean).join(' · ')
 }
+
+export const portfolioFormats: { value: PortfolioFormat; label: string }[] = [
+  { value: 'resume', label: '이력서용 3줄' },
+  { value: 'paragraph', label: '경험 기술 문단' },
+]
+export const formatLabel = (format: PortfolioFormat) =>
+  portfolioFormats.find((item) => item.value === format)?.label ?? ''
