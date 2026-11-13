@@ -1,8 +1,8 @@
 import type { HomeData } from '@/features/home/types'
 
-export const homeMockData: HomeData = {
+export const homeMockData: Omit<HomeData, 'user'> & { user: { initial: string } } = {
   mode: 'project-active',
-  user: { initial: '데', cohortLabel: '14기 아기사자', part: 'PM', team: '멋사수첩팀' },
+  user: { initial: '데' },
   project: {
     dateLabel: '10월 27일 화요일',
     week: 2,
