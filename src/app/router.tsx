@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router'
 
 import { adminRoutes } from '@/features/admin/routes'
 import { homeRoutes } from '@/features/home/routes'
+import { guideRoutes } from '@/features/guide/routes'
 import { meetingRoutes } from '@/features/meeting/routes'
 import { onboardingRoutes } from '@/features/onboarding/routes'
 import { MobileLayout } from '@/layouts/MobileLayout'
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
       ...onboardingRoutes,
       ...adminRoutes,
       ...homeRoutes,
+      ...guideRoutes,
       ...meetingRoutes,
       { path: '*', element: <NotFoundPage /> },
     ],

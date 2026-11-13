@@ -2,8 +2,10 @@ import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { CloseIcon } from '@/components/icons'
 import { Illust, type IllustName } from '@/components/ui/Illust'
+import { useBottomSheetDrag, type SheetDragOptions } from '@/hooks/useBottomSheetDrag'
 import { cn } from '@/lib/cn'
 import { getFrameElement } from '@/lib/frame'
+
 type Props = {
   open: boolean
   onClose: () => void
@@ -18,9 +20,14 @@ type Props = {
   titleClassName?: string
   handleClassName?: string
   overlayClassName?: string
-  /** 새 화면에서 닫힘 애니메이션, 포커스/스크롤 잠금, 드래그 닫기를 활성화해요. */
   motion?: boolean
+  /** 기존 화면은 기본 애니메이션을 유지하고 필요한 화면만 전체 높이 슬라이드를 사용해요. */
+  slideFromBottom?: boolean
+  slideDistance?: number
+  animationDuration?: number
+  dragOptions?: SheetDragOptions
 }
+
 export function BottomSheet({
   open,
   onClose,
@@ -36,35 +43,60 @@ export function BottomSheet({
   handleClassName,
   overlayClassName,
   motion = false,
+  slideFromBottom = false,
+  slideDistance,
+  animationDuration = 200,
+  dragOptions,
 }: Props) {
   const [mounted, setMounted] = useState(open)
   const [exiting, setExiting] = useState(false)
-  const [dragY, setDragY] = useState(0)
+  const [entered, setEntered] = useState(!slideFromBottom)
   const dialogRef = useRef<HTMLDivElement>(null)
   const portalRef = useRef<HTMLDivElement>(null)
-  const dragStart = useRef<number | null>(null)
   const onCloseRef = useRef(onClose)
   useEffect(() => {
     onCloseRef.current = onClose
   }, [onClose])
   const visible = motion ? open || mounted : open
+  const duration =
+    slideFromBottom && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      ? 0
+      : animationDuration
+  const { reset: resetDrag, ...drag } = useBottomSheetDrag({
+    enabled: motion && visible,
+    dialogRef,
+    onClose: () => onCloseRef.current(),
+    options: dragOptions,
+  })
+
   useEffect(() => {
     if (!motion) return
     if (open) {
       setMounted(true)
       setExiting(false)
-      setDragY(0)
-      return
+      resetDrag()
+      if (!slideFromBottom) return
+      setEntered(false)
+      let secondFrame = 0
+      const firstFrame = requestAnimationFrame(() => {
+        secondFrame = requestAnimationFrame(() => setEntered(true))
+      })
+      return () => {
+        cancelAnimationFrame(firstFrame)
+        cancelAnimationFrame(secondFrame)
+      }
     }
     if (!mounted) return
     setExiting(true)
     const timeout = window.setTimeout(() => {
       setMounted(false)
       setExiting(false)
-      setDragY(0)
-    }, 200)
+      setEntered(false)
+      resetDrag()
+    }, duration)
     return () => window.clearTimeout(timeout)
-  }, [open, mounted, motion])
+  }, [open, mounted, motion, slideFromBottom, duration, resetDrag])
+
   useEffect(() => {
     if (!visible) return
     const previousFocus = document.activeElement as HTMLElement | null
@@ -84,7 +116,9 @@ export function BottomSheet({
     scrolling.forEach((element) => {
       element.style.overflowY = 'hidden'
     })
-    const focusTimer = motion ? window.setTimeout(() => dialogRef.current?.focus(), 0) : undefined
+    const focusTimer = motion
+      ? window.setTimeout(() => dialogRef.current?.focus({ preventScroll: true }), 0)
+      : undefined
     const onKey = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         event.preventDefault()
@@ -96,23 +130,20 @@ export function BottomSheet({
       )
       if (!focusable?.length) {
         event.preventDefault()
-        dialogRef.current?.focus()
+        dialogRef.current?.focus({ preventScroll: true })
         return
       }
       const first = focusable[0],
         last = focusable[focusable.length - 1]
-      if (
-        event.shiftKey &&
-        (document.activeElement === first || document.activeElement === dialogRef.current)
-      ) {
+      const outside =
+        !dialogRef.current?.contains(document.activeElement) ||
+        document.activeElement === dialogRef.current
+      if (event.shiftKey && (document.activeElement === first || outside)) {
         event.preventDefault()
-        last.focus()
-      } else if (
-        !event.shiftKey &&
-        (document.activeElement === last || document.activeElement === dialogRef.current)
-      ) {
+        last.focus({ preventScroll: true })
+      } else if (!event.shiftKey && (document.activeElement === last || outside)) {
         event.preventDefault()
-        first.focus()
+        first.focus({ preventScroll: true })
       }
     }
     document.addEventListener('keydown', onKey)
@@ -128,6 +159,11 @@ export function BottomSheet({
       if (motion && previousFocus?.isConnected) previousFocus.focus({ preventScroll: true })
     }
   }, [visible, motion])
+  // 자료 목록에서 미리보기로 전환하는 등 내용이 바뀌어도 최초 트리거는 그대로 기억해요.
+  useEffect(() => {
+    if (visible && motion) dialogRef.current?.focus({ preventScroll: true })
+  }, [title, visible, motion])
+
   if (!visible) return null
   return createPortal(
     <div ref={portalRef} className="absolute inset-0 z-50">
@@ -137,10 +173,14 @@ export function BottomSheet({
           aria-label="바깥 영역을 눌러 닫기"
           onClick={onClose}
           className={cn(
-            'animate-fade-in bg-dim absolute inset-0 cursor-default transition-opacity duration-200',
+            'bg-dim absolute inset-0 cursor-default transition-opacity',
+            !slideFromBottom && 'animate-fade-in',
             overlayClassName,
           )}
-          style={exiting ? { opacity: 0 } : undefined}
+          style={{
+            transitionDuration: `${duration}ms`,
+            opacity: slideFromBottom ? (entered && !exiting ? 1 : 0) : exiting ? 0 : undefined,
+          }}
         />
         <div
           ref={dialogRef}
@@ -148,67 +188,60 @@ export function BottomSheet({
           aria-modal="true"
           aria-label={title}
           tabIndex={-1}
+          onPointerDown={(event) => drag.startPointer(event)}
+          onPointerMove={(event) => drag.movePointer(event)}
+          onPointerUp={(event) => drag.endPointer(event)}
+          onPointerCancel={drag.cancelPointer}
           className={cn(
             'bg-paper no-scrollbar absolute inset-x-0 bottom-0 flex max-h-[92%] flex-col gap-3.5 overflow-y-auto overscroll-contain rounded-t-3xl px-5 pt-3 pb-[34px] outline-none',
             motion && '[&>*]:shrink-0',
-            !exiting && 'animate-sheet-up',
+            !exiting && !slideFromBottom && 'animate-sheet-up',
             className,
           )}
           style={
             motion
               ? {
-                  transform: `translateY(${exiting ? '100%' : `${dragY}px`})`,
-                  opacity: exiting ? 0 : 1,
-                  transition: 'transform 200ms ease, opacity 200ms ease',
+                  transform: `translateY(${exiting || (slideFromBottom && !entered) ? (slideDistance === undefined ? '100%' : `${Math.max(slideDistance, drag.offset)}px`) : `${drag.offset}px`})`,
+                  opacity: exiting || (slideFromBottom && !entered) ? 0 : 1,
+                  transition: drag.dragging
+                    ? 'none'
+                    : `transform ${duration}ms ease, opacity ${duration}ms ease`,
+                  userSelect: drag.dragging ? 'none' : undefined,
                 }
               : undefined
           }
         >
           <div
-            className="flex w-full touch-none justify-center"
-            onPointerDown={
-              motion
-                ? (event) => {
-                    dragStart.current = event.clientY
-                    event.currentTarget.setPointerCapture(event.pointerId)
-                  }
-                : undefined
-            }
-            onPointerMove={
-              motion
-                ? (event) => {
-                    if (dragStart.current !== null)
-                      setDragY(Math.max(0, event.clientY - dragStart.current))
-                  }
-                : undefined
-            }
-            onPointerUp={
-              motion
-                ? () => {
-                    if (dragY > 70) onClose()
-                    else setDragY(0)
-                    dragStart.current = null
-                  }
-                : undefined
-            }
-            onPointerCancel={() => {
-              dragStart.current = null
-              setDragY(0)
-            }}
+            data-sheet-handle
+            className={cn(
+              'relative flex w-full touch-none justify-center',
+              motion && 'before:absolute before:inset-x-0 before:-inset-y-2',
+            )}
+            onPointerDown={(event) => drag.startPointer(event, true)}
+            onPointerMove={(event) => drag.movePointer(event, true)}
+            onPointerUp={(event) => drag.endPointer(event, true)}
+            onPointerCancel={drag.cancelPointer}
           >
             <div className={cn('bg-handle h-1 w-10 rounded-sm', handleClassName)} />
           </div>
           <div className="flex w-full items-center gap-2">
             {headerIcon ?? (illust && <Illust name={illust} size={illustSize} />)}
-            <h2 className={cn('text-ink text-[20px] leading-tight font-bold', titleClassName)}>
+            <h2
+              className={cn(
+                'text-ink min-w-0 flex-1 text-[20px] leading-tight font-bold [overflow-wrap:anywhere]',
+                titleClassName,
+              )}
+            >
               {title}
             </h2>
-            <div className="flex-1" />
             <button
               type="button"
               aria-label="닫기"
               onClick={onClose}
-              className={cn('shrink-0', !closeIcon && 'p-0.5')}
+              className={cn(
+                'relative shrink-0 before:absolute before:-inset-2',
+                !closeIcon && 'p-0.5',
+              )}
             >
               {closeIcon ?? <CloseIcon size={22} />}
             </button>
