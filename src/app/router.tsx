@@ -4,6 +4,7 @@ import { AssignmentBoundary } from '@/features/assignment/AssignmentBoundary'
 import { adminRoutes } from '@/features/admin/routes'
 import { homeRoutes } from '@/features/home/routes'
 import { guideRoutes } from '@/features/guide/routes'
+import { journalRoutes } from '@/features/journal/routes'
 import { meetingRoutes } from '@/features/meeting/routes'
 import { noteRoutes } from '@/features/note/routes'
 import { onboardingRoutes } from '@/features/onboarding/routes'
@@ -29,6 +30,8 @@ export const router = createBrowserRouter([
       },
       // 노트는 배정 정보가 없어도 열리고 운영진도 같이 써서 AssignmentBoundary 밖에 둬요.
       ...noteRoutes,
+      // 내 기록도 운영진 탭바가 같이 쓰고, 배정 정보는 화면 안에서 기본값으로만 써요.
+      ...journalRoutes,
       { path: '*', element: <NotFoundPage /> },
     ],
   },

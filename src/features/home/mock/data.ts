@@ -13,7 +13,7 @@ export const homeMockData: Omit<HomeData, 'user'> & { user: { initial: string } 
   returnedJournal: {
     count: 1,
     description: '운영진이 남긴 한 줄을 보고 다시 내 주세요',
-    action: { label: '고치기 ›' },
+    action: { label: '고치기 ›', to: '/me/journal/journal-long-meeting' },
   },
   todos: [
     { id: 'availability', title: '팀원 가능 시간 모으기', isCompleted: true, dueLabel: '월' },
@@ -41,7 +41,7 @@ export const homeMockData: Omit<HomeData, 'user'> & { user: { initial: string } 
     helpfulCount: 24,
     isHelpful: false,
   },
-  journalAction: { label: '이번 주 성장일지 쓰기' },
+  journalAction: { label: '이번 주 성장일지 쓰기', to: '/me/journal/new?import=week' },
   noteStats: { cohort: 14, readCount: 23, helpfulCount: 10, publicCount: 2 },
   archiveAction: { label: '더 보기', to: '/notes?cohort=past' },
   archiveNotes: [

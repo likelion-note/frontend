@@ -120,7 +120,7 @@ export function MeetingSummaryCompletePage({ onJournal }: { onJournal?: () => vo
                 홈으로
               </Button>
               <Button
-                onClick={onJournal ?? (() => toast('성장일지 기능은 추후 제공될 예정입니다.'))}
+                onClick={onJournal ?? (() => navigate('/me/journal/new?import=week'))}
                 className="min-w-0 flex-1 leading-[22px]"
               >
                 성장일지 쓰기
