@@ -1,7 +1,11 @@
 import type { RouteObject } from 'react-router'
-import { MeetingPage } from '@/features/meeting/pages/MeetingPage'
 export const meetingRoutes: RouteObject[] = [
-  { path: 'meeting', element: <MeetingPage /> },
+  {
+    path: 'meeting',
+    lazy: async () => ({
+      Component: (await import('@/features/meeting/pages/MeetingPage')).MeetingPage,
+    }),
+  },
   {
     path: 'meeting/history',
     lazy: async () => ({

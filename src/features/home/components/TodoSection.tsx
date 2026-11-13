@@ -1,9 +1,9 @@
+import { TaskChecklist } from '@/components/common/TaskChecklist'
 import ring from '@/assets/home/progress-ring.svg'
 import halfRing from '@/assets/home/progress-half.svg'
 import { Card } from '@/components/ui/Card'
 import { HomeAction } from '@/features/home/components/HomeAction'
 import type { HomeAction as Action, Todo } from '@/features/home/types'
-import { cn } from '@/lib/cn'
 
 export function TodoSection({
   todos,
@@ -53,45 +53,19 @@ export function TodoSection({
           className="text-muted shrink-0 text-[13px] leading-[16px] font-medium"
         />
       </div>
-      <ul className="flex flex-col gap-0.5">
-        {todos.map((todo) => (
-          <li key={todo.id} className="flex items-start gap-3 py-[9px]">
-            <input
-              id={`home-todo-${todo.id}`}
-              type="checkbox"
-              checked={todo.isCompleted}
-              onChange={() => onToggle(todo.id)}
-              aria-label={todo.title}
-              className="checked:bg-accent checked:border-accent focus-visible:outline-accent size-[22px] shrink-0 cursor-pointer appearance-none rounded-lg border-[1.6px] border-[#dcc9b2] bg-white leading-[14px] checked:after:block checked:after:text-center checked:after:text-[12px] checked:after:leading-[19px] checked:after:text-white checked:after:content-['✓'] focus-visible:outline-2"
+      <TaskChecklist
+        tasks={todos}
+        idPrefix="home-todo"
+        onToggle={onToggle}
+        renderAction={(todo) =>
+          todo.action && (
+            <HomeAction
+              action={todo.action}
+              className="text-accent-deep mt-[3px] block text-left text-[12px] leading-[14px] font-bold"
             />
-            <div className="min-w-0 flex-1">
-              <label
-                htmlFor={`home-todo-${todo.id}`}
-                className={cn(
-                  'block text-[15px] leading-[18px] font-medium',
-                  todo.isCompleted ? 'text-muted line-through' : 'text-ink',
-                )}
-              >
-                {todo.title}
-              </label>
-              {todo.action && (
-                <HomeAction
-                  action={todo.action}
-                  className="text-accent-deep mt-[3px] block text-left text-[12px] leading-[14px] font-bold"
-                />
-              )}
-            </div>
-            <span
-              className={cn(
-                'shrink-0 text-[12px] leading-[14px] font-bold',
-                todo.isDueToday ? 'text-accent-deep' : 'text-muted',
-              )}
-            >
-              {todo.dueLabel}
-            </span>
-          </li>
-        ))}
-      </ul>
+          )
+        }
+      />
     </Card>
   )
 }

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router'
 import { initialMeetingDraft, meetingDefinitions } from '@/features/meeting/mock/data'
 import type { MeetingDraft, MeetingType } from '@/features/meeting/types'
 const storageKey = 'likelion-meeting-draft:v1'
@@ -24,7 +25,24 @@ function loadDraft(): MeetingDraft {
   return fallback
 }
 export function useMeeting() {
-  const [draft, setDraft] = useState(loadDraft)
+  const [params, setParams] = useSearchParams()
+  const preset = meetingDefinitions.find((meeting) => meeting.id === params.get('meetingType'))?.id
+  const [draft, setDraft] = useState(() => ({
+    ...loadDraft(),
+    ...(preset ? { type: preset } : {}),
+  }))
+  useEffect(() => {
+    if (!preset) return
+    setDraft((current) => ({ ...current, type: preset }))
+    setParams(
+      (current) => {
+        const next = new URLSearchParams(current)
+        next.delete('meetingType')
+        return next
+      },
+      { replace: true },
+    )
+  }, [preset, setParams])
   useEffect(() => {
     try {
       sessionStorage.setItem(storageKey, JSON.stringify(draft))
