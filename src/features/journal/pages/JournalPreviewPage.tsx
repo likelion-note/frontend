@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router'
 
 import grid from '@/assets/journal/grid-bg.svg'
@@ -27,6 +27,8 @@ export function JournalPreviewPage() {
   const [answer, setAnswer] = useState('')
   const [skipped, setSkipped] = useState(false)
   const [busy, setBusy] = useState(false)
+  // 검토 요청 직후에는 내 기록으로 가는 중이라 '이미 낸 일지면 상세로'를 건너뛰어요.
+  const submitted = useRef(false)
 
   if (query.isPending) {
     return (
@@ -51,7 +53,7 @@ export function JournalPreviewPage() {
     )
   }
   if (!journal.organized) return <Navigate to={`/me/journal/${id}/organizing`} replace />
-  if (journal.status === 'PENDING' || journal.status === 'APPROVED') {
+  if (!submitted.current && (journal.status === 'PENDING' || journal.status === 'APPROVED')) {
     return <Navigate to={`/me/journal/${id}`} replace />
   }
   const organized = journal.organized
@@ -219,6 +221,7 @@ export function JournalPreviewPage() {
                 () => submitJournal(id),
                 () => {
                   toast('검토를 요청했어요. 결과는 내 기록에서 볼 수 있어요.')
+                  submitted.current = true
                   navigate('/me', { replace: true })
                 },
               )

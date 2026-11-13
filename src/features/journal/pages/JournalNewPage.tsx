@@ -19,8 +19,8 @@ export function JournalNewPage() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    // 개발 모드에서 효과가 두 번 돌아도 일지는 하나만 만들어요.
-    if (started.current) return
+    // 배정 정보(내 파트)를 불러온 뒤에 만들어요. 개발 모드에서 효과가 두 번 돌아도 하나만 만들어요.
+    if (!context.ready || started.current) return
     started.current = true
     createJournalDraft({
       cohort: context.cohort,
@@ -34,7 +34,7 @@ export function JournalNewPage() {
       .catch((reason: unknown) =>
         setError(reason instanceof Error ? reason.message : '새 일지를 만들지 못했어요.'),
       )
-  }, [cache, context.cohort, context.part, location.search, navigate])
+  }, [cache, context.ready, context.cohort, context.part, location.search, navigate])
 
   return (
     <ScreenContent>

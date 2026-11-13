@@ -69,7 +69,10 @@ function excerptAround(text: string, token = '[') {
   const index = text.indexOf(token)
   if (index < 0) return null
   if (text.length <= 48) return text
-  const start = Math.max(0, index - 24)
+  // 단어 중간에서 자르지 않도록 24자 앞쪽의 다음 띄어쓰기부터 보여줘요.
+  const rough = Math.max(0, index - 24)
+  const space = rough > 0 ? text.indexOf(' ', rough) : 0
+  const start = space >= 0 && space < index ? space : rough
   return `${start > 0 ? '…' : ''}${text.slice(start).trim()}`
 }
 

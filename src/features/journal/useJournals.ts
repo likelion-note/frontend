@@ -50,6 +50,8 @@ export function useJournalContext() {
   const assignment = useMyAssignment()
   const data = assignment.data
   return {
+    /** 배정 정보를 다 불러왔는지(실패 포함). 새 일지는 이걸 기다렸다 기본값을 채워요. */
+    ready: !assignment.isPending,
     cohort: data?.cohort ?? currentCohort,
     part: data?.assignmentStatus === 'ASSIGNED' ? data.part : null,
     teamName: data?.teamName ?? null,
