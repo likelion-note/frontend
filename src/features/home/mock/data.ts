@@ -43,7 +43,7 @@ export const homeMockData: Omit<HomeData, 'user'> & { user: { initial: string } 
   },
   journalAction: { label: '이번 주 성장일지 쓰기' },
   noteStats: { cohort: 14, readCount: 23, helpfulCount: 10, publicCount: 2 },
-  archiveAction: { label: '더 보기' },
+  archiveAction: { label: '더 보기', to: '/notes?cohort=past' },
   archiveNotes: [
     {
       id: 'changed-topic',
@@ -55,6 +55,7 @@ export const homeMockData: Omit<HomeData, 'user'> & { user: { initial: string } 
       readCount: 41,
       helpfulCount: 17,
       tag: '#주제 변경',
+      to: '/notes/changed-topic',
     },
     {
       id: 'meeting-rules',
@@ -65,6 +66,7 @@ export const homeMockData: Omit<HomeData, 'user'> & { user: { initial: string } 
       readCount: 33,
       helpfulCount: 21,
       tag: '#회의 진행',
+      to: '/notes/meeting-rules',
     },
   ],
 }

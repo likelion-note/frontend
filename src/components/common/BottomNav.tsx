@@ -6,6 +6,7 @@ import activeMeetIcon from '@/assets/meeting/nav-meet.svg'
 import meetIcon from '@/assets/home/nav-meet.svg'
 import notesIcon from '@/assets/home/nav-notes.svg'
 import recordIcon from '@/assets/home/nav-record.svg'
+import activeNotesIcon from '@/assets/note/nav-notes-active.svg'
 import { cn } from '@/lib/cn'
 
 export interface BottomNavItem {
@@ -20,7 +21,7 @@ export interface BottomNavItem {
 const memberNavItems: readonly BottomNavItem[] = [
   { id: 'home', label: '홈', icon: homeIcon, activeIcon: activeHomeIcon, to: '/home' },
   { id: 'meet', label: '회의', icon: meetIcon, activeIcon: activeMeetIcon, to: '/meeting' },
-  { id: 'notes', label: '노트', icon: notesIcon },
+  { id: 'notes', label: '노트', icon: notesIcon, activeIcon: activeNotesIcon, to: '/notes' },
   { id: 'record', label: '내 기록', icon: recordIcon },
 ]
 
