@@ -42,13 +42,15 @@ type BackHeaderProps = {
   /** 뒤로 갈 곳. 없으면 브라우저 뒤로 가기 */
   backTo?: string
   backIcon?: ReactNode
+  /** backTo로 갈 때 View Transition을 써요 (노트 상세 → 게시판 접힘 효과) */
+  viewTransition?: boolean
 }
 
 /** 뒤로 가기 + 제목 + 오른쪽 글자 */
-export function BackHeader({ title, right, backTo, backIcon }: BackHeaderProps) {
+export function BackHeader({ title, right, backTo, backIcon, viewTransition }: BackHeaderProps) {
   const navigate = useNavigate()
   const goBack = () => {
-    if (backTo) navigate(backTo)
+    if (backTo) navigate(backTo, { viewTransition })
     else if (window.history.length > 1) navigate(-1)
     else navigate('/')
   }

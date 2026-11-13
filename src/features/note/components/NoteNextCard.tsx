@@ -9,7 +9,7 @@ export function NoteNextCard({ note, search }: { note: Note; search: string }) {
     <Link
       to={{ pathname: `/notes/${note.id}`, search }}
       viewTransition
-      className="focus-visible:outline-accent flex w-full items-center gap-2.5 rounded-[6px] border border-[#efdfc6] bg-white/75 px-[18px] py-3.5 focus-visible:outline-2"
+      className="focus-visible:outline-accent flex w-full items-center gap-2.5 rounded-[6px] border border-[#efdfc6] bg-white/75 px-[18px] py-3.5 text-[#5a3e2b] focus-visible:outline-2"
     >
       <span className="flex min-w-0 flex-1 flex-col gap-0.5 font-bold">
         <span className="text-[11px] leading-[16px] text-[#a08568]">다음 장 · 비슷한 노트</span>

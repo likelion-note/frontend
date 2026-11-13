@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router'
 
 import boardGrid from '@/assets/note/board-grid.svg'
@@ -22,7 +22,6 @@ import { filterNotes, readFilters, sortLabels, writeFilters } from '@/features/n
 import type { NoteFilters, NoteSort } from '@/features/note/types'
 import { useNoteState } from '@/features/note/useNoteState'
 import { useNotes } from '@/features/note/useNotes'
-import { cn } from '@/lib/cn'
 
 import '@/features/note/note.css'
 
@@ -56,7 +55,6 @@ export function NoteBoardPage() {
   const [query, setQuery] = useState(filters.query)
   const notes = useNotes()
   const noteState = useNoteState()
-  const stuck = useStuck()
 
   function update(patch: Partial<NoteFilters>) {
     const next = { ...filters, query, ...patch }
@@ -70,18 +68,17 @@ export function NoteBoardPage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
+      {/* 탭 화면 헤더. 회의 도우미와 같은 모양이고, 아래 본문만 스크롤돼요. */}
+      <header className="border-header-line bg-paper flex h-[52px] shrink-0 items-center gap-1.5 border-b px-5">
+        <h1 className="min-w-0 flex-1 text-[24px] leading-[29px] font-bold">
+          <span className="marker-underline-lg">노트 게시판</span>
+        </h1>
+        <NoteIllustration name={searching ? 'search' : 'grad'} size={48} className="-mr-1" />
+      </header>
       <ScreenContent
-        className="bg-paper relative [background-size:390px_auto] [background-position:top_center] [background-repeat:repeat-y] pt-2"
+        className="bg-paper [background-size:390px_auto] [background-position:top_center] [background-repeat:repeat-y] pt-2"
         style={{ backgroundImage: `url(${empty ? emptyGrid : boardGrid})` }}
       >
-        <div className="relative flex items-center">
-          <h1 className="text-[24px] leading-[29px] font-bold">노트 게시판</h1>
-          <NoteIllustration
-            name={searching ? 'search' : 'grad'}
-            size={56}
-            className="absolute -top-2 -right-1"
-          />
-        </div>
         {!searching && (
           <div className="flex">
             <img src={headHandwriting} width={115} height={30} alt="선배들이 남긴 한 줄" />
@@ -89,14 +86,7 @@ export function NoteBoardPage() {
         )}
         <NoteSearchBar value={query} onChange={(value) => update({ query: value })} />
 
-        <div ref={stuck.sentinel} aria-hidden="true" className="-mb-3.5 h-0" />
-        {/* 붙었을 때 바탕이 칩 위아래로 조금 남도록 여백을 두고, 같은 만큼 바깥 여백을 당겨 둬요. */}
-        <div
-          className={cn(
-            'sticky -top-2 z-10 -mx-5 -my-2.5 flex flex-col gap-2 px-5 py-2.5 transition-[background-color,box-shadow] duration-200',
-            stuck.value && 'bg-paper/95 shadow-[0_6px_10px_-8px_rgba(115,77,38,0.25)]',
-          )}
-        >
+        <div className="flex flex-col gap-2">
           <NoteFilterRow
             label="기수"
             options={cohortOptions}
@@ -199,20 +189,4 @@ export function NoteBoardPage() {
       <BottomNav />
     </div>
   )
-}
-
-/** 필터 묶음이 위에 붙었는지. 붙었을 때만 바탕을 깔아서 평소에는 모눈이 그대로 보여요. */
-function useStuck() {
-  const sentinel = useRef<HTMLDivElement>(null)
-  const [value, setValue] = useState(false)
-  useEffect(() => {
-    const node = sentinel.current
-    if (!node) return
-    const observer = new IntersectionObserver(([entry]) => setValue(!entry.isIntersecting), {
-      root: node.closest('main'),
-    })
-    observer.observe(node)
-    return () => observer.disconnect()
-  }, [])
-  return { sentinel, value }
 }

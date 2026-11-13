@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
-import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router'
+import { Link, useLocation, useParams, useSearchParams } from 'react-router'
 
-import backIcon from '@/assets/note/back.svg'
+import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { NoteBookmarkIcon } from '@/features/note/components/NoteBookmarkIcon'
 import { NoteDiaryPaper } from '@/features/note/components/NoteDiaryPaper'
 import { NoteNextCard } from '@/features/note/components/NoteNextCard'
@@ -15,12 +15,11 @@ import '@/features/note/note.css'
 /**
  * 노트 상세 · 다이어리. 게시판의 필터를 쿼리로 이어받아서
  * 'n / 전체'와 다음 장을 게시판에서 보던 순서대로 보여줘요.
- * 피그마처럼 BottomNav는 없어요.
+ * 헤더와 본문은 다른 상세 화면과 같은 공통 BackHeader · ScreenContent를 쓰고, BottomNav는 없어요.
  */
 export function NoteDetailPage() {
   const { id = '' } = useParams()
   const location = useLocation()
-  const navigate = useNavigate()
   const [params] = useSearchParams()
   const toast = useToast()
   const note = useNote(id)
@@ -56,46 +55,43 @@ export function NoteDetailPage() {
   }
 
   return (
-    <div className="flex h-full min-h-0 flex-col text-[#5a3e2b]">
-      {/* 책상 색이 상태바 자리까지 깔리도록 폰 프레임(#mobile-frame) 전체를 덮어요. */}
-      <div aria-hidden="true" className="absolute inset-0 bg-[#f5ebda]" />
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="bg-paper shrink-0">
+        <BackHeader
+          title="선배 노트"
+          backTo={`/notes${location.search}`}
+          viewTransition
+          right={
+            <div className="flex items-center gap-2">
+              {index >= 0 && (
+                <p>
+                  <span className="sr-only">전체 {list.length}개 중 </span>
+                  {index + 1} / {list.length}
+                </p>
+              )}
+              {found && (
+                <button
+                  type="button"
+                  aria-label="노트 저장"
+                  aria-pressed={saved}
+                  onClick={() => toggle('saved')}
+                  className="text-ink focus-visible:outline-accent shrink-0 rounded focus-visible:outline-2"
+                >
+                  <NoteBookmarkIcon filled={saved} />
+                </button>
+              )}
+            </div>
+          }
+        />
+      </div>
 
-      <header className="relative flex h-12 shrink-0 items-center gap-1.5 pr-[18px] pl-3">
-        <button
-          type="button"
-          aria-label="노트 게시판으로"
-          onClick={() => navigate(backTo, { viewTransition: true })}
-          className="focus-visible:outline-accent shrink-0 rounded focus-visible:outline-2"
-        >
-          <img src={backIcon} width={24} height={24} alt="" />
-        </button>
-        <p className="min-w-0 flex-1 text-[16px] leading-[23px] font-bold">선배 노트</p>
-        {index >= 0 && (
-          <p className="shrink-0 text-[12px] leading-[17px] font-medium text-[#a08568]">
-            <span className="sr-only">전체 {list.length}개 중 </span>
-            {index + 1} / {list.length}
-          </p>
-        )}
-        {found && (
-          <button
-            type="button"
-            aria-label="노트 저장"
-            aria-pressed={saved}
-            onClick={() => toggle('saved')}
-            className="focus-visible:outline-accent shrink-0 rounded focus-visible:outline-2"
-          >
-            <NoteBookmarkIcon filled={saved} />
-          </button>
-        )}
-      </header>
-
-      <main className="no-scrollbar relative flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto overscroll-contain px-3 pt-1.5 pb-[max(24px,env(safe-area-inset-bottom))] [&>*]:shrink-0">
+      <ScreenContent className="pb-[max(28px,env(safe-area-inset-bottom))]">
         {note.isPending ? (
-          <p role="status" className="px-2 text-[13px] text-[#a08568]">
+          <p role="status" className="text-muted text-[13px]">
             노트를 펼치고 있어요.
           </p>
         ) : note.isError ? (
-          <div role="alert" className="px-2 text-[13px]">
+          <div role="alert" className="text-[13px]">
             <p>노트를 불러오지 못했어요.</p>
             <button
               type="button"
@@ -106,7 +102,7 @@ export function NoteDetailPage() {
             </button>
           </div>
         ) : !note.data ? (
-          <div role="alert" className="px-2 py-6 text-center text-[13px]">
+          <div role="alert" className="py-6 text-center text-[13px]">
             <p>찾는 노트가 없어요. 지워졌거나 주소가 바뀌었을 수 있어요.</p>
             <Link to={backTo} className="text-accent-deep mt-2 inline-block underline">
               노트 게시판으로
@@ -122,7 +118,7 @@ export function NoteDetailPage() {
             {next && <NoteNextCard note={next} search={location.search} />}
           </>
         )}
-      </main>
+      </ScreenContent>
     </div>
   )
 }

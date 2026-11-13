@@ -11,7 +11,7 @@ import { cn } from '@/lib/cn'
 
 /**
  * 노트 상세의 종이 한 장 (피그마 A1 꿀우유 · 스티커는 A2 살구 크림).
- * 색은 이 화면에만 쓰여서 테마 토큰 대신 여기서 바로 써요.
+ * 화면 배경과 헤더는 공통 종이 바탕이고, 다이어리 색은 이 종이에만 써서 테마 토큰 대신 여기서 바로 써요.
  * 종이 모눈과 스프링은 피그마 에셋을 세로로 반복해서 글이 길어도 끝까지 이어져요.
  */
 export function NoteDiaryPaper({
@@ -26,7 +26,7 @@ export function NoteDiaryPaper({
   return (
     <article
       aria-labelledby="note-subject"
-      className="relative flex w-full flex-col gap-5 rounded-[6px] border border-[#efdfc6] bg-[#fffdf7] pt-[22px] pr-4 pb-6 pl-[42px] drop-shadow-[0_2px_5px_rgba(89,61,41,0.1)] [view-transition-name:note-paper]"
+      className="relative flex w-full flex-col gap-5 rounded-[6px] border border-[#efdfc6] bg-[#fffdf7] pt-[22px] pr-4 pb-6 pl-[42px] text-[#5a3e2b] drop-shadow-[0_2px_5px_rgba(89,61,41,0.1)] [view-transition-name:note-paper]"
     >
       <div
         aria-hidden="true"
