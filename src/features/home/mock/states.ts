@@ -36,6 +36,7 @@ export const beforePartMockData: BeforePartHomeData = {
       readCount: 52,
       helpfulCount: 19,
       tag: '#발표 준비',
+      to: '/notes/presentation-deck',
     },
   ],
 }
@@ -44,5 +45,5 @@ export const inactiveMockData: InactiveHomeData = {
   user: homeMockData.user,
   title: '지금은 프로젝트 기간이 아니에요',
   description: '지난 기수 노트를 둘러보며 다음 프로젝트를 준비해 보세요.',
-  action: { label: '노트 둘러보기' },
+  action: { label: '노트 둘러보기', to: '/notes' },
 }
