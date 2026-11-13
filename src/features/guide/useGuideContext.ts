@@ -24,7 +24,8 @@ export function useGuideContext() {
   const previewPart = import.meta.env.DEV ? normalizePart(params.get('userPart')) : null
   const assignedPart =
     previewPart ?? normalizePart(homeMockData.user.part) ?? (import.meta.env.DEV ? 'PM' : null)
-  const userKey = getSession()?.email ?? 'mock-member'
+  const sessionUser = getSession()?.user
+  const userKey = sessionUser?.email ?? (sessionUser ? String(sessionUser.id) : 'mock-member')
   return {
     assignedPart,
     currentWeek: guideProject.currentWeek,
