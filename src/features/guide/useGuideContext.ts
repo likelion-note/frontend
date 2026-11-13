@@ -1,8 +1,7 @@
-import { useSearchParams } from 'react-router'
-import { guideParts, guideProject } from '@/features/guide/mock/data'
+import { guideProject } from '@/features/guide/mock/data'
 import type { GuidePart } from '@/features/guide/types'
-import { homeMockData } from '@/features/home/mock/data'
-import { getSession } from '@/features/onboarding/session'
+import { PART_LABEL } from '@/features/admin/types'
+import { useMyAssignment } from '@/features/assignment/useMyAssignment'
 
 export function normalizePart(value: string | null): GuidePart | null {
   const aliases: Record<string, GuidePart> = {
@@ -20,17 +19,15 @@ export function normalizePart(value: string | null): GuidePart | null {
 
 /** 실제 배정 정보와 가이드의 탐색 탭은 분리해요. userPart는 개발 전용 미리보기예요. */
 export function useGuideContext() {
-  const [params] = useSearchParams()
-  const previewPart = import.meta.env.DEV ? normalizePart(params.get('userPart')) : null
+  const assignment = useMyAssignment()
   const assignedPart =
-    previewPart ?? normalizePart(homeMockData.user.part) ?? (import.meta.env.DEV ? 'PM' : null)
-  const userKey = getSession()?.email ?? 'mock-member'
+    assignment.data?.assignmentStatus === 'ASSIGNED' ? assignment.data.part : null
   return {
     assignedPart,
     currentWeek: guideProject.currentWeek,
     weeks: guideProject.weeks,
-    userKey,
-    partLabel: guideParts.find((part) => part.id === assignedPart)?.label ?? homeMockData.user.part,
+    userKey: assignment.userKey,
+    partLabel: assignedPart ? PART_LABEL[assignedPart] : null,
   }
 }
 

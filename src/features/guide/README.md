@@ -6,7 +6,7 @@
 - `types.ts`: 기존 Todo/HomeAction을 확장한 GuideTask, WeeklyGuide, GuideResource.
 - `api.ts`: getWeeklyGuide/getGuideResources/getGuideResourceById의 비동기 Mock 조회. 실제 API 도입 시 이 함수들의 내부와 홈의 현재 주차 조회를 교체하세요. Query 키는 파트·주차를 포함하여 빠른 전환에서도 이전 응답이 다른 선택에 표시되지 않습니다.
 - `completionStore.ts`, `useGuideCompletion.ts`: localStorage `likelion-guide-completion:v1`의 사용자·프로젝트·파트·주차·할 일 ID별 boolean override. useSyncExternalStore로 같은 화면·다른 탭의 변경을 구독합니다. 저장 실패 시 메모리에 유지하며 토스트를 표시합니다.
-- `useGuideContext.ts`: 실제 사용자 배정 파트와 탐색용 part를 구분합니다. 현재는 기존 홈 Mock을 조회합니다. 파트 정보가 없는 개발 환경만 PM으로 대체합니다.
+- `useGuideContext.ts`: 실제 사용자 배정 파트와 탐색용 part를 구분합니다. 공통 useMyAssignment 조회를 사용하고 파트 미배정 시 null을 유지합니다.
 - `components/`: 자료 메타데이터 카드, 기획서 목록 바텀시트, 운영진 메모. 파일 URL은 현재 모두 null이며 자료 카드를 누르면 ID로 조회한 목차 미리보기를 표시합니다. 실제 PDF 로딩이나 가짜 파일 URL은 사용하지 않습니다.
 
 ## 확인 방법
