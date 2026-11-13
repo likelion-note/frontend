@@ -24,6 +24,8 @@ import { useNoteState } from '@/features/note/useNoteState'
 import { useNotes } from '@/features/note/useNotes'
 import { cn } from '@/lib/cn'
 
+import '@/features/note/note.css'
+
 const cohortOptions = [
   { value: 'all' as const, label: '전체' },
   { value: 'past' as const, label: '지난 기수' },

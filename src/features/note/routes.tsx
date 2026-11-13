@@ -11,4 +11,10 @@ export const noteRoutes: RouteObject[] = [
       Component: (await import('@/features/note/pages/NoteBoardPage')).NoteBoardPage,
     }),
   },
+  {
+    path: 'notes/:id',
+    lazy: async () => ({
+      Component: (await import('@/features/note/pages/NoteDetailPage')).NoteDetailPage,
+    }),
+  },
 ]
