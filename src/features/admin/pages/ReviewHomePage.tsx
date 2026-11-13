@@ -30,7 +30,13 @@ export function ReviewHomePage() {
   const { data: recent } = useQuery(recentDecisionsQuery())
 
   const cohort = me?.cohort ?? 14
-  const pendingCount = summary?.pendingCount ?? pending?.length ?? 0
+  const pendingCount = summary?.pendingCount ?? pending?.length
+  const headline =
+    pendingCount === undefined
+      ? '검토할 일지를 불러오고 있어요'
+      : pendingCount > 0
+        ? `검토할 일지가 ${pendingCount}개 있어요`
+        : '검토할 일지가 없어요'
 
   return (
     <>
@@ -42,9 +48,7 @@ export function ReviewHomePage() {
             <p className="text-ink-2 text-[15px] leading-tight font-medium">
               {me ? `${me.name} 운영진님,` : ' '}
             </p>
-            <h1 className="text-ink text-[22px] leading-tight font-bold">
-              {pendingCount > 0 ? `검토할 일지가 ${pendingCount}개 있어요` : '검토할 일지가 없어요'}
-            </h1>
+            <h1 className="text-ink text-[22px] leading-tight font-bold">{headline}</h1>
           </div>
           <Illust name="lion-check" size={64} />
         </div>

@@ -2,17 +2,10 @@ import presentationQuote from '@/assets/home/quote-presentation.svg'
 import { homeMockData } from '@/features/home/mock/data'
 import type { BeforePartHomeData, HomeState, InactiveHomeData } from '@/features/home/types'
 
-/** API 연결 전 기본 상태. URL 미리보기는 개발 환경에서만 이 값을 덮어써요. */
-export const mockHomeState: HomeState = { isPartAssigned: true, isProjectActive: true }
+/** 프로젝트 진행 여부 Mock. 사용자 배정 상태는 공통 배정 조회로 판단해요. */
+export const mockHomeState: Pick<HomeState, 'isProjectActive'> = { isProjectActive: true }
 
-export const beforePartMockData: BeforePartHomeData = {
-  user: {
-    initial: homeMockData.user.initial,
-    cohortLabel: homeMockData.user.cohortLabel,
-    part: null,
-    team: null,
-    assignmentLabel: '파트 배정 전',
-  },
+export const beforePartMockData: Omit<BeforePartHomeData, 'user'> = {
   project: homeMockData.project,
   assignment: {
     title: '운영진이 파트와 프로젝트를\n배정하고 있어요',
@@ -41,8 +34,7 @@ export const beforePartMockData: BeforePartHomeData = {
   ],
 }
 
-export const inactiveMockData: InactiveHomeData = {
-  user: homeMockData.user,
+export const inactiveMockData: Omit<InactiveHomeData, 'user'> = {
   title: '지금은 프로젝트 기간이 아니에요',
   description: '지난 기수 노트를 둘러보며 다음 프로젝트를 준비해 보세요.',
   action: { label: '노트 둘러보기', to: '/notes' },

@@ -6,6 +6,7 @@ import { NoteBookmarkIcon } from '@/features/note/components/NoteBookmarkIcon'
 import { NoteDiaryPaper } from '@/features/note/components/NoteDiaryPaper'
 import { NoteNextCard } from '@/features/note/components/NoteNextCard'
 import { filterNotes, readFilters } from '@/features/note/noteFilters'
+import { useMyNotePart } from '@/features/note/useMyNotePart'
 import { useNoteState } from '@/features/note/useNoteState'
 import { useNote, useNotes } from '@/features/note/useNotes'
 import { useToast } from '@/hooks/useToast'
@@ -36,12 +37,13 @@ export function NoteDetailPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [found, id])
 
-  const filtered = notes.data ? filterNotes(notes.data, readFilters(params)) : []
+  const myPart = useMyNotePart()
+  const filtered = notes.data ? filterNotes(notes.data, readFilters(params, myPart)) : []
   // 홈처럼 다른 곳에서 열어 지금 필터에 없는 노트면 전체 순서를 기준으로 해요.
   const list =
     filtered.some((item) => item.id === id) || !notes.data
       ? filtered
-      : filterNotes(notes.data, { ...readFilters(new URLSearchParams()), part: 'all' })
+      : filterNotes(notes.data, readFilters(new URLSearchParams(), 'all'))
   const index = list.findIndex((item) => item.id === id)
   const next = index >= 0 ? list[index + 1] : undefined
   const backTo = { pathname: '/notes', search: location.search }

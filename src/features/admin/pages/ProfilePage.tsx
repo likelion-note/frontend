@@ -11,6 +11,7 @@ import { AdminBackHeader } from '@/features/admin/components/AdminHeader'
 import { AdminContent } from '@/features/admin/components/AdminLayout'
 import { useInvalidateAdmin } from '@/features/admin/hooks/useInvalidateAdmin'
 import { meQuery } from '@/features/admin/queries'
+import { clearAuth } from '@/features/onboarding/session'
 import { useToast } from '@/hooks/useToast'
 
 /** 프로필 설정. 온보딩 SCR-ONB-03 과 같은 구성으로, 이름·닉네임만 바꿀 수 있어요 */
@@ -47,7 +48,9 @@ export function ProfilePage() {
             {me?.name.charAt(0)}
           </span>
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-            <p className="text-ink truncate text-[15px] leading-tight font-bold">{me?.email}</p>
+            <p className="text-ink truncate text-[15px] leading-tight font-bold">
+              {me?.email || '구글 계정'}
+            </p>
             <p className="text-muted text-[12px] leading-tight">
               구글 계정 연결됨 · {me?.cohort}기 운영진
             </p>
@@ -85,6 +88,16 @@ export function ProfilePage() {
         <Button disabled={!canSave} onClick={() => save.mutate()}>
           저장하기
         </Button>
+        <button
+          type="button"
+          onClick={() => {
+            clearAuth()
+            navigate('/onboarding', { replace: true })
+          }}
+          className="text-muted mx-auto py-1 text-[13px] font-medium underline underline-offset-4"
+        >
+          로그아웃
+        </button>
       </AdminContent>
     </>
   )

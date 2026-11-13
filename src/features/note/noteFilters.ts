@@ -1,5 +1,3 @@
-import { normalizePart } from '@/features/guide/useGuideContext'
-import { homeMockData } from '@/features/home/mock/data'
 import { currentCohort, noteParts, notePhases } from '@/features/note/mock/data'
 import type {
   Note,
@@ -18,10 +16,8 @@ export const sortLabels: Record<NoteSort, string> = {
   read: '많이 읽은순',
 }
 
-/** 처음 들어오면 내 파트가 골라져 있어요. 배정 전이면 전체예요. */
-export function defaultPart(): NotePart | 'all' {
-  return normalizePart(homeMockData.user.part) ?? 'all'
-}
+/** 파트 필터의 기본값. 내 파트(useMyNotePart) 또는 전체예요. */
+export type DefaultPart = NotePart | 'all'
 
 const knownPart = (value: string | null): value is NotePart =>
   noteParts.some((part) => part.id === value)
@@ -29,7 +25,7 @@ const knownPhase = (value: string | null): value is NotePhase =>
   notePhases.some((phase) => phase.id === value)
 
 /** URL 쿼리를 필터로 읽어요. 모르는 값은 기본값으로 돌려요. */
-export function readFilters(params: URLSearchParams): NoteFilters {
+export function readFilters(params: URLSearchParams, defaultPart: DefaultPart): NoteFilters {
   const cohort = params.get('cohort')
   const part = params.get('part')
   const phase = params.get('phase')
@@ -37,7 +33,7 @@ export function readFilters(params: URLSearchParams): NoteFilters {
   return {
     query: params.get('q') ?? '',
     cohort: cohorts.find((value) => value === cohort) ?? 'all',
-    part: part === 'all' ? 'all' : knownPart(part) ? part : defaultPart(),
+    part: part === 'all' ? 'all' : knownPart(part) ? part : defaultPart,
     phase: knownPhase(phase) ? phase : 'all',
     tag: params.get('tag') || null,
     sort: sorts.find((value) => value === sort) ?? 'latest',
@@ -45,7 +41,11 @@ export function readFilters(params: URLSearchParams): NoteFilters {
 }
 
 /** 필터를 URL 쿼리에 써요. 개발용 상태 쿼리(userPart 등)는 그대로 둬요. */
-export function writeFilters(params: URLSearchParams, filters: NoteFilters) {
+export function writeFilters(
+  params: URLSearchParams,
+  filters: NoteFilters,
+  defaultPart: DefaultPart,
+) {
   const next = new URLSearchParams(params)
   const set = (key: string, value: string | null, fallback: string) => {
     if (value === null || value === fallback) next.delete(key)
@@ -53,7 +53,7 @@ export function writeFilters(params: URLSearchParams, filters: NoteFilters) {
   }
   set('q', filters.query.trim() ? filters.query : null, '')
   set('cohort', filters.cohort, 'all')
-  set('part', filters.part, defaultPart())
+  set('part', filters.part, defaultPart)
   set('phase', filters.phase, 'all')
   set('tag', filters.tag, '')
   set('sort', filters.sort, 'latest')

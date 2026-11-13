@@ -21,6 +21,7 @@ import {
 import { filterNotes, readFilters, sortLabels, writeFilters } from '@/features/note/noteFilters'
 import type { NoteFilters, NoteSort } from '@/features/note/types'
 import { useNoteState } from '@/features/note/useNoteState'
+import { useMyNotePart } from '@/features/note/useMyNotePart'
 import { useNotes } from '@/features/note/useNotes'
 
 import '@/features/note/note.css'
@@ -50,7 +51,8 @@ const allFilters: Omit<NoteFilters, 'sort'> = {
 export function NoteBoardPage() {
   const location = useLocation()
   const [params, setParams] = useSearchParams()
-  const filters = readFilters(params)
+  const myPart = useMyNotePart()
+  const filters = readFilters(params, myPart)
   // 한글 조합 중에 입력이 끊기지 않도록 검색어는 화면 상태가 기준이고 URL에는 따라 써요.
   const [query, setQuery] = useState(filters.query)
   const notes = useNotes()
@@ -59,7 +61,7 @@ export function NoteBoardPage() {
   function update(patch: Partial<NoteFilters>) {
     const next = { ...filters, query, ...patch }
     if (patch.query !== undefined) setQuery(patch.query)
-    setParams(writeFilters(params, next), { replace: true, preventScrollReset: true })
+    setParams(writeFilters(params, next, myPart), { replace: true, preventScrollReset: true })
   }
 
   const visible = notes.data ? filterNotes(notes.data, { ...filters, query }) : []

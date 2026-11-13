@@ -1,12 +1,13 @@
+import { PART_LABEL } from '@/features/admin/types'
 import sticky from '@/assets/home/sticky.svg'
 import { homeMockData } from '@/features/home/mock/data'
 import type { GuidePart, GuideResource, GuideTask, WeeklyGuide } from '@/features/guide/types'
 
 export const guideParts: { id: GuidePart; label: string }[] = [
-  { id: 'PM', label: 'PM' },
-  { id: 'DESIGN', label: '디자인' },
-  { id: 'FRONTEND', label: '프론트' },
-  { id: 'BACKEND', label: '백엔드' },
+  { id: 'PM', label: PART_LABEL.PM },
+  { id: 'DESIGN', label: PART_LABEL.DESIGN },
+  { id: 'FRONTEND', label: PART_LABEL.FRONTEND },
+  { id: 'BACKEND', label: PART_LABEL.BACKEND },
 ]
 export const guideProject = {
   id: 'mock-project-2026',

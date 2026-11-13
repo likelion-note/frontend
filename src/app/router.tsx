@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router'
 
+import { AssignmentBoundary } from '@/features/assignment/AssignmentBoundary'
 import { adminRoutes } from '@/features/admin/routes'
 import { homeRoutes } from '@/features/home/routes'
 import { guideRoutes } from '@/features/guide/routes'
@@ -22,9 +23,11 @@ export const router = createBrowserRouter([
       { index: true, element: <RootRedirect /> },
       ...onboardingRoutes,
       ...adminRoutes,
-      ...homeRoutes,
-      ...guideRoutes,
-      ...meetingRoutes,
+      {
+        element: <AssignmentBoundary />,
+        children: [...homeRoutes, ...guideRoutes, ...meetingRoutes],
+      },
+      // 노트는 배정 정보가 없어도 열리고 운영진도 같이 써서 AssignmentBoundary 밖에 둬요.
       ...noteRoutes,
       { path: '*', element: <NotFoundPage /> },
     ],

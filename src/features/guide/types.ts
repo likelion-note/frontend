@@ -1,6 +1,7 @@
 import type { HomeAction, Todo } from '@/features/home/types'
 
-export type GuidePart = 'PM' | 'DESIGN' | 'FRONTEND' | 'BACKEND'
+export type { AssignedPart as GuidePart } from '@/features/assignment/types'
+import type { AssignedPart as GuidePart } from '@/features/assignment/types'
 export interface GuideTask extends Todo {
   weekday: string
   action?: HomeAction & { kind: 'meeting' | 'resources'; resourceIds?: string[] }

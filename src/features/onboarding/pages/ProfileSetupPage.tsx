@@ -22,26 +22,29 @@ export function ProfileSetupPage() {
 
   const signup = useMutation({
     mutationFn: () => {
-      if (!draft) throw new Error('처음부터 다시 진행해 주세요')
-      return api.completeSignup({ ...draft, name })
-    },
-    onSuccess: async () => {
-      if (!draft) return
-      setSession({
-        name: name.trim(),
+      if (!draft?.code) throw new Error('처음부터 다시 진행해 주세요')
+      return api.signup({
+        signupToken: draft.signupToken,
+        inviteCode: draft.code,
+        name,
         email: draft.email,
-        cohort: draft.cohort,
-        userType: draft.userType,
       })
+    },
+    onSuccess: async (session) => {
+      setSession(session)
       setDraft(null)
       await invalidate()
-      toast(draft.userType === 'ADMIN' ? '운영진으로 시작해요' : '가입을 마쳤어요')
-      navigate(homePathFor(draft.userType), { replace: true })
+      toast(session.user.userType === 'ADMIN' ? '운영진으로 시작해요' : '가입을 마쳤어요')
+      navigate(homePathFor(session.user.userType), { replace: true })
     },
     onError: (e: Error) => toast(e.message),
   })
 
+  // 초대코드를 거치지 않았으면 코드 화면으로
   if (!draft) return <Navigate to="/onboarding" replace />
+  if (!draft.code || !draft.cohort || !draft.userType) {
+    return <Navigate to="/onboarding/code" replace />
+  }
 
   const isAdmin = draft.userType === 'ADMIN'
   const typeLabel = isAdmin ? '운영진' : '아기사자'
@@ -102,7 +105,7 @@ export function ProfileSetupPage() {
         <div className="flex-1" />
 
         <Button disabled={!canStart} onClick={() => signup.mutate()}>
-          시작하기
+          {signup.isPending ? '가입하고 있어요…' : '시작하기'}
         </Button>
       </ScreenContent>
     </>

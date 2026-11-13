@@ -13,7 +13,7 @@
 - `types.ts`: Note/NoteFilters 데이터 계약. 파트는 가이드와 같은 코드(PM/DESIGN/FRONTEND/BACKEND)에 운영진(STAFF)을 더했습니다.
 - `mock/data.ts`: 노트 13개(PM 9개), 필터 선택지, 검색 추천어. 홈 카드와 같은 id(`changed-topic`, `meeting-rules`, `presentation-deck`)를 씁니다. 우리 기수는 홈 노트 통계의 기수(14)를 따릅니다.
 - `api.ts`: getNotes/getNoteById. 실제 API로 교체할 지점입니다. 검색·필터·정렬은 지금 화면에서 합니다. 서버로 옮기면 `filterNotes` 대신 쿼리 파라미터를 넘기세요.
-- `noteFilters.ts`: URL 쿼리 ↔ 필터 변환, 검색·필터·정렬, 카드·상세 문구. 처음 들어오면 홈 사용자의 파트가 골라져 있습니다(배정 전이면 전체).
+- `noteFilters.ts`: URL 쿼리 ↔ 필터 변환, 검색·필터·정렬, 카드·상세 문구. 처음 들어오면 내 배정 파트(`useMyNotePart` → `useMyAssignment`, 홈·가이드와 같은 배정 정보)가 골라져 있습니다. 배정 전·운영진·조회 중이면 전체입니다. 노트는 배정 정보 없이도 열리고 운영진도 쓰므로 `AssignmentBoundary` 밖에 둡니다.
 - `noteStore.ts`, `useNoteState.ts`: localStorage `likelion-note-state:v1`의 읽음·도움돼요·저장 id 목록. useSyncExternalStore로 같은 화면·다른 탭의 변경을 구독하고, 저장에 실패하면 메모리에 유지하며 토스트로 알립니다.
 - `useNotes.ts`: 게시판과 상세가 같은 React Query 조회 결과를 씁니다.
 - `note.css`: 노트 열기 전환.
