@@ -12,6 +12,7 @@ import { ComingSoonPage } from '@/pages/ComingSoonPage'
  * 운영진 라우트.
  * 탭이 있는 화면은 AdminLayout 아래, 일지 검토처럼 탭이 없는 화면은 AdminDetailLayout 아래에 둬요.
  * 노트 · 내 기록 탭은 아기사자 화면과 같아서 그쪽이 준비되면 연결만 바꿔요.
+ * 노트(/notes)는 noteRoutes로 옮겼어요.
  */
 export const adminRoutes: RouteObject[] = [
   {
@@ -22,7 +23,6 @@ export const adminRoutes: RouteObject[] = [
       { path: 'admin/members', element: <MembersPage /> },
       { path: 'admin/ops', element: <Navigate to="/admin/ops/schedule" replace /> },
       { path: 'admin/ops/:tab', element: <OpsPage /> },
-      { path: 'notes', element: <ComingSoonPage title="노트" /> },
       { path: 'me', element: <ComingSoonPage title="내 기록" /> },
     ],
   },

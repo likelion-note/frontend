@@ -2,15 +2,11 @@
 
 `/notes`(게시판)와 `/notes/:id`(노트 상세 · 다이어리)입니다. Figma 02-3의 SCR-NOTE-01 노트 게시판, 검색 결과 없음, SCR-NOTE-02 노트 상세 · 다이어리(A1 꿀우유 + A2 살구 크림 스티커)를 구현했습니다. 파트 배정 전·프로젝트 기간이 아닐 때도 열 수 있도록 홈 상태(useHomeMode)로 막지 않았습니다.
 
-## 연결 방법 (아직 안 함)
+## 연결
 
-라우트는 `routes.tsx`에만 정의했고 공통 파일은 건드리지 않았습니다. 화면을 열려면 아래 세 곳을 바꿔야 합니다.
-
-1. `app/router.tsx`: `noteRoutes`를 import해서 children에 추가합니다.
-2. `features/admin/routes.tsx`: `{ path: 'notes', element: <ComingSoonPage title="노트" /> }`를 지웁니다. 남아 있으면 경로가 겹쳐서 준비 중 화면이 먼저 열립니다.
-3. `components/common/BottomNav.tsx`: 노트 탭에 `to: '/notes'`와 `activeIcon`을 넣습니다. 켜진 아이콘은 `@/assets/note/nav-notes-active.svg`입니다. 상세(`/notes/:id`)에서는 탭이 없습니다.
-
-홈은 이미 연결되어 있습니다. 지난 기수 카드는 같은 id의 상세로, 더 보기는 `/notes?cohort=past`로, 프로젝트 기간이 아닐 때의 노트 둘러보기는 `/notes`로 이동합니다.
+- `app/router.tsx`에 `noteRoutes`를 합쳤습니다. 기존 운영진 라우트의 `/notes` 준비 중 화면은 지웠고, 운영진 탭바의 노트 탭도 이 게시판으로 이동합니다.
+- 하단 탭의 노트 탭은 `/notes`로 이동하며 켜진 아이콘은 `@/assets/note/nav-notes-active.svg`입니다. 상세(`/notes/:id`)에는 탭이 없습니다.
+- 홈: 지난 기수 카드는 같은 id의 상세로, 더 보기는 `/notes?cohort=past`로, 프로젝트 기간이 아닐 때의 노트 둘러보기는 `/notes`로 이동합니다.
 
 ## 파일
 
@@ -54,4 +50,4 @@ Figma '노트 열기 전환' 프로토타입(Smart Animate 320ms · ease-out)을
 
 새 에셋은 `src/assets/note/`에 있습니다(모눈 배경 2종, 손글씨 머리말, 검색·지우기·뒤로·다음·발자국 아이콘, 종이 모눈, 스프링, 켜진 노트 탭 아이콘). 사자·체크·전구 스프라이트와 손글씨 인용(`quote-presentation.svg`), 물음표 아이콘은 기존 홈 에셋과 공통 `QuestionIcon`을 그대로 씁니다. 손글씨 머리말은 GRIUN 폰트로 교체될 예정이라 이미지로 두고 alt에 문구를 넣었습니다.
 
-검증: 390px 기준으로 게시판·검색 결과 없음·상세 화면을 Figma와 비교, 타입 검사·ESLint·Prettier 통과. 라우트가 연결되지 않아 앱 안에서의 탭 이동과 전환 애니메이션은 라우트 연결 후 실제 브라우저에서 확인이 필요합니다.
+검증: 390px 기준으로 게시판·검색 결과 없음·상세 화면을 Figma와 비교. Chrome에서 홈 → 노트 탭(켜짐 표시) → 카드 열기(전환, 1 / 9, 다음 장) → 도움돼요·저장 토스트 → 뒤로(전환, 읽음 흐림) → 검색 결과 없음 → 추천어 검색 → 파트·상황 필터와 URL 반영 → 필터 고정 → 홈 카드에서 상세 열기 → 없는 노트 안내까지 확인. 타입 검사·ESLint·Prettier·빌드 통과.

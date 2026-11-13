@@ -4,6 +4,7 @@ import { adminRoutes } from '@/features/admin/routes'
 import { homeRoutes } from '@/features/home/routes'
 import { guideRoutes } from '@/features/guide/routes'
 import { meetingRoutes } from '@/features/meeting/routes'
+import { noteRoutes } from '@/features/note/routes'
 import { onboardingRoutes } from '@/features/onboarding/routes'
 import { MobileLayout } from '@/layouts/MobileLayout'
 import { NotFoundPage } from '@/pages/NotFoundPage'
@@ -24,6 +25,7 @@ export const router = createBrowserRouter([
       ...homeRoutes,
       ...guideRoutes,
       ...meetingRoutes,
+      ...noteRoutes,
       { path: '*', element: <NotFoundPage /> },
     ],
   },
