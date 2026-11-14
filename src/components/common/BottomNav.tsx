@@ -48,6 +48,21 @@ const adminNavItems: readonly BottomNavItem[] = [
 ]
 
 /**
+ * 개발 미리보기 쿼리(?userPart= · ?partAssigned= · ?projectActive=)만 다음 탭으로 넘겨요.
+ * 노트 필터(?cohort=) · 내 기록 탭(?tab=)처럼 그 화면에서만 쓰는 쿼리는 넘기지 않아요.
+ */
+const PREVIEW_PARAMS = ['userPart', 'partAssigned', 'projectActive']
+function previewSearch(search: string) {
+  const from = new URLSearchParams(search)
+  const kept = new URLSearchParams()
+  for (const key of PREVIEW_PARAMS) {
+    const value = from.get(key)
+    if (value !== null) kept.set(key, value)
+  }
+  return kept.size ? `?${kept}` : ''
+}
+
+/**
  * 하단 탭. 로그인한 계정 유형에 따라 아기사자 메뉴 또는 운영진 메뉴를 보여줘요.
  * 노트 · 내 기록처럼 둘이 같이 쓰는 화면에서도 자기 메뉴가 유지돼요.
  * - 아기사자: 프로젝트 기간이 아니면 회의 탭이 꺼져요 (배정 전에는 쓸 수 있어요)
@@ -112,7 +127,7 @@ export function BottomNav({
         item.to && (item.id !== 'meet' || meetOk) ? (
           <NavLink
             key={item.id}
-            to={{ pathname: item.to, search: admin ? '' : location.search }}
+            to={{ pathname: item.to, search: admin ? '' : previewSearch(location.search) }}
             end={item.end ?? true}
             className="focus-visible:outline-accent relative flex min-w-0 flex-1 flex-col items-center gap-[3px] rounded focus-visible:outline-2"
           >
