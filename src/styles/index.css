@@ -195,3 +195,14 @@
     display: none;
   }
 }
+
+/*
+ * 폰 프레임 안의 화면은 세로로만 스크롤해요. 세로 스크롤 영역(overflow-y-auto)은 브라우저가
+ * 가로도 스크롤 가능하게 만들어서, 내용이 조금만 넘쳐도 화면이 옆으로 밀릴 수 있어요.
+ * 칩 줄처럼 일부러 가로로 미는 영역(overflow-x-auto)은 그대로 둬요.
+ */
+#mobile-frame .overflow-y-auto:not(.overflow-x-auto) {
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}

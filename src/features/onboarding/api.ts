@@ -1,6 +1,6 @@
 import { api, USE_MOCK } from '@/api/client'
 import { MOCK_TODAY } from '@/features/admin/mock/data'
-import { nextId, store } from '@/features/admin/mock/store'
+import { MOCK_COHORT, nextId, saveStore, store } from '@/features/admin/mock/store'
 import type { UserType } from '@/features/admin/types'
 import type { InviteCodePreview, LoginResponse, MeResponse } from '@/features/onboarding/types'
 import type { Session, SessionUser } from '@/lib/authStorage'
@@ -52,11 +52,37 @@ export type MockAccount = {
   status: 'new' | 'member' | 'admin'
 }
 
-export const mockAccounts: MockAccount[] = [
-  { id: 'new', name: '새 아기사자', email: 'new.lion14@gmail.com', status: 'new' },
-  { id: 'u-deong', name: '데옹', email: 'deo***@gmail.com', status: 'member' },
-  { id: 'admin-1', name: '하린', email: 'harin.lion14@gmail.com', status: 'admin' },
-]
+const FRESH_ACCOUNT_ID = 'new'
+/** 아직 가입하지 않은 새 구글 계정의 이메일. 가입할 때마다 다음 계정으로 넘어가요 */
+const freshEmail = () =>
+  store.signups.length === 0
+    ? 'new.lion14@gmail.com'
+    : `new${store.signups.length + 1}.lion14@gmail.com`
+
+/**
+ * 계정 선택 시트에 보여줄 목 구글 계정.
+ * 새 계정 하나 + 피그마 예시 계정(데옹 · 하린) + 이 브라우저에서 가입을 마친 계정들이에요.
+ */
+export function listMockAccounts(): MockAccount[] {
+  const nameOf = (id: string, fallback: string) =>
+    store.members.find((m) => m.id === id)?.name ?? fallback
+  return [
+    { id: FRESH_ACCOUNT_ID, name: '새 아기사자', email: freshEmail(), status: 'new' },
+    { id: 'u-deong', name: nameOf('u-deong', '데옹'), email: 'deo***@gmail.com', status: 'member' },
+    ...store.signups.map((item): MockAccount => ({
+      id: item.userId,
+      name: nameOf(item.userId, item.name),
+      email: item.email,
+      status: item.userType === 'ADMIN' ? 'admin' : 'member',
+    })),
+    {
+      id: 'admin-1',
+      name: nameOf('admin-1', '하린'),
+      email: 'harin.lion14@gmail.com',
+      status: 'admin',
+    },
+  ]
+}
 
 const mockSession = (
   id: string,
@@ -78,18 +104,19 @@ export async function loginWithGoogle(input: LoginInput): Promise<LoginResult> {
   }
 
   await delay(400)
-  const account = mockAccounts.find((a) => a.id === input.mockAccountId)
+  const account = listMockAccounts().find((a) => a.id === input.mockAccountId)
   if (!account) throw new Error('계정을 찾을 수 없어요')
   if (account.status === 'new') {
     return { status: 'NEED_SIGNUP', email: account.email, signupToken: 'mock' }
   }
+  const cohort = store.signups.find((item) => item.userId === account.id)?.cohort ?? MOCK_COHORT
   return {
     status: 'REGISTERED',
     session: mockSession(
       account.id,
       account.name,
       account.email,
-      14,
+      cohort,
       account.status === 'admin' ? 'ADMIN' : 'MEMBER',
     ),
   }
@@ -133,18 +160,25 @@ export async function signup(input: SignupInput): Promise<Session> {
   if (!code) throw new Error('코드를 다시 확인해 주세요')
   code.usedCount += 1
 
+  // 가입한 사람은 운영진의 멤버 목록에 바로 나타나요 (아기사자는 '배정 전')
   const id = nextId('u')
-  if (code.userType === 'MEMBER') {
-    store.members.unshift({
-      id,
-      name,
-      email: input.email.replace(/^(.{3}).*(@.*)$/, '$1***$2'),
-      part: null,
-      projectId: null,
-      joinedAt: `${MOCK_TODAY}T11:30:00`,
-      type: 'MEMBER',
-    })
-  }
+  store.members.unshift({
+    id,
+    name,
+    email: input.email.replace(/^(.{3}).*(@.*)$/, '$1***$2'),
+    part: code.userType === 'ADMIN' ? 'OPS' : null,
+    projectId: null,
+    joinedAt: `${MOCK_TODAY}T11:30:00`,
+    type: code.userType,
+  })
+  store.signups.push({
+    email: input.email,
+    userId: id,
+    name,
+    cohort: code.cohort,
+    userType: code.userType,
+  })
+  saveStore()
   return mockSession(id, name, input.email, code.cohort, code.userType)
 }
 

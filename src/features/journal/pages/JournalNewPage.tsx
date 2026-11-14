@@ -3,7 +3,6 @@ import { Link, useLocation, useNavigate } from 'react-router'
 
 import { ScreenContent } from '@/components/layout/Screen'
 import { createJournalDraft } from '@/features/journal/api'
-import { myProjects } from '@/features/journal/mock/data'
 import { useJournalCache, useJournalContext } from '@/features/journal/useJournals'
 
 /**
@@ -24,7 +23,7 @@ export function JournalNewPage() {
     started.current = true
     createJournalDraft({
       cohort: context.cohort,
-      projectId: myProjects[0]?.id ?? null,
+      projectId: null,
       part: context.part,
     })
       .then((draft) => {

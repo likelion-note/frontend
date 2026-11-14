@@ -5,6 +5,7 @@ import backIcon from '@/assets/meeting/history-back.svg'
 import grid from '@/assets/meeting/summary-grid.svg'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { useHomeMode } from '@/features/home/useHomeMode'
+import { canUseMeeting } from '@/features/home/state'
 import { getMeetingSummaryDraft } from '@/features/meeting/api'
 import { MeetingSummaryForm } from '@/features/meeting/components/MeetingSummaryForm'
 
@@ -16,9 +17,9 @@ export function MeetingSummaryPage() {
   const draft = useQuery({
     queryKey: ['meeting', 'summary-draft', id],
     queryFn: () => getMeetingSummaryDraft(id),
-    enabled: mode === 'project-active',
+    enabled: canUseMeeting(mode),
   })
-  if (mode !== 'project-active') return <Navigate to={`/home${location.search}`} replace />
+  if (!canUseMeeting(mode)) return <Navigate to={`/home${location.search}`} replace />
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="bg-paper shrink-0">

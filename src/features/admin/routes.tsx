@@ -3,15 +3,13 @@ import { Navigate, type RouteObject } from 'react-router'
 import { AdminDetailLayout, AdminLayout } from '@/features/admin/components/AdminLayout'
 import { MembersPage } from '@/features/admin/pages/MembersPage'
 import { OpsPage } from '@/features/admin/pages/OpsPage'
-import { ProfilePage } from '@/features/admin/pages/ProfilePage'
 import { ReviewDetailPage } from '@/features/admin/pages/ReviewDetailPage'
 import { ReviewHomePage } from '@/features/admin/pages/ReviewHomePage'
 
 /**
  * 운영진 라우트.
  * 탭이 있는 화면은 AdminLayout 아래, 일지 검토처럼 탭이 없는 화면은 AdminDetailLayout 아래에 둬요.
- * 노트 · 내 기록 탭은 아기사자 화면과 같아서 그쪽이 준비되면 연결만 바꿔요.
- * 노트(/notes)는 noteRoutes로, 내 기록(/me)은 journalRoutes로 옮겼어요.
+ * 노트(/notes) · 내 기록(/me) · 프로필 설정(/profile)은 아기사자와 같이 써서 app/router.tsx 에 있어요.
  */
 export const adminRoutes: RouteObject[] = [
   {
@@ -26,9 +24,6 @@ export const adminRoutes: RouteObject[] = [
   },
   {
     element: <AdminDetailLayout />,
-    children: [
-      { path: 'admin/review/:id', element: <ReviewDetailPage /> },
-      { path: 'admin/profile', element: <ProfilePage /> },
-    ],
+    children: [{ path: 'admin/review/:id', element: <ReviewDetailPage /> }],
   },
 ]

@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router'
 
-import { AdminTabBar } from '@/features/admin/components/AdminTabBar'
+import { BottomNav } from '@/components/common/BottomNav'
 
 /** 운영진 탭 화면 틀: 헤더(고정) + 본문(스크롤, AdminContent) + 하단 탭. 모눈 배경은 프레임(MobileLayout)에 깔려 있어요 */
 export function AdminLayout() {
@@ -9,7 +9,7 @@ export function AdminLayout() {
       <div className="flex min-h-0 flex-1 flex-col">
         <Outlet />
       </div>
-      <AdminTabBar />
+      <BottomNav />
     </div>
   )
 }

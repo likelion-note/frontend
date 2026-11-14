@@ -6,6 +6,7 @@ import grid from '@/assets/meeting/complete-grid.svg'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { Button } from '@/components/ui/Button'
 import { useHomeMode } from '@/features/home/useHomeMode'
+import { canUseMeeting } from '@/features/home/state'
 import { MeetingIllustration } from '@/features/meeting/components/MeetingIllustration'
 import { MeetingSummaryCard } from '@/features/meeting/components/MeetingSummaryCard'
 import { countThisWeek } from '@/features/meeting/meetingDates'
@@ -20,10 +21,10 @@ export function MeetingSummaryCompletePage({ onJournal }: { onJournal?: () => vo
   const location = useLocation()
   const navigate = useNavigate()
   const toast = useToast()
-  const record = useMeetingRecord(id, mode === 'project-active')
-  const records = useMeetingRecords(mode === 'project-active')
+  const record = useMeetingRecord(id, canUseMeeting(mode))
+  const records = useMeetingRecords(canUseMeeting(mode))
   const [copying, setCopying] = useState(false)
-  if (mode !== 'project-active') return <Navigate to={`/home${location.search}`} replace />
+  if (!canUseMeeting(mode)) return <Navigate to={`/home${location.search}`} replace />
 
   async function copy() {
     if (!record.data || copying) return

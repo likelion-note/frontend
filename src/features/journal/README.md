@@ -21,7 +21,8 @@ Figma 02-4의 일곱 화면입니다. `/me`(내 기록), `/me/journal/:id/edit`(
 
 - `types.ts`: MyJournal · OrganizedJournal · PortfolioSummary. 상태(PENDING/APPROVED/REJECTED) · 공개 범위(NOW/NEXT) · 행사 종류는 운영진 검토(`admin/types.ts`)와 같은 이름이고, 아직 내지 않은 일지는 DRAFT입니다. 시점은 노트 게시판과 같은 단위입니다.
 - `mock/data.ts`: Figma 예시 일지 5개(읽음 20 · 도움돼요 8), 내 프로젝트 2개(p1은 운영진 목의 멋사수첩팀과 같은 id), 가릴 이름 목록, 하루 요약 횟수(5).
-- `journalStore.ts`: 목 + localStorage `likelion-journals:v1`을 id로 합칩니다(회의 기록 recordStore와 같은 방식). 운영진 검토 화면과는 저장소를 공유하지 않습니다. 백엔드가 붙으면 같은 API로 합쳐집니다.
+- 내 프로젝트(`getMyProjects`)는 로그인한 사람 기준입니다. 지금 배정된 프로젝트 + 예전에 일지를 쓴 프로젝트이고, 운영진은 운영 분류, 배정 전 아기사자는 '미분류'를 고릅니다.
+- `journalStore.ts`: 목 + localStorage `likelion-journals:v1`을 id로 합칩니다(회의 기록 recordStore와 같은 방식). 일지마다 쓴 사람(`ownerId`)이 있어서 내 기록은 로그인한 사람의 일지만 보여줍니다. 예시 일지 5개는 목 계정 '데옹'의 것이고, 다른 멤버가 낸 일지(`mock/others.ts`)도 함께 들어 있습니다. 운영진 검토 화면이 이 저장소를 그대로 읽고 써서, 검토 요청한 일지가 검토 대기열에 들어가고 승인 · 돌려보내기가 내 기록에 바로 반영됩니다. 승인된 일지는 노트 게시판에도 올라갑니다(`note/journalNotes.ts`).
 - `organize.ts`: AI 정리 · 포트폴리오 요약의 규칙 기반 목입니다. 팀원 이름은 `[팀원 A]`, 팀 이름은 `[우리 팀]`으로 가리고, 단어로 상황 태그를 고르고, 행사 · 시점 · 태그로 제목을 만듭니다(예: '중간발표 앞두고 의견이 갈렸을 때 정리한 방법'). 넘긴 방법이 짧거나 다시 한다면이 비면 보완 질문을 냅니다. 요약은 도움돼요가 많은 일지 순으로 문장을 고르고, 숫자가 없는 성과 자리에 `[결과 수치 입력]`을 넣습니다. 다시 만들기는 고르는 순서를 돌립니다.
 - `portfolioStore.ts`: localStorage `likelion-portfolio:v1`에 프로젝트 · 형식별 마지막 요약과 오늘 만든 횟수를 둡니다. 날짜가 바뀌면 다시 5번입니다(실제 제한은 서버가 정함).
 - `api.ts`: 화면이 부르는 함수입니다. 백엔드 · AI가 정해지면 각 함수의 내부만 교체하세요.

@@ -9,11 +9,14 @@ import { Illust, type IllustName } from '@/components/ui/Illust'
 import { Pill } from '@/components/ui/Pill'
 import { meQuery } from '@/features/admin/queries'
 
-/** 검토 홈 맨 위 로고 줄: 앱 아이콘 · 손글씨 로고 · 운영진 뱃지 · 아바타 */
+/**
+ * 검토 홈 맨 위 로고 줄: 앱 아이콘 · 손글씨 로고 · 운영진 뱃지 · 아바타.
+ * 아기사자 홈처럼 본문 안에 넣어서 같이 스크롤해요.
+ */
 export function AdminLogoHeader() {
   const { data: me } = useQuery(meQuery())
   return (
-    <header className="flex h-[46px] w-full items-center gap-2 px-5 pt-1.5 pb-1">
+    <header className="flex w-full items-center gap-2">
       <Link to="/admin/review" aria-label="홈으로" className="flex items-center gap-2">
         <img src={appIcon} alt="" width={30} height={30} className="size-[30px] shrink-0" />
         <img
@@ -29,7 +32,7 @@ export function AdminLogoHeader() {
       </Pill>
       <div className="flex-1" />
       <Link
-        to="/admin/profile"
+        to="/profile"
         aria-label="프로필 설정"
         className="bg-card text-ink shadow-card flex size-9 shrink-0 items-center justify-center rounded-full text-[14px] font-bold active:brightness-95"
       >
