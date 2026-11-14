@@ -1,7 +1,9 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { deleteMeetingRecord } from '@/features/meeting/api'
 import { formatActionItem } from '@/features/meeting/formatRecord'
 import { shareMeetingRecord } from '@/features/meeting/shareRecord'
 import type { MeetingRecord } from '@/features/meeting/types'
@@ -17,6 +19,8 @@ export function MeetingHistoryCard({
 }) {
   const [open, setOpen] = useState(initiallyOpen)
   const [sharing, setSharing] = useState(false)
+  const [removing, setRemoving] = useState(false)
+  const queryClient = useQueryClient()
   const toast = useToast()
   const headerId = `record-heading-${record.id}`
   const panelId = `record-details-${record.id}`
@@ -33,6 +37,20 @@ export function MeetingHistoryCard({
       toast(error instanceof Error ? error.message : '회의 내용을 공유하지 못했어요.')
     } finally {
       setSharing(false)
+    }
+  }
+
+  async function remove() {
+    if (removing) return
+    if (!window.confirm(`${record.title} (${formatMonthDay(record.date)}) 기록을 지울까요?`)) return
+    setRemoving(true)
+    try {
+      await deleteMeetingRecord(record.id)
+      await queryClient.invalidateQueries({ queryKey: ['meeting'] })
+      toast('회의 기록을 지웠어요.')
+    } catch (error) {
+      toast(error instanceof Error ? error.message : '회의 기록을 지우지 못했어요.')
+      setRemoving(false)
     }
   }
 
@@ -105,6 +123,14 @@ export function MeetingHistoryCard({
             >
               공유하기
             </Button>
+            <button
+              type="button"
+              onClick={() => void remove()}
+              disabled={removing}
+              className="text-muted relative self-center text-[13px] leading-[16px] font-medium underline underline-offset-4 before:absolute before:-inset-2 disabled:opacity-50"
+            >
+              이 기록 지우기
+            </button>
           </div>
         </div>
       </div>

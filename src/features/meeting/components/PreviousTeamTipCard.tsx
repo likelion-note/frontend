@@ -17,7 +17,7 @@ export function PreviousTeamTipCard({ tip }: { tip: PreviousTeamTip }) {
         <span className="text-muted text-[12px] leading-[14px]">{tip.author}</span>
         {tip.handwritten ? (
           <span className="pt-0.5">
-            <img src={quote} width={155} height={24} alt={tip.excerpt} />
+            <img src={quote} width={194} height={30} alt={tip.excerpt} />
           </span>
         ) : (
           <span className="text-ink-2 text-[13px] leading-[16px]">{tip.excerpt}</span>

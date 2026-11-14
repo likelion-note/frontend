@@ -13,6 +13,16 @@ import { isSeedUser, userStorageKey } from '@/lib/currentUser'
 /** 회의 정리는 본인만 봐요. 계정마다 따로 보관해요. */
 export const recordsStorageKey = 'likelion-meeting-records:v1'
 const recordsKey = () => userStorageKey(recordsStorageKey)
+/** 지운 기록의 id. 예시 기록은 코드에 들어 있어서, 지웠다는 표시를 따로 남겨요 */
+const deletedKey = () => userStorageKey('likelion-meeting-deleted:v1')
+function deletedIds(): string[] {
+  try {
+    const value: unknown = JSON.parse(localStorage.getItem(deletedKey()) ?? '[]')
+    return Array.isArray(value) ? value.filter((id): id is string => typeof id === 'string') : []
+  } catch {
+    return []
+  }
+}
 const draftKey = (id: string) => `likelion-meeting-summary-draft:${id}`
 const object = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === 'object'
@@ -74,6 +84,7 @@ export function readMeetingRecords(): MeetingRecord[] {
   const seeds = isSeedUser() ? meetingRecords : []
   const byId = new Map(seeds.map((record) => [record.id, record]))
   for (const record of savedRecords()) byId.set(record.id, record)
+  for (const id of deletedIds()) byId.delete(id)
   return structuredClone([...byId.values()]).sort(
     (left, right) =>
       right.date.localeCompare(left.date) ||
@@ -83,6 +94,24 @@ export function readMeetingRecords(): MeetingRecord[] {
 }
 export function readMeetingRecord(id: string) {
   return readMeetingRecords().find((record) => record.id === id) ?? null
+}
+
+/** 회의 기록을 지워요. 이 기록을 불러와 쓴 성장일지의 내용은 그대로 남아요 */
+export function removeMeetingRecord(id: string) {
+  try {
+    localStorage.setItem(
+      recordsKey(),
+      JSON.stringify(savedRecords().filter((item) => item.id !== id)),
+    )
+    localStorage.setItem(deletedKey(), JSON.stringify([...new Set([...deletedIds(), id])]))
+  } catch {
+    throw new Error('회의 기록을 지우지 못했어요. 브라우저 저장소를 확인해 주세요.')
+  }
+  try {
+    sessionStorage.removeItem(draftKey(id))
+  } catch {
+    /* 임시 저장본은 못 지워도 괜찮아요 */
+  }
 }
 
 export function persistSummaryDraft(draft: MeetingSummaryDraft) {
