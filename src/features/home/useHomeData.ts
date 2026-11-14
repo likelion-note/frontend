@@ -12,12 +12,37 @@ import { homeMockData } from '@/features/home/mock/data'
 import { beforePartMockData, inactiveMockData } from '@/features/home/mock/states'
 import { useHomeMode } from '@/features/home/useHomeMode'
 import { useMyJournals } from '@/features/journal/useJournals'
-import { getCurrentUser } from '@/lib/currentUser'
+import { getCurrentUser, userStorageKey } from '@/lib/currentUser'
 import { useToast } from '@/hooks/useToast'
+
+/** 운영진 한마디에 '도움돼요'를 눌렀는지. 1인 1회라 계정마다 브라우저에 남겨요 */
+const staffHelpfulKey = () => userStorageKey('likelion-staff-helpful:v1')
+function readStaffHelpful() {
+  try {
+    return localStorage.getItem(staffHelpfulKey()) === '1'
+  } catch {
+    return false
+  }
+}
+function writeStaffHelpful(on: boolean) {
+  try {
+    if (on) localStorage.setItem(staffHelpfulKey(), '1')
+    else localStorage.removeItem(staffHelpfulKey())
+  } catch {
+    /* 저장이 막혀 있으면 이번 화면에서만 유지돼요 */
+  }
+}
 
 /** API 연결 지점. 홈과 가이드의 할 일은 같은 데이터와 완료 저장소를 사용해요. */
 export function useHomeData() {
-  const [data, setData] = useState(() => structuredClone(homeMockData))
+  const [data, setData] = useState(() => {
+    const initial = structuredClone(homeMockData)
+    if (readStaffHelpful()) {
+      initial.staffMessage.isHelpful = true
+      initial.staffMessage.helpfulCount += 1
+    }
+    return initial
+  })
   const mode = useHomeMode()
   const assignment = useMyAssignment()
   const assigned = assignment.data?.assignmentStatus === 'ASSIGNED' ? assignment.data : null
@@ -64,6 +89,7 @@ export function useHomeData() {
     if (error) toast(error)
   }
   function toggleHelpful() {
+    writeStaffHelpful(!data.staffMessage.isHelpful)
     setData((current) => ({
       ...current,
       staffMessage: {

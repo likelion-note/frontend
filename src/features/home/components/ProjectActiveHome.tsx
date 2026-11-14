@@ -1,3 +1,5 @@
+import { Link } from 'react-router'
+
 import grid from '@/assets/home/grid-bg.svg'
 import { Card } from '@/components/ui/Card'
 import { ArchiveSection } from '@/features/home/components/ArchiveSection'
@@ -50,20 +52,29 @@ export function ProjectActiveHome({
         action={data.journalAction}
         className="bg-accent flex min-h-[50px] items-center justify-center rounded-full px-4 text-center text-[18px] leading-[22px] font-bold tracking-[-0.18px] text-white"
       />
-      <Card as="section" aria-label="내 노트 통계">
+      <Card as="section" aria-label="내 노트 통계" className="relative active:brightness-[0.98]">
         <div className="flex items-center gap-2">
           <div className="bg-accent-soft flex size-10 shrink-0 items-center justify-center rounded-[14px]">
             <HomeIllustration name="paw" size={30} />
           </div>
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="text-[14px] leading-[17px] font-bold">
-              내 노트를 읽은 {data.noteStats.cohort}기 {data.noteStats.readCount}번 · 도움돼요{' '}
-              {data.noteStats.helpfulCount}
+              {/* 카드 어디를 눌러도 내 기록으로 가요 */}
+              <Link to="/me" className="before:absolute before:inset-0 before:rounded-2xl">
+                내 노트를 읽은 {data.noteStats.cohort}기 {data.noteStats.readCount}번 · 도움돼요{' '}
+                {data.noteStats.helpfulCount}
+              </Link>
             </p>
             <p className="text-muted mt-0.5 text-[12px] leading-[14px]">
               공개 중인 내 노트 {data.noteStats.publicCount}개
             </p>
           </div>
+          <span
+            aria-hidden="true"
+            className="text-icon-muted shrink-0 text-[18px] leading-[22px] font-bold"
+          >
+            ›
+          </span>
         </div>
       </Card>
       <ArchiveSection notes={data.archiveNotes} action={data.archiveAction} />
