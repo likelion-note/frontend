@@ -2,14 +2,15 @@ import { formatActionItem } from '@/features/meeting/formatRecord'
 import { isCompleteDate, localDateString } from '@/features/meeting/meetingDates'
 import type { MeetingRecord } from '@/features/meeting/types'
 import type { MyJournal } from '@/features/journal/types'
+import { now } from '@/lib/clock'
 import { formatMonthDay } from '@/lib/date'
 
 /**
  * '이번 주 회의 불러오기'. 회의 도우미에서 정리한 기록 중 이번 주(월~일, 브라우저 날짜) 것만 써요.
  * 회의 정리 완료 화면의 주간 개수(countThisWeek)와 같은 기준이에요.
  */
-export function thisWeekMeetings(records: MeetingRecord[], now = new Date()) {
-  const monday = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+export function thisWeekMeetings(records: MeetingRecord[], current = now()) {
+  const monday = new Date(current.getFullYear(), current.getMonth(), current.getDate())
   monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7))
   const nextMonday = new Date(monday)
   nextMonday.setDate(nextMonday.getDate() + 7)

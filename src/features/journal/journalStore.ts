@@ -1,5 +1,6 @@
 import { myJournals } from '@/features/journal/mock/data'
 import { otherJournals } from '@/features/journal/mock/others'
+import { now } from '@/lib/clock'
 import { SEED_USER_ID } from '@/lib/currentUser'
 import type { MyJournal } from '@/features/journal/types'
 
@@ -68,7 +69,7 @@ export function readJournal(id: string) {
 
 /** id 기준으로 덮어써요. 저장에 실패하면 화면이 안내할 수 있게 오류를 던져요. */
 export function writeJournal(journal: MyJournal): MyJournal {
-  const next = { ...journal, updatedAt: new Date().toISOString() }
+  const next = { ...journal, updatedAt: now().toISOString() }
   const saved = savedJournals().filter((item) => item.id !== next.id)
   try {
     localStorage.setItem(journalsStorageKey, JSON.stringify([...saved, next]))

@@ -7,6 +7,7 @@ import type {
   SummaryActionItem,
   Weekday,
 } from '@/features/meeting/types'
+import { now } from '@/lib/clock'
 import { formatWeekday } from '@/lib/date'
 
 export const weekdays: Weekday[] = ['월', '화', '수', '목', '금', '토', '일']
@@ -67,7 +68,7 @@ export function summaryToRecord(
   previous?: MeetingRecord,
 ): MeetingRecord {
   if (Object.keys(validateSummary(draft)).length) throw new Error('입력한 내용을 확인해 주세요.')
-  const now = new Date().toISOString()
+  const stamp = now().toISOString()
   return {
     id: draft.id,
     type: draft.type,
@@ -78,7 +79,7 @@ export function summaryToRecord(
     actionItems: draft.actionItems
       .filter((row) => row.assignee.trim() || row.task.trim() || row.dueDay)
       .map((row) => ({ ...row })),
-    createdAt: previous?.createdAt ?? now,
-    updatedAt: now,
+    createdAt: previous?.createdAt ?? stamp,
+    updatedAt: stamp,
   }
 }
