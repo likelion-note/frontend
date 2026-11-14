@@ -13,7 +13,7 @@ const crops = {
   eraser: { width: '945.24%', height: '630.16%', left: '-826.98%', top: '-334.13%' },
   pencil: { width: '844.68%', height: '563.12%', left: '-654.96%', top: '-291.49%' },
   flag: { width: '1134.29%', height: '756.19%', left: '-801.43%', top: '-528.57%' },
-  think: { width: '569.86%', height: '379.9%', left: '-98.56%', top: '-1.44%' },
+  think: { width: '614.4%', height: '409.6%', left: '-113.6%', top: '-1.6%' },
   folder: { width: '923.26%', height: '615.5%', left: '-445.74%', top: '-509.69%' },
   docs: { width: '992.5%', height: '661.67%', left: '-280%', top: '-552.5%' },
   bell: { width: '952.8%', height: '635.2%', left: '-573.6%', top: '-431.2%' },
