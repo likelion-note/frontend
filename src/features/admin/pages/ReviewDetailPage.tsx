@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router'
+import { Link, Navigate, useNavigate, useParams } from 'react-router'
 
-import { QuestionIcon } from '@/components/icons'
+import { ChevronIcon, QuestionIcon } from '@/components/icons'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Illust } from '@/components/ui/Illust'
@@ -60,7 +60,19 @@ export function ReviewDetailPage() {
 
   const cohort = me?.cohort ?? 14
   const position = pending ? pending.findIndex((j) => j.id === id) : -1
-  const counter = pending && position >= 0 ? `${position + 1} / ${pending.length}` : undefined
+  const prevId = pending && position > 0 ? pending[position - 1].id : null
+  const nextId = pending && position >= 0 ? (pending[position + 1]?.id ?? null) : null
+  // 대기 중인 일지끼리 앞 · 뒤로 넘겨 가며 볼 수 있어요
+  const counter =
+    pending && position >= 0 ? (
+      <span className="flex items-center gap-1">
+        <StepButton label="이전 일지" to={prevId} direction="prev" />
+        <span className="min-w-[38px] text-center">
+          {position + 1} / {pending.length}
+        </span>
+        <StepButton label="다음 일지" to={nextId} direction="next" />
+      </span>
+    ) : undefined
   const busy = approve.isPending || reject.isPending
 
   return (
@@ -171,5 +183,28 @@ function BodyBlock({ icon, label, text }: { icon: ReactNode; label: string; text
         {text}
       </p>
     </section>
+  )
+}
+
+/** 대기 중인 앞 · 뒤 일지로 넘기는 화살표. 끝이면 흐리게 꺼져요 */
+function StepButton({
+  label,
+  to,
+  direction,
+}: {
+  label: string
+  to: string | null
+  direction: 'prev' | 'next'
+}) {
+  const icon = <ChevronIcon size={18} className={direction === 'prev' ? 'rotate-180' : ''} />
+  const shape = 'relative flex size-6 items-center justify-center before:absolute before:-inset-1.5'
+  return to ? (
+    <Link to={`/admin/review/${to}`} replace aria-label={label} className={`${shape} text-ink`}>
+      {icon}
+    </Link>
+  ) : (
+    <span aria-hidden="true" className={`${shape} text-icon-muted opacity-40`}>
+      {icon}
+    </span>
   )
 }
