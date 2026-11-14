@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 
 import { Button } from '@/components/ui/Button'
 import { Segment } from '@/components/ui/Segment'
@@ -12,6 +12,7 @@ import {
   useMyJournals,
   useMyProjects,
   usePortfolioQuota,
+  usePortfolioSummary,
 } from '@/features/journal/useJournals'
 import { useToast } from '@/hooks/useToast'
 import { cn } from '@/lib/cn'
@@ -54,6 +55,8 @@ export function PortfolioTab() {
   const selected =
     rows.find((row) => row.project.id === picked && row.ready) ?? rows.find((row) => row.ready)
   const left = quota.data ?? 0
+  // 고른 프로젝트 · 형식으로 전에 만든 요약이 있으면 횟수를 쓰지 않고 다시 열 수 있어요.
+  const previous = usePortfolioSummary(selected?.project.id ?? '', format)
 
   async function create() {
     if (!selected || creating) return
@@ -107,6 +110,14 @@ export function PortfolioTab() {
       >
         요약 만들기
       </Button>
+      {selected && previous.data && (
+        <Link
+          to={`/me/portfolio/${selected.project.id}?format=${format}`}
+          className="text-accent-deep relative self-center text-[13px] leading-[17px] font-bold underline underline-offset-4 before:absolute before:-inset-2"
+        >
+          전에 만든 요약 보기
+        </Link>
+      )}
       <p className="text-muted text-center text-[12px] leading-[17px]">
         {quota.isPending
           ? '남은 횟수를 확인하고 있어요'

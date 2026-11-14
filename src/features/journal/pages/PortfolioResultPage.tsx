@@ -145,7 +145,11 @@ export function PortfolioResultPage() {
           <span className="marker-underline">근거가 된 일지</span>
         </h2>
         {used.length > 0 ? (
-          <JournalList journals={used} meta={(journal) => formatMonthDay(journalDate(journal))} />
+          <JournalList
+            journals={used}
+            meta={(journal) => formatMonthDay(journalDate(journal))}
+            from={`/me/portfolio/${projectId}?format=${format}`}
+          />
         ) : (
           <p className="text-muted text-[13px]">
             근거가 된 일지를 찾지 못했어요.{' '}

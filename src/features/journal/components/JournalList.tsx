@@ -13,9 +13,12 @@ import type { MyJournal } from '@/features/journal/types'
 export function JournalList({
   journals,
   meta,
+  from,
 }: {
   journals: MyJournal[]
   meta: (journal: MyJournal) => string
+  /** 이 목록이 있는 화면 주소. 일지 상세의 '뒤로'가 여기로 돌아와요 (없으면 내 기록) */
+  from?: string
 }) {
   return (
     <Card as="section" className="flex flex-col px-[18px] py-1">
@@ -32,6 +35,7 @@ export function JournalList({
               <li>
                 <Link
                   to={to}
+                  state={from ? { from } : undefined}
                   className="focus-visible:outline-accent flex items-center gap-2 rounded py-3 focus-visible:outline-2"
                 >
                   <span className="flex min-w-0 flex-1 flex-col gap-[3px]">

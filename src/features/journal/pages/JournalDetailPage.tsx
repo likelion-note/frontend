@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from 'react-router'
+import { Link, useLocation, useNavigate, useParams } from 'react-router'
 
 import grid from '@/assets/journal/grid-bg.svg'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
@@ -14,6 +14,7 @@ import {
 } from '@/features/journal/labels'
 import type { MyJournal } from '@/features/journal/types'
 import { useMyJournal, useMyProjects } from '@/features/journal/useJournals'
+import { useNotes } from '@/features/note/useNotes'
 import { cn } from '@/lib/cn'
 
 /**
@@ -26,11 +27,22 @@ export function JournalDetailPage() {
   const query = useMyJournal(id)
   const projects = useMyProjects()
   const journal = query.data
+  // 요약 결과의 '근거가 된 일지'에서 왔으면 그 화면으로 돌아가요.
+  const from = (useLocation().state as { from?: string } | null)?.from
+  const backTo = from?.startsWith('/me') ? from : '/me'
+  // 공개 중인 일지는 노트 게시판에 올라간 노트를 바로 열 수 있어요.
+  const notes = useNotes()
+  const noteId =
+    journal?.status === 'APPROVED'
+      ? notes.data?.find(
+          (note) => note.id === journal.id || note.title === journal.organized?.title,
+        )?.id
+      : undefined
 
   return (
     <div className="flex h-full min-h-0 flex-col">
       <div className="bg-paper shrink-0">
-        <BackHeader title="내 일지" backTo="/me" />
+        <BackHeader title="내 일지" backTo={backTo} />
       </div>
       <ScreenContent
         className="bg-paper [background-size:390px_auto] [background-position:top_center] [background-repeat:repeat-y] pt-2 pb-[max(28px,env(safe-area-inset-bottom))]"
@@ -58,6 +70,14 @@ export function JournalDetailPage() {
               </p>
             </div>
             <StatusNotice journal={journal} />
+            {noteId && (
+              <Link
+                to={`/notes/${noteId}`}
+                className="bg-accent-soft text-accent-deep flex h-[46px] w-full items-center justify-center rounded-full text-[16px] font-bold tracking-[-0.16px] active:brightness-95"
+              >
+                노트 게시판에서 보기
+              </Link>
+            )}
             {(journal.status === 'REJECTED' || journal.status === 'DRAFT') && (
               <>
                 <Button
