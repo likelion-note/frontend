@@ -127,26 +127,27 @@ export function ReviewDetailPage() {
             </div>
           </div>
 
-          <div className="h-1" />
-
-          {journal.status === 'PENDING' ? (
-            <div className="flex w-full items-center gap-2">
-              <Button
-                variant="ghost"
-                className="flex-1"
-                disabled={busy}
-                onClick={() => setRejectOpen(true)}
-              >
-                돌려보내기
-              </Button>
-              <Button className="flex-1" disabled={busy} onClick={() => approve.mutate()}>
-                승인하고 올리기
-              </Button>
-            </div>
-          ) : (
+          {journal.status !== 'PENDING' && (
             <p className="text-muted text-center text-[13px]">이미 처리한 일지예요.</p>
           )}
         </AdminContent>
+      )}
+
+      {/* 승인 · 돌려보내기는 본문을 다 내리지 않아도 누를 수 있게 아래에 붙여 둬요 */}
+      {journal?.status === 'PENDING' && (
+        <div className="border-header-line bg-paper/95 flex w-full shrink-0 items-center gap-2 border-t px-5 pt-3 pb-5">
+          <Button
+            variant="ghost"
+            className="flex-1"
+            disabled={busy}
+            onClick={() => setRejectOpen(true)}
+          >
+            돌려보내기
+          </Button>
+          <Button className="flex-1" disabled={busy} onClick={() => approve.mutate()}>
+            승인하고 올리기
+          </Button>
+        </div>
       )}
 
       <RejectSheet
