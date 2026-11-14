@@ -5,7 +5,7 @@ import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { NoteBookmarkIcon } from '@/features/note/components/NoteBookmarkIcon'
 import { NoteDiaryPaper } from '@/features/note/components/NoteDiaryPaper'
 import { NoteNextCard } from '@/features/note/components/NoteNextCard'
-import { filterNotes, readFilters } from '@/features/note/noteFilters'
+import { filterNotes, noteDetailTitle, readFilters } from '@/features/note/noteFilters'
 import { useMyNotePart } from '@/features/note/useMyNotePart'
 import { useNoteState } from '@/features/note/useNoteState'
 import { useNote, useNotes } from '@/features/note/useNotes'
@@ -60,7 +60,7 @@ export function NoteDetailPage() {
     <div className="flex h-full min-h-0 flex-col">
       <div className="bg-paper shrink-0">
         <BackHeader
-          title="선배 노트"
+          title={noteDetailTitle(note.data)}
           backTo={`/notes${location.search}`}
           viewTransition
           right={
@@ -77,7 +77,7 @@ export function NoteDetailPage() {
                   aria-label="노트 저장"
                   aria-pressed={saved}
                   onClick={() => toggle('saved')}
-                  className="text-ink focus-visible:outline-accent shrink-0 rounded focus-visible:outline-2"
+                  className="text-ink focus-visible:outline-accent relative shrink-0 rounded before:absolute before:-inset-2.5 focus-visible:outline-2"
                 >
                   <NoteBookmarkIcon filled={saved} />
                 </button>

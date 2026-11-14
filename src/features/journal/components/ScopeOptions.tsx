@@ -4,7 +4,7 @@ import { cn } from '@/lib/cn'
 
 /**
  * '누구에게 공개할까요' 라디오 카드 두 장. 고른 카드는 연주황 바탕 · 주황 테두리예요.
- * 다음 기수 공개는 팀 이름 대신 'A팀'처럼 가린 이름으로 보여요.
+ * 다음 기수 공개는 팀 이름 대신 'A팀'처럼 가린 이름으로 보여요 (pastLabel).
  */
 export function ScopeOptions({
   id,
@@ -12,12 +12,15 @@ export function ScopeOptions({
   onChange,
   cohort,
   partLabel,
+  pastLabel,
 }: {
   id: string
   value: Scope
   onChange: (value: Scope) => void
   cohort: number
   partLabel: string | null
+  /** '지난 기수 A팀'. 팀 배정 전이면 '지난 기수' */
+  pastLabel: string
 }) {
   const options: { value: Scope; lines: string[] }[] = [
     {
@@ -30,9 +33,7 @@ export function ScopeOptions({
     },
     {
       value: 'NEXT',
-      lines: [
-        ['내년 아기사자에게만 보여요', '지난 기수 A팀', partLabel].filter(Boolean).join(' · '),
-      ],
+      lines: [['내년 아기사자에게만 보여요', pastLabel, partLabel].filter(Boolean).join(' · ')],
     },
   ]
   return (

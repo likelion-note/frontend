@@ -16,6 +16,7 @@ import {
   type UserType,
 } from '@/features/admin/types'
 import { readJournal, readJournals, writeJournal } from '@/features/journal/journalStore'
+import { pastTeamLabel } from '@/features/journal/labels'
 import type { MyJournal } from '@/features/journal/types'
 import { localDateString } from '@/features/meeting/meetingDates'
 import { phaseLabel } from '@/features/note/noteFilters'
@@ -80,12 +81,6 @@ export type PendingSort = 'oldest' | 'newest'
 
 const adminCount = () => store.members.filter((m) => m.type === 'ADMIN').length
 
-/** 다음 기수에게 보이는 팀 가명 (A팀, B팀…). 아기사자 팀 분류가 만들어진 순서예요 */
-function teamLetter(projectId: string | null): string | null {
-  const index = store.projects.filter((p) => p.kind === 'TEAM').findIndex((p) => p.id === projectId)
-  return index >= 0 ? String.fromCharCode(65 + index) : null
-}
-
 /** 공개되면 붙는 익명 표기. 작성자가 고른 범위 그대로 보여줘요 */
 function reviewLabel(journal: MyJournal): string {
   const owner = store.members.find((m) => m.id === journal.ownerId)
@@ -94,8 +89,7 @@ function reviewLabel(journal: MyJournal): string {
   }
   const part = journal.part ? PART_LABEL[journal.part] : null
   if (journal.scope === 'NEXT') {
-    const letter = teamLetter(journal.projectId)
-    return [letter ? `지난 기수 ${letter}팀` : '지난 기수', part].filter(Boolean).join(' · ')
+    return [pastTeamLabel(journal.projectId), part].filter(Boolean).join(' · ')
   }
   const when =
     journal.eventType && journal.phase
@@ -121,7 +115,7 @@ function toReview(journal: MyJournal): ReviewJournal | null {
       nextTime: organized.body.nextTime,
     },
     maskedCount: organized.maskedCount,
-    submittedAt: journal.submittedAt ?? journal.updatedAt.slice(0, 10),
+    submittedAt: journal.submittedAt ?? localDateString(new Date(journal.updatedAt)),
     status: journal.status,
     decidedAt: journal.decidedAt,
     rejectReason: journal.rejectReason,

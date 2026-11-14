@@ -111,5 +111,13 @@ export function formatNoteMeta(note: Note) {
 /** 상세 머리말의 시기. '중간발표 · 1~2주 전' */
 export const formatNoteTiming = (note: Note) => `${note.event} · ${phaseLabel(note.phase)}`
 
-/** 상세 맺음말의 작성자. 이름 없이 기수와 파트만 보여줘요. '14기 PM 선배' */
-export const formatNoteAuthor = (note: Note) => `${note.cohort}기 ${partLabel(note.part)} 선배`
+/** 지난 기수가 쓴 노트인지. 같은 기수 노트는 '선배'라고 부르지 않아요 */
+export const isPastNote = (note: Note) => note.cohort < currentCohort
+
+/** 상세 맺음말의 작성자. 이름 없이 기수와 파트만 보여줘요. '13기 PM 선배' / '14기 PM' */
+export const formatNoteAuthor = (note: Note) =>
+  `${note.cohort}기 ${partLabel(note.part)}${isPastNote(note) ? ' 선배' : ''}`
+
+/** 상세 화면 제목 */
+export const noteDetailTitle = (note: Note | null | undefined) =>
+  note && !isPastNote(note) ? '우리 기수 노트' : '선배 노트'

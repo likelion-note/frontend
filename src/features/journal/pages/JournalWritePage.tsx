@@ -16,6 +16,7 @@ import {
   journalParts,
   journalPhases,
   partLabel,
+  pastTeamLabel,
 } from '@/features/journal/labels'
 import { importMeetings, meetingsLabel, thisWeekMeetings } from '@/features/journal/meetingImport'
 import type { MyJournal } from '@/features/journal/types'
@@ -328,6 +329,7 @@ export function JournalWritePage() {
             onChange={(scope) => update({ ...draft, scope })}
             cohort={draft.cohort}
             partLabel={draft.part ? partLabel(draft.part) : null}
+            pastLabel={pastTeamLabel(draft.projectId)}
           />
         </section>
         <p className="text-muted text-[12px] leading-[17px]">
