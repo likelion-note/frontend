@@ -1,4 +1,5 @@
 import { localDateString } from '@/features/meeting/meetingDates'
+import { userStorageKey } from '@/lib/currentUser'
 import { dailyPortfolioLimit } from '@/features/journal/mock/data'
 import type { PortfolioFormat, PortfolioSummary } from '@/features/journal/types'
 
@@ -6,7 +7,8 @@ import type { PortfolioFormat, PortfolioSummary } from '@/features/journal/types
  * 포트폴리오 요약과 오늘 만든 횟수를 브라우저에 보관해요.
  * 횟수 제한은 실제로는 서버가 정해요. 날짜가 바뀌면 다시 5번이에요.
  */
-const storageKey = 'likelion-portfolio:v1'
+/** 요약과 하루 횟수는 계정마다 따로 보관해요. */
+const storageKey = () => userStorageKey('likelion-portfolio:v1')
 
 type State = {
   date: string
@@ -20,7 +22,7 @@ export const summaryKey = (projectId: string, format: PortfolioFormat) => `${pro
 function read(): State {
   const today = localDateString()
   try {
-    const value = JSON.parse(localStorage.getItem(storageKey) ?? 'null') as State | null
+    const value = JSON.parse(localStorage.getItem(storageKey()) ?? 'null') as State | null
     if (value && typeof value === 'object' && value.summaries) {
       return value.date === today ? value : { ...value, date: today, used: 0 }
     }
@@ -32,7 +34,7 @@ function read(): State {
 
 function write(state: State) {
   try {
-    localStorage.setItem(storageKey, JSON.stringify(state))
+    localStorage.setItem(storageKey(), JSON.stringify(state))
   } catch {
     throw new Error('요약을 저장하지 못했어요. 저장 공간과 브라우저 권한을 확인해 주세요.')
   }

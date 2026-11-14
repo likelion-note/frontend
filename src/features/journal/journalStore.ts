@@ -1,4 +1,6 @@
 import { myJournals } from '@/features/journal/mock/data'
+import { otherJournals } from '@/features/journal/mock/others'
+import { SEED_USER_ID } from '@/lib/currentUser'
 import type { MyJournal } from '@/features/journal/types'
 
 /**
@@ -38,10 +40,21 @@ function savedJournals(): MyJournal[] {
   }
 }
 
-/** 최근에 쓴 일지가 위로 와요. */
+/** 피그마 예시 일지 5개는 목 계정 '데옹'의 일지예요. */
+export const SEED_OWNER_ID = SEED_USER_ID
+
+/** 처음부터 들어 있는 일지: 데옹의 일지 + 다른 멤버가 낸 일지(운영진 검토용) */
+export const seedJournals: MyJournal[] = [
+  ...myJournals.map((journal) => ({ ...journal, ownerId: SEED_OWNER_ID })),
+  ...otherJournals,
+]
+
+/** 모든 사람의 일지. 최근에 쓴 일지가 위로 와요. 내 것만 볼 때는 api.ts의 getMyJournals를 써요. */
 export function readJournals(): MyJournal[] {
-  const byId = new Map(myJournals.map((journal) => [journal.id, journal]))
-  for (const journal of savedJournals()) byId.set(journal.id, journal)
+  const byId = new Map(seedJournals.map((journal) => [journal.id, journal]))
+  for (const journal of savedJournals()) {
+    byId.set(journal.id, { ...journal, ownerId: journal.ownerId ?? SEED_OWNER_ID })
+  }
   return structuredClone([...byId.values()]).sort(
     (left, right) =>
       (right.submittedAt ?? right.updatedAt).localeCompare(left.submittedAt ?? left.updatedAt) ||

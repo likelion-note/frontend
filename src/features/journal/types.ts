@@ -41,6 +41,8 @@ export interface OrganizedJournal {
 
 export interface MyJournal {
   id: string
+  /** 쓴 사람의 사용자 id. 내 기록은 내 것만 보여주고, 운영진 검토는 모두의 일지를 봐요. */
+  ownerId?: string
   cohort: number
   projectId: string | null
   eventType: JournalEventType | null
