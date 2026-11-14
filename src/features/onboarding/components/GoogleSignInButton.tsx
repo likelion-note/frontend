@@ -14,11 +14,14 @@ type Props = {
 }
 
 /**
- * 구글 로그인 버튼. 우리 디자인의 버튼 위에 구글 공식 버튼을 투명하게 겹쳐서,
- * 보이는 건 우리 버튼이고 눌리는 건 구글 버튼이에요 (ID 토큰은 공식 버튼으로만 받을 수 있어요).
+ * 구글 로그인 버튼. ID 토큰은 구글 공식 버튼으로만 받을 수 있어서 공식 버튼을 그대로 보여줘요.
+ *
+ * 예전에는 우리 버튼 위에 공식 버튼을 투명하게 겹쳤는데, 구글은 보이지 않는 버튼이 눌리는 걸
+ * 막아요 (PC의 둥근 폰 프레임 안에서 실제로 안 눌렸어요). 그래서 가리지 않고 보이게 둬요.
+ * 공식 버튼이 준비되기 전에는 같은 자리에 우리 버튼을 비활성으로 보여줘요.
  */
 export function GoogleSignInButton({ onCredential, onError, disabled = false }: Props) {
-  const overlayRef = useRef<HTMLDivElement>(null)
+  const slotRef = useRef<HTMLDivElement>(null)
   const [ready, setReady] = useState(false)
   const onCredentialRef = useRef(onCredential)
   const onErrorRef = useRef(onError)
@@ -27,8 +30,8 @@ export function GoogleSignInButton({ onCredential, onError, disabled = false }: 
 
   useEffect(() => {
     let cancelled = false
-    const overlay = overlayRef.current
-    if (!overlay) return
+    const slot = slotRef.current
+    if (!slot) return
 
     loadGoogleIdentity()
       .then((google) => {
@@ -39,14 +42,15 @@ export function GoogleSignInButton({ onCredential, onError, disabled = false }: 
           ux_mode: 'popup',
           itp_support: true,
         })
-        overlay.innerHTML = ''
-        google.accounts.id.renderButton(overlay, {
+        slot.innerHTML = ''
+        google.accounts.id.renderButton(slot, {
           type: 'standard',
+          theme: 'outline',
           size: 'large',
           text: 'continue_with',
           shape: 'pill',
           logo_alignment: 'center',
-          width: Math.min(400, Math.max(200, Math.round(overlay.clientWidth || 350))),
+          width: Math.min(400, Math.max(200, Math.round(slot.clientWidth || 350))),
           locale: 'ko',
         })
         setReady(true)
@@ -61,18 +65,20 @@ export function GoogleSignInButton({ onCredential, onError, disabled = false }: 
   }, [])
 
   return (
-    <div className="relative w-full">
-      <Button variant="ghost" className="gap-2" disabled={disabled || !ready} tabIndex={-1}>
-        <GoogleIcon />
-        Google 계정으로 계속하기
-      </Button>
-      {/* 구글 공식 버튼. 투명하게 겹쳐서 클릭만 받아요 */}
+    <div className="relative flex min-h-[50px] w-full items-center justify-center">
+      {!ready && (
+        <Button variant="ghost" className="gap-2" disabled tabIndex={-1}>
+          <GoogleIcon />
+          Google 계정으로 계속하기
+        </Button>
+      )}
+      {/* 구글 공식 버튼이 그려지는 자리. 로그인 요청 중에는 다시 못 누르게 해요 */}
       <div
-        ref={overlayRef}
-        aria-label="Google 계정으로 계속하기"
+        ref={slotRef}
         className={cn(
-          'absolute inset-0 flex items-center justify-center overflow-hidden opacity-0 [&_iframe]:!h-[50px] [&>div]:h-full [&>div]:w-full',
-          (disabled || !ready) && 'pointer-events-none',
+          'flex w-full items-center justify-center transition-opacity',
+          !ready && 'invisible absolute inset-0',
+          disabled && 'pointer-events-none opacity-50',
         )}
       />
     </div>
