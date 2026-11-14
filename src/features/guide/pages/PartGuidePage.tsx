@@ -122,7 +122,7 @@ export function PartGuidePage() {
             </Chip>
           ))}
         </div>
-        <label className="border-input-line relative flex h-[50px] items-center border-b-[1.4px] px-0.5">
+        <label className="border-input-line relative flex h-[50px] items-center gap-1.5 border-b-[1.4px] px-0.5">
           <GuideIllustration name="calendar" size={24} />
           <select
             aria-label="주차 선택"
@@ -180,7 +180,7 @@ export function PartGuidePage() {
                   (task.action.kind === 'meeting' ? (
                     <Link
                       to={ideaMeetingPath(location.search)}
-                      className="text-accent-deep mt-[3px] block text-left text-[12px] leading-[14px] font-bold"
+                      className="text-accent-deep relative mt-[3px] block w-fit text-left text-[12px] leading-[14px] font-bold before:absolute before:-inset-x-2 before:-inset-y-1.5"
                     >
                       {task.action.label}
                     </Link>
@@ -192,7 +192,7 @@ export function PartGuidePage() {
                         setResourceIds(task.action?.resourceIds ?? [])
                         setResourcesOpen(true)
                       }}
-                      className="text-accent-deep mt-[3px] block text-left text-[12px] leading-[14px] font-bold"
+                      className="text-accent-deep relative mt-[3px] block w-fit text-left text-[12px] leading-[14px] font-bold before:absolute before:-inset-x-2 before:-inset-y-1.5"
                     >
                       {task.action.label}
                     </button>

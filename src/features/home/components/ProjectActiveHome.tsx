@@ -40,7 +40,7 @@ export function ProjectActiveHome({
           </div>
           <HomeAction
             action={data.returnedJournal.action}
-            className="text-danger shrink-0 text-[13px] leading-[16px] font-bold"
+            className="text-danger relative shrink-0 text-[13px] leading-[16px] font-bold before:absolute before:-inset-2.5"
           />
         </section>
       )}

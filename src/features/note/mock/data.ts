@@ -71,7 +71,7 @@ export const notes: Note[] = [
     phase: 'soon',
     title: '중간발표 덱을 3장으로 줄인 날',
     excerpt: '발표보다 질문이 먼저 나왔어요',
-    handwrittenImage: { src: presentationQuote, width: 155, height: 24 },
+    handwrittenImage: { src: presentationQuote, width: 194, height: 30 },
     tags: ['#발표 준비'],
     sections: {
       stuck:

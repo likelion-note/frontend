@@ -136,7 +136,7 @@ export function MeetingSummaryForm({
         <button
           type="button"
           onClick={() => update({ ...draft, actionItems: [...draft.actionItems, newActionItem()] })}
-          className="text-accent-deep self-start text-[14px] leading-[17px] font-bold"
+          className="text-accent-deep relative self-start text-[14px] leading-[17px] font-bold before:absolute before:-inset-2.5"
         >
           + 한 줄 추가
         </button>

@@ -72,7 +72,7 @@ export function ReviewHomePage() {
             <button
               type="button"
               onClick={() => setSort(sort === 'oldest' ? 'newest' : 'oldest')}
-              className="text-muted text-[13px] leading-none font-medium"
+              className="text-muted relative text-[13px] leading-none font-medium before:absolute before:-inset-2.5"
             >
               {SORT_LABEL[sort]} ▾
             </button>

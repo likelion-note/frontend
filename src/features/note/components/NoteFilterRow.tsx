@@ -28,8 +28,8 @@ export function NoteFilterRow<T extends string>({
       <span className="text-muted w-[25px] shrink-0 text-[12px] leading-[14px] font-bold">
         {label}
       </span>
-      {/* 칩 줄은 화면 오른쪽 끝까지 이어져요. */}
-      <div className="no-scrollbar -mr-5 flex min-w-0 flex-1 gap-1.5 overflow-x-auto overscroll-x-contain pr-5">
+      {/* 칩 줄은 화면 오른쪽 끝까지 이어져요. 끝은 흐리게 해서 옆으로 더 있다는 걸 알려줘요. */}
+      <div className="no-scrollbar -mr-5 flex min-w-0 flex-1 gap-1.5 overflow-x-auto overscroll-x-contain [mask-image:linear-gradient(to_right,#000_calc(100%-22px),transparent)] pr-5">
         {options.map((option) => {
           const selected = option.value === value
           return (
