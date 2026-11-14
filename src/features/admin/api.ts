@@ -1,4 +1,4 @@
-import { MOCK_COHORT, nextId, saveStore, store } from '@/features/admin/mock/store'
+import { MOCK_COHORT, nextId, saveStore, store, today } from '@/features/admin/mock/store'
 import { getProjectTimeline } from '@/features/admin/timeline'
 import {
   EVENT_TYPE_LABEL,
@@ -146,7 +146,8 @@ export async function listPendingJournals(sort: PendingSort = 'oldest'): Promise
   return sort === 'oldest' ? list : list.reverse()
 }
 
-export async function listRecentDecisions(limit = 3): Promise<ReviewJournal[]> {
+/** 처리한 일지 (최근 처리한 것부터). 검토 홈은 앞의 몇 개만 보여주고 '전체 보기'로 펼쳐요 */
+export async function listRecentDecisions(limit = Infinity): Promise<ReviewJournal[]> {
   await delay(150)
   const decided = readJournals()
     .filter((j) => j.status === 'APPROVED' || j.status === 'REJECTED')
@@ -214,6 +215,17 @@ export async function assignMember(
   return clone(member)
 }
 
+/** 배정 풀기. 파트와 프로젝트를 비워서 '배정 전' 목록으로 돌려보내요. 쓴 일지는 그 분류에 남아요 */
+export async function unassignMember(memberId: string): Promise<Member> {
+  await delay(250)
+  const member = store.members.find((m) => m.id === memberId)
+  if (!member) throw notFound('멤버')
+  member.part = null
+  member.projectId = null
+  saveStore()
+  return clone(member)
+}
+
 export async function createProject(input: {
   title: string
   kind: ProjectKind
@@ -221,6 +233,9 @@ export async function createProject(input: {
   await delay(250)
   const title = input.title.trim()
   if (!title) throw new Error('분류 제목을 적어 주세요')
+  if (store.projects.some((p) => p.title.replace(/\s+/g, '') === title.replace(/\s+/g, ''))) {
+    throw new Error('같은 제목의 분류가 이미 있어요')
+  }
   const shortName = title.split('·').pop()?.trim() || title
   const project: ProjectCategory = {
     id: nextId('p'),
@@ -285,6 +300,7 @@ export async function createInviteCode(input: {
   expiresAt: string
 }): Promise<InviteCode> {
   await delay(250)
+  if (input.expiresAt < today()) throw new Error('만료일은 오늘 이후로 골라 주세요')
   const prefix = input.userType === 'MEMBER' ? 'LION' : 'STAF'
   let code = `${prefix}${input.cohort}`
   // 같은 코드가 있으면 뒤에 숫자를 붙여요 (6자리 유지)

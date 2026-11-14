@@ -44,8 +44,24 @@ export function AssignSheet({ member, isNew = false, onClose }: Props) {
     onError: (e: Error) => toast(e.message),
   })
 
+  const unassign = useMutation({
+    mutationFn: () => {
+      if (!member) throw new Error('멤버를 찾을 수 없어요')
+      return api.unassignMember(member.id)
+    },
+    onSuccess: async (saved) => {
+      await invalidate()
+      toast(`${saved.name} 님의 배정을 풀었어요`)
+      onClose()
+    },
+    onError: (e: Error) => toast(e.message),
+  })
+
   const teamProjects = projects?.filter((p) => p.kind === 'TEAM') ?? []
-  const canSave = Boolean(part && projectId) && !save.isPending
+  const busy = save.isPending || unassign.isPending
+  const assigned = Boolean(member?.part && member.projectId)
+  const changed = part !== (member?.part ?? null) || projectId !== (member?.projectId ?? null)
+  const canSave = Boolean(part && projectId) && changed && !busy
 
   return (
     <BottomSheet
@@ -95,6 +111,16 @@ export function AssignSheet({ member, isNew = false, onClose }: Props) {
           저장하기
         </Button>
       </div>
+      {assigned && (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={() => unassign.mutate()}
+          className="text-muted relative self-center text-[13px] font-medium underline underline-offset-4 before:absolute before:-inset-2 disabled:opacity-50"
+        >
+          배정 풀기
+        </button>
+      )}
     </BottomSheet>
   )
 }
