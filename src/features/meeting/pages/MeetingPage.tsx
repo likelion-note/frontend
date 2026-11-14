@@ -5,6 +5,7 @@ import { BottomNav } from '@/components/common/BottomNav'
 import { Button } from '@/components/ui/Button'
 import { Segment } from '@/components/ui/Segment'
 import { useHomeMode } from '@/features/home/useHomeMode'
+import { canUseMeeting } from '@/features/home/state'
 import { MeetingHelpBottomSheet } from '@/features/meeting/components/MeetingHelpBottomSheet'
 import { MeetingHelpSection } from '@/features/meeting/components/MeetingHelpSection'
 import { MeetingIllustration } from '@/features/meeting/components/MeetingIllustration'
@@ -23,11 +24,11 @@ export function MeetingPage({ onFinish }: { onFinish?: () => void }) {
   const navigate = useNavigate()
   const toast = useToast()
   const meeting = useMeeting()
-  const records = useMeetingRecords(mode === 'project-active')
+  const records = useMeetingRecords(canUseMeeting(mode))
   const swipe = useMeetingSwipe(meeting.moveType)
   const [helpOpen, setHelpOpen] = useState(false)
   const [situationId, setSituationId] = useState<SituationId>('consensus')
-  if (mode !== 'project-active') return <Navigate to={`/home${location.search}`} replace />
+  if (!canUseMeeting(mode)) return <Navigate to={`/home${location.search}`} replace />
   function finish() {
     if (onFinish) {
       onFinish()

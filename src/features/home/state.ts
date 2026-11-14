@@ -17,3 +17,8 @@ export function readPreviewState(params: URLSearchParams, fallback: HomeState): 
     isProjectActive: readBoolean('projectActive', fallback.isProjectActive),
   }
 }
+
+/** 회의 도우미는 배정 전에도 쓸 수 있어요. 프로젝트 기간이 아닐 때만 막아요. */
+export function canUseMeeting(mode: HomeMode | null): boolean {
+  return mode !== null && mode !== 'project-inactive'
+}

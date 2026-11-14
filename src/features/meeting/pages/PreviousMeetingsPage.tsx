@@ -4,6 +4,7 @@ import backIcon from '@/assets/meeting/history-back.svg'
 import grid from '@/assets/meeting/history-grid.svg'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { useHomeMode } from '@/features/home/useHomeMode'
+import { canUseMeeting } from '@/features/home/state'
 import { MeetingHistoryCard } from '@/features/meeting/components/MeetingHistoryCard'
 import { MeetingIllustration } from '@/features/meeting/components/MeetingIllustration'
 import { useMeetingRecords } from '@/features/meeting/useMeetingRecords'
@@ -11,8 +12,8 @@ import { useMeetingRecords } from '@/features/meeting/useMeetingRecords'
 export function PreviousMeetingsPage() {
   const mode = useHomeMode()
   const location = useLocation()
-  const records = useMeetingRecords(mode === 'project-active')
-  if (mode !== 'project-active') return <Navigate to={`/home${location.search}`} replace />
+  const records = useMeetingRecords(canUseMeeting(mode))
+  if (!canUseMeeting(mode)) return <Navigate to={`/home${location.search}`} replace />
 
   return (
     <div className="flex h-full min-h-0 flex-col">
