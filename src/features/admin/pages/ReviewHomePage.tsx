@@ -40,8 +40,8 @@ export function ReviewHomePage() {
 
   return (
     <>
-      <AdminLogoHeader />
-      <AdminContent className="pt-2.5">
+      <AdminContent className="pt-1">
+        <AdminLogoHeader />
         {/* 인사말 */}
         <div className="flex w-full items-center gap-2 pt-1">
           <div className="flex min-w-0 flex-1 flex-col gap-0.5">
