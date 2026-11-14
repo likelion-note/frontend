@@ -8,8 +8,11 @@ import {
   weekdays,
 } from '@/features/meeting/summaryDraft'
 import type { MeetingRecord, MeetingSummaryDraft, MeetingType } from '@/features/meeting/types'
+import { isSeedUser, userStorageKey } from '@/lib/currentUser'
 
+/** 회의 정리는 본인만 봐요. 계정마다 따로 보관해요. */
 export const recordsStorageKey = 'likelion-meeting-records:v1'
+const recordsKey = () => userStorageKey(recordsStorageKey)
 const draftKey = (id: string) => `likelion-meeting-summary-draft:${id}`
 const object = (value: unknown): value is Record<string, unknown> =>
   !!value && typeof value === 'object'
@@ -58,7 +61,7 @@ function validDraft(value: unknown): value is MeetingSummaryDraft {
 }
 function savedRecords(): MeetingRecord[] {
   try {
-    const value: unknown = JSON.parse(localStorage.getItem(recordsStorageKey) ?? '[]')
+    const value: unknown = JSON.parse(localStorage.getItem(recordsKey()) ?? '[]')
     if (!Array.isArray(value) || !value.every(validRecord)) throw new Error('Invalid records')
     return value
   } catch {
@@ -67,7 +70,9 @@ function savedRecords(): MeetingRecord[] {
 }
 
 export function readMeetingRecords(): MeetingRecord[] {
-  const byId = new Map(meetingRecords.map((record) => [record.id, record]))
+  // 예시 회의 기록은 예시 계정(데옹)의 것이에요.
+  const seeds = isSeedUser() ? meetingRecords : []
+  const byId = new Map(seeds.map((record) => [record.id, record]))
   for (const record of savedRecords()) byId.set(record.id, record)
   return structuredClone([...byId.values()]).sort(
     (left, right) =>
@@ -115,7 +120,7 @@ export function writeMeetingSummary(draft: MeetingSummaryDraft): MeetingRecord {
   const record = summaryToRecord(draft, existing ?? undefined)
   const saved = savedRecords().filter((item) => item.id !== record.id)
   try {
-    localStorage.setItem(recordsStorageKey, JSON.stringify([...saved, record]))
+    localStorage.setItem(recordsKey(), JSON.stringify([...saved, record]))
   } catch {
     throw new Error('회의 기록을 저장하지 못했어요. 저장 공간과 브라우저 권한을 확인해 주세요.')
   }

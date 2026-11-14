@@ -3,7 +3,11 @@
  * 서버가 생기면 이 파일 대신 api.ts에서 조회·저장하도록 바꿔요.
  * 같은 화면과 다른 탭의 변경은 useSyncExternalStore로 구독해요 (useNoteState.ts).
  */
+import { userStorageKey } from '@/lib/currentUser'
+
+/** 읽음 · 도움돼요는 1인 1회라 계정마다 따로 보관해요. */
 export const noteStateStorageKey = 'likelion-note-state:v1'
+const stateKey = () => userStorageKey(noteStateStorageKey)
 const eventName = 'likelion-note-state-change'
 
 export type NoteFlag = 'read' | 'helpful' | 'saved'
@@ -15,7 +19,7 @@ let memoryFallback: string | null = null
 export function noteStateSnapshot() {
   if (memoryFallback !== null) return memoryFallback
   try {
-    return localStorage.getItem(noteStateStorageKey) ?? ''
+    return localStorage.getItem(stateKey()) ?? ''
   } catch {
     return ''
   }
@@ -37,7 +41,7 @@ export function parseNoteState(snapshot: string): NoteState {
 
 export function subscribeNoteState(listener: () => void) {
   const onStorage = (event: StorageEvent) => {
-    if (event.key === noteStateStorageKey || event.key === null) {
+    if (event.key === stateKey() || event.key === null) {
       memoryFallback = null
       listener()
     }
@@ -55,7 +59,7 @@ function write(state: NoteState) {
   const next = JSON.stringify(state)
   let error: string | null = null
   try {
-    localStorage.setItem(noteStateStorageKey, next)
+    localStorage.setItem(stateKey(), next)
     memoryFallback = null
   } catch {
     memoryFallback = next
