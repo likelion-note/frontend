@@ -1,3 +1,4 @@
+import { getProjectTimeline } from '@/features/admin/timeline'
 import { guideProject } from '@/features/guide/mock/data'
 import type { GuidePart } from '@/features/guide/types'
 import { PART_LABEL } from '@/features/admin/types'
@@ -17,6 +18,12 @@ export function normalizePart(value: string | null): GuidePart | null {
   return value ? (aliases[value.toUpperCase()] ?? null) : null
 }
 
+/** 운영진이 등록한 프로젝트 시작일 기준 이번 주차. 가이드가 있는 주차 안으로 맞춰요. */
+export function currentGuideWeek() {
+  const week = getProjectTimeline().week ?? guideProject.weeks[0]
+  return Math.min(Math.max(week, guideProject.weeks[0]), guideProject.weeks.at(-1) ?? week)
+}
+
 /** 실제 배정 정보와 가이드의 탐색 탭은 분리해요. userPart는 개발 전용 미리보기예요. */
 export function useGuideContext() {
   const assignment = useMyAssignment()
@@ -24,7 +31,7 @@ export function useGuideContext() {
     assignment.data?.assignmentStatus === 'ASSIGNED' ? assignment.data.part : null
   return {
     assignedPart,
-    currentWeek: guideProject.currentWeek,
+    currentWeek: currentGuideWeek(),
     weeks: guideProject.weeks,
     userKey: assignment.userKey,
     partLabel: assignedPart ? PART_LABEL[assignedPart] : null,
