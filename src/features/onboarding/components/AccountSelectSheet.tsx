@@ -1,6 +1,6 @@
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { Card } from '@/components/ui/Card'
-import { mockAccounts, type MockAccount } from '@/features/onboarding/api'
+import { listMockAccounts, type MockAccount } from '@/features/onboarding/api'
 import { cn } from '@/lib/cn'
 
 type Props = {
@@ -25,7 +25,7 @@ export function AccountSelectSheet({ open, onClose, onSelect, busy = false }: Pr
       title="계정 선택"
       description={<span className="text-muted">실제 앱에서는 구글 로그인 화면이 떠요</span>}
     >
-      {mockAccounts.map((account) => (
+      {listMockAccounts().map((account) => (
         <Card key={account.id} className="p-0">
           <button
             type="button"

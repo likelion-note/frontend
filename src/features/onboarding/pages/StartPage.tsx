@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 
@@ -22,6 +22,7 @@ const REAL_GOOGLE_LOGIN = !USE_MOCK && GOOGLE_CLIENT_ID.length > 0
 export function StartPage() {
   const navigate = useNavigate()
   const toast = useToast()
+  const queryClient = useQueryClient()
   const [picking, setPicking] = useState(false)
 
   const login = useMutation({
@@ -33,6 +34,8 @@ export function StartPage() {
         navigate('/onboarding/code')
         return
       }
+      // 계정이 바뀌면 이전 계정으로 불러 둔 데이터를 버려요.
+      queryClient.clear()
       setSession(result.session)
       navigate(homePathFor(result.session.user.userType), { replace: true })
     },

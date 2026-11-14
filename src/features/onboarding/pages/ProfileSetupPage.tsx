@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Navigate, useNavigate } from 'react-router'
 
@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Field, UnderlineInput } from '@/components/ui/Field'
 import { Illust } from '@/components/ui/Illust'
-import { useInvalidateAdmin } from '@/features/admin/hooks/useInvalidateAdmin'
 import * as api from '@/features/onboarding/api'
 import { getDraft, homePathFor, setDraft, setSession } from '@/features/onboarding/session'
 import { useToast } from '@/hooks/useToast'
@@ -16,7 +15,7 @@ import { useToast } from '@/hooks/useToast'
 export function ProfileSetupPage() {
   const navigate = useNavigate()
   const toast = useToast()
-  const invalidate = useInvalidateAdmin()
+  const queryClient = useQueryClient()
   const [draft] = useState(getDraft)
   const [name, setName] = useState('')
 
@@ -30,10 +29,10 @@ export function ProfileSetupPage() {
         email: draft.email,
       })
     },
-    onSuccess: async (session) => {
+    onSuccess: (session) => {
+      queryClient.clear()
       setSession(session)
       setDraft(null)
-      await invalidate()
       toast(session.user.userType === 'ADMIN' ? '운영진으로 시작해요' : '가입을 마쳤어요')
       navigate(homePathFor(session.user.userType), { replace: true })
     },
