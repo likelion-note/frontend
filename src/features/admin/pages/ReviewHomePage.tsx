@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
+import { Link } from 'react-router'
 
+import { ChevronIcon } from '@/components/icons'
 import { Card, Divider } from '@/components/ui/Card'
 import { Illust } from '@/components/ui/Illust'
 import { Pill } from '@/components/ui/Pill'
@@ -21,9 +23,13 @@ import { formatDday, formatMonthDay } from '@/lib/date'
 
 const SORT_LABEL: Record<PendingSort, string> = { oldest: '오래된 순', newest: '최신 순' }
 
+/** 최근 처리는 처음에 이만큼만 보여주고 '전체 보기'로 펼쳐요 */
+const RECENT_PREVIEW = 3
+
 /** SCR-ADM-01 검토 홈 (운영진 첫 탭) */
 export function ReviewHomePage() {
   const [sort, setSort] = useState<PendingSort>('oldest')
+  const [showAllRecent, setShowAllRecent] = useState(false)
   const { data: me } = useQuery(meQuery())
   const { data: summary } = useQuery(summaryQuery())
   const { data: pending } = useQuery(pendingJournalsQuery(sort))
@@ -56,11 +62,16 @@ export function ReviewHomePage() {
         {/* 요약 카드 3개 */}
         <div className="flex w-full items-start gap-2">
           <StatCard label="검토 대기" value={String(summary?.pendingCount ?? '-')} accent />
-          <StatCard label="미배정 멤버" value={String(summary?.unassignedCount ?? '-')} />
+          <StatCard
+            label="미배정 멤버"
+            value={String(summary?.unassignedCount ?? '-')}
+            to="/admin/members"
+          />
           <StatCard
             label={summary?.nextEvent?.name ?? '다음 행사'}
             value={summary?.nextEvent ? formatDday(summary.nextEvent.dday) : '-'}
             illust="calendar"
+            to="/admin/ops/schedule"
           />
         </div>
 
@@ -72,7 +83,7 @@ export function ReviewHomePage() {
             <button
               type="button"
               onClick={() => setSort(sort === 'oldest' ? 'newest' : 'oldest')}
-              className="text-muted text-[13px] leading-none font-medium"
+              className="text-muted relative text-[13px] leading-none font-medium before:absolute before:-inset-2.5"
             >
               {SORT_LABEL[sort]} ▾
             </button>
@@ -93,14 +104,23 @@ export function ReviewHomePage() {
           title="최근 처리"
           illust="clock"
           action={
-            <span className="text-muted text-[13px] leading-none font-medium">전체 보기</span>
+            recent && recent.length > RECENT_PREVIEW ? (
+              <button
+                type="button"
+                aria-expanded={showAllRecent}
+                onClick={() => setShowAllRecent((open) => !open)}
+                className="text-muted relative text-[13px] leading-none font-medium before:absolute before:-inset-2.5"
+              >
+                {showAllRecent ? '접기' : `전체 보기 (${recent.length})`}
+              </button>
+            ) : undefined
           }
         />
         <Card className="py-1">
           {recent?.length === 0 && (
             <p className="text-muted py-3 text-[13px]">아직 처리한 일지가 없어요.</p>
           )}
-          {recent?.map((journal, index) => (
+          {(showAllRecent ? recent : recent?.slice(0, RECENT_PREVIEW))?.map((journal, index) => (
             <div key={journal.id}>
               {index > 0 && <Divider />}
               <RecentRow journal={journal} cohort={cohort} />
@@ -117,14 +137,19 @@ function StatCard({
   value,
   accent = false,
   illust,
+  to,
 }: {
   label: string
   value: string
   accent?: boolean
   illust?: 'calendar'
+  /** 누르면 갈 곳. 없으면 숫자만 보여줘요 */
+  to?: string
 }) {
-  return (
-    <div className="bg-card shadow-card relative flex min-w-0 flex-1 flex-col gap-0.5 rounded-2xl px-3.5 py-3">
+  const shape =
+    'bg-card shadow-card relative flex min-w-0 flex-1 flex-col gap-0.5 rounded-2xl px-3.5 py-3'
+  const body = (
+    <>
       <p className="text-muted truncate text-[12px] leading-tight font-medium">{label}</p>
       <p
         className={`text-[24px] leading-tight font-bold whitespace-nowrap ${accent ? 'text-accent' : 'text-ink'}`}
@@ -132,7 +157,14 @@ function StatCard({
         {value}
       </p>
       {illust && <Illust name={illust} size={28} className="absolute top-2 right-2" />}
-    </div>
+    </>
+  )
+  return to ? (
+    <Link to={to} className={`${shape} active:brightness-95`}>
+      {body}
+    </Link>
+  ) : (
+    <div className={shape}>{body}</div>
   )
 }
 
@@ -143,12 +175,16 @@ function RecentRow({ journal, cohort }: { journal: ReviewJournal; cohort: number
       ? `${scopeLabel(journal.scope, cohort)} · ${formatMonthDay(journal.decidedAt ?? journal.submittedAt)}`
       : `"${journal.rejectReason ?? ''}"`
   return (
-    <div className="flex w-full items-center gap-2.5 py-3">
+    <Link
+      to={`/admin/review/${journal.id}`}
+      className="flex w-full items-center gap-2.5 py-3 active:opacity-70"
+    >
       <Pill tone={STATUS_TONE[journal.status]}>{STATUS_LABEL[journal.status]}</Pill>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className="text-ink truncate text-[14px] leading-tight font-bold">{journal.title}</p>
         <p className="text-muted truncate text-[12px] leading-tight">{sub}</p>
       </div>
-    </div>
+      <ChevronIcon className="text-icon-muted shrink-0" />
+    </Link>
   )
 }

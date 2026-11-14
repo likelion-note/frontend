@@ -9,7 +9,7 @@ const crops = {
   headset: { width: '559.15%', height: '372.77%', left: '-365.73%', top: '-94.84%' },
   bulb: { width: '909.16%', height: '606.11%', left: '-112.6%', top: '-409.16%' },
   chat: { width: '968.29%', height: '645.53%', left: '-236.59%', top: '-441.87%' },
-  think: { width: '569.86%', height: '379.9%', left: '-98.56%', top: '-1.44%' },
+  think: { width: '614.4%', height: '409.6%', left: '-113.6%', top: '-1.6%' },
 }
 export function MeetingIllustration({ name, size }: { name: keyof typeof crops; size: number }) {
   return (

@@ -40,7 +40,7 @@ export function NoteSearchBar({
           type="button"
           aria-label="검색어 지우기"
           onClick={() => onChange('')}
-          className="focus-visible:outline-accent flex size-[22px] shrink-0 items-center justify-center rounded-full bg-[#dcc9b2] focus-visible:outline-2"
+          className="focus-visible:outline-accent relative flex size-[22px] shrink-0 items-center justify-center rounded-full bg-[#dcc9b2] before:absolute before:-inset-2.5 focus-visible:outline-2"
         >
           <img src={clearIcon} width={12} height={12} alt="" />
         </button>

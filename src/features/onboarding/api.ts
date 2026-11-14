@@ -68,7 +68,12 @@ export function listMockAccounts(): MockAccount[] {
     store.members.find((m) => m.id === id)?.name ?? fallback
   return [
     { id: FRESH_ACCOUNT_ID, name: '새 아기사자', email: freshEmail(), status: 'new' },
-    { id: 'u-deong', name: nameOf('u-deong', '데옹'), email: 'deo***@gmail.com', status: 'member' },
+    {
+      id: 'u-deong',
+      name: nameOf('u-deong', '데옹'),
+      email: 'deong.lion14@gmail.com',
+      status: 'member',
+    },
     ...store.signups.map((item): MockAccount => ({
       id: item.userId,
       name: nameOf(item.userId, item.name),

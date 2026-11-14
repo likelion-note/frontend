@@ -52,6 +52,7 @@ export function CodeInput({ value, onChange, length = 6, error = false, disabled
         value={value}
         disabled={disabled}
         onChange={(e) => {
+          // 붙여넣은 글자에 공백 · 기호가 섞여 있어도 영문 · 숫자만 남기고 앞에서 6자를 써요
           const next = e.target.value
             .toUpperCase()
             .replace(/[^A-Z0-9]/g, '')
@@ -65,7 +66,6 @@ export function CodeInput({ value, onChange, length = 6, error = false, disabled
         autoCapitalize="characters"
         autoCorrect="off"
         spellCheck={false}
-        maxLength={length}
         className="absolute inset-0 h-full w-full cursor-text opacity-0"
       />
     </div>

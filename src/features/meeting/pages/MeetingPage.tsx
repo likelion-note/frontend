@@ -53,7 +53,7 @@ export function MeetingPage({ onFinish }: { onFinish?: () => void }) {
         </h1>
         <Link
           to={{ pathname: '/meeting/history', search: location.search }}
-          className="text-muted text-[13px] leading-[16px] font-medium"
+          className="text-muted relative text-[13px] leading-[16px] font-medium before:absolute before:-inset-2.5"
         >
           지난 회의 {records.data?.length ?? '…'} ›
         </Link>

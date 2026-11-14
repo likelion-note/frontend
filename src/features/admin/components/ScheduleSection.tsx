@@ -126,7 +126,7 @@ function EventRow({
           aria-label={`${event.name} 일정 삭제`}
           onClick={onDelete}
           disabled={deleting}
-          className="shrink-0 p-0.5"
+          className="relative shrink-0 p-0.5 before:absolute before:-inset-2.5"
         >
           <CloseIcon size={18} />
         </button>

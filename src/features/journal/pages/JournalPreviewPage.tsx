@@ -189,7 +189,6 @@ export function JournalPreviewPage() {
                 건너뛰기
               </Button>
               <Button
-                variant="soft"
                 disabled={!answer.trim() || busy}
                 onClick={() =>
                   void run(
@@ -197,7 +196,7 @@ export function JournalPreviewPage() {
                     () => toast('답을 정리본에 더했어요.'),
                   )
                 }
-                className="min-w-0 flex-1"
+                className="h-[46px] min-w-0 flex-1 text-[16px] tracking-[-0.16px]"
               >
                 답하기
               </Button>

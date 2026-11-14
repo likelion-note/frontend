@@ -14,6 +14,7 @@ import type {
   PortfolioFormat,
   PortfolioSummary,
 } from '@/features/journal/types'
+import { now } from '@/lib/clock'
 import { getCurrentUser } from '@/lib/currentUser'
 import { localDateString } from '@/features/meeting/meetingDates'
 
@@ -73,8 +74,20 @@ export async function getMyProjects(): Promise<MyProject[]> {
       .filter((project): project is MyProject => !!project),
   )
 }
+/**
+ * 열기만 하고 아무것도 안 쓴 일지. '새로 쓰기'를 누를 때마다 빈 일지가 하나씩 생기지 않게,
+ * 목록에서는 숨기고 다음에 새로 쓸 때 다시 써요.
+ */
+const isBlankDraft = (journal: MyJournal) =>
+  journal.status === 'DRAFT' &&
+  !journal.organized &&
+  !journal.eventType &&
+  !journal.phase &&
+  journal.importedMeetingIds.length === 0 &&
+  Object.values(journal.body).every((text) => !text.trim())
+
 export async function getMyJournals(): Promise<MyJournal[]> {
-  return readJournals().filter(mine)
+  return readJournals().filter((journal) => mine(journal) && !isBlankDraft(journal))
 }
 export async function getMyJournal(id: string): Promise<MyJournal | null> {
   const journal = readJournal(id)
@@ -85,11 +98,22 @@ export async function getMyJournal(id: string): Promise<MyJournal | null> {
 export async function createJournalDraft(
   defaults: Pick<MyJournal, 'cohort' | 'projectId' | 'part'>,
 ): Promise<MyJournal> {
-  const now = new Date()
+  const created = now()
   // 프로젝트를 안 정했으면 지금 배정된 프로젝트(없으면 미분류)로 시작해요.
   const projectId = defaults.projectId ?? (await getMyProjects())[0]?.id ?? null
+  // 전에 열기만 하고 비워 둔 일지가 있으면 새로 만들지 않고 그 일지를 다시 써요.
+  const blank = readJournals().find((journal) => mine(journal) && isBlankDraft(journal))
+  if (blank) {
+    return writeJournal({
+      ...blank,
+      ...defaults,
+      projectId,
+      scope: 'NOW',
+      createdAt: localDateString(created),
+    })
+  }
   return writeJournal({
-    id: `journal-${now.getTime().toString(36)}`,
+    id: `journal-${Date.now().toString(36)}`,
     ownerId: myId(),
     ...defaults,
     projectId,
@@ -100,8 +124,8 @@ export async function createJournalDraft(
     importedMeetingIds: [],
     status: 'DRAFT',
     organized: null,
-    createdAt: localDateString(now),
-    updatedAt: now.toISOString(),
+    createdAt: localDateString(created),
+    updatedAt: created.toISOString(),
     readCount: 0,
     helpfulCount: 0,
   })
@@ -158,6 +182,6 @@ export async function createPortfolioSummary(
     projectId,
     format,
     ...summarizePortfolio(project, journals, format, variant),
-    createdAt: new Date().toISOString(),
+    createdAt: now().toISOString(),
   }))
 }

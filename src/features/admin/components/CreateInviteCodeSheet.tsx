@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { Field, UnderlineInput } from '@/components/ui/Field'
 import { Segment } from '@/components/ui/Segment'
 import * as api from '@/features/admin/api'
+import { today } from '@/features/admin/mock/store'
 import { useInvalidateAdmin } from '@/features/admin/hooks/useInvalidateAdmin'
 import type { UserType } from '@/features/admin/types'
 import { useToast } from '@/hooks/useToast'
@@ -40,7 +41,9 @@ export function CreateInviteCodeSheet({ open, onClose, cohort }: Props) {
   }
 
   const parsedCohort = Number(cohortText)
-  const valid = Number.isInteger(parsedCohort) && parsedCohort > 0 && expiresAt.length > 0
+  const expired = expiresAt.length > 0 && expiresAt < today()
+  const valid =
+    Number.isInteger(parsedCohort) && parsedCohort > 0 && expiresAt.length > 0 && !expired
 
   const create = useMutation({
     mutationFn: () => api.createInviteCode({ cohort: parsedCohort, userType, expiresAt }),
@@ -79,10 +82,16 @@ export function CreateInviteCodeSheet({ open, onClose, cohort }: Props) {
         <UnderlineInput
           id="code-expires"
           type="date"
+          min={today()}
           value={expiresAt}
           onChange={(e) => setExpiresAt(e.target.value)}
         />
       </Field>
+      {expired && (
+        <p role="alert" className="text-danger text-[12px] leading-normal">
+          만료일은 오늘 이후로 골라 주세요.
+        </p>
+      )}
 
       <div className="h-1.5" />
 

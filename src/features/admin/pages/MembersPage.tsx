@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Fragment, useState, type ReactNode } from 'react'
 
-import { ChevronIcon } from '@/components/icons'
 import { Button } from '@/components/ui/Button'
 import { Card, Divider } from '@/components/ui/Card'
 import { Illust } from '@/components/ui/Illust'
@@ -157,7 +156,6 @@ export function MembersPage() {
                       {admins.length > 0 && ` · ${admins.map((a) => a.name).join(', ')}`}
                     </p>
                   </div>
-                  <ChevronIcon />
                 </div>
               </Fragment>
             )

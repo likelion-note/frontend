@@ -28,6 +28,8 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <MobileLayout />,
+    // 첫 화면 코드를 받아오는 동안은 빈 화면이에요 (아주 짧아요)
+    hydrateFallbackElement: <></>,
     children: [
       { index: true, element: <RootRedirect /> },
       { element: <GuestOnly />, children: onboardingRoutes },

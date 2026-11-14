@@ -20,7 +20,7 @@ type State = {
 export const summaryKey = (projectId: string, format: PortfolioFormat) => `${projectId}:${format}`
 
 function read(): State {
-  const today = localDateString()
+  const today = localDateString(new Date())
   try {
     const value = JSON.parse(localStorage.getItem(storageKey()) ?? 'null') as State | null
     if (value && typeof value === 'object' && value.summaries) {

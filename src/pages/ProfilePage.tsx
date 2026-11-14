@@ -130,7 +130,7 @@ export function ProfilePage() {
           <button
             type="button"
             onClick={logout}
-            className="text-muted text-[13px] font-medium underline underline-offset-4"
+            className="text-muted relative text-[13px] font-medium underline underline-offset-4 before:absolute before:-inset-2"
           >
             로그아웃
           </button>
@@ -138,7 +138,7 @@ export function ProfilePage() {
             <button
               type="button"
               onClick={resetDemo}
-              className="text-muted text-[13px] font-medium underline underline-offset-4"
+              className="text-muted relative text-[13px] font-medium underline underline-offset-4 before:absolute before:-inset-2"
             >
               데모 데이터 처음으로
             </button>

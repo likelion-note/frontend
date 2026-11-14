@@ -50,7 +50,7 @@ export function TodoSection({
         </div>
         <HomeAction
           action={action}
-          className="text-muted shrink-0 text-[13px] leading-[16px] font-medium"
+          className="text-muted relative shrink-0 text-[13px] leading-[16px] font-medium before:absolute before:-inset-2.5"
         />
       </div>
       <TaskChecklist
@@ -61,7 +61,7 @@ export function TodoSection({
           todo.action && (
             <HomeAction
               action={todo.action}
-              className="text-accent-deep mt-[3px] block text-left text-[12px] leading-[14px] font-bold"
+              className="text-accent-deep relative mt-[3px] block w-fit text-left text-[12px] leading-[14px] font-bold before:absolute before:-inset-x-2 before:-inset-y-1.5"
             />
           )
         }

@@ -1,3 +1,4 @@
+import { store } from '@/features/admin/mock/store'
 import { EVENT_TYPE_LABEL, PART_LABEL } from '@/features/admin/types'
 import type { AssignedPart } from '@/features/assignment/types'
 import { phaseLabel } from '@/features/note/noteFilters'
@@ -8,6 +9,7 @@ import type {
   MyProject,
   PortfolioFormat,
 } from '@/features/journal/types'
+import { localDateString } from '@/features/meeting/meetingDates'
 import { formatMonthDay } from '@/lib/date'
 
 export const journalEventTypes: JournalEventType[] = [
@@ -64,7 +66,7 @@ export function journalTitle(journal: MyJournal) {
 
 /** 검토 요청한 날, 없으면 마지막으로 고친 날 */
 export const journalDate = (journal: MyJournal) =>
-  journal.submittedAt ?? journal.updatedAt.slice(0, 10)
+  journal.submittedAt ?? localDateString(new Date(journal.updatedAt))
 
 /** '멋사수첩팀 · 10/26' */
 export function journalMeta(journal: MyJournal, projects: MyProject[]) {
@@ -72,9 +74,18 @@ export function journalMeta(journal: MyJournal, projects: MyProject[]) {
   return [project?.shortName, formatMonthDay(journalDate(journal))].filter(Boolean).join(' · ')
 }
 
+/**
+ * 다음 기수에게 보이는 이름. 팀 이름 대신 팀 분류가 만들어진 순서로 A팀, B팀… 을 붙여요.
+ * 아직 팀에 배정되지 않았으면 '지난 기수'만 보여요.
+ */
+export function pastTeamLabel(projectId: string | null | undefined) {
+  const index = store.projects.filter((p) => p.kind === 'TEAM').findIndex((p) => p.id === projectId)
+  return index >= 0 ? `지난 기수 ${String.fromCharCode(65 + index)}팀` : '지난 기수'
+}
+
 /** 공개되면 노트 카드에 붙는 표기. '14기 · PM · 중간발표 1~2주 전' / '지난 기수 A팀 · PM · …' */
 export function anonymousLabel(journal: MyJournal) {
-  const who = journal.scope === 'NOW' ? `${journal.cohort}기` : '지난 기수 A팀'
+  const who = journal.scope === 'NOW' ? `${journal.cohort}기` : pastTeamLabel(journal.projectId)
   const when =
     journal.eventType && journal.phase
       ? `${eventLabel(journal.eventType)} ${phaseLabel(journal.phase)}`

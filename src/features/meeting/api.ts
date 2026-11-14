@@ -3,6 +3,7 @@ import {
   readMeetingRecord,
   readMeetingRecords,
   readSummaryDraft,
+  removeMeetingRecord,
   writeMeetingSummary,
 } from '@/features/meeting/recordStore'
 import type {
@@ -27,4 +28,8 @@ export async function getMeetingSummaryDraft(id: string): Promise<MeetingSummary
 }
 export async function saveMeetingSummary(draft: MeetingSummaryDraft): Promise<MeetingRecord> {
   return writeMeetingSummary(draft)
+}
+/** 회의 기록 지우기 (DELETE /api/meetings/{id}) */
+export async function deleteMeetingRecord(id: string): Promise<void> {
+  removeMeetingRecord(id)
 }

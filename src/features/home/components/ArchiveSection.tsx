@@ -20,22 +20,29 @@ export function ArchiveSection({
         </h2>
         <HomeAction
           action={action}
-          className="text-muted shrink-0 text-[13px] leading-[16px] font-medium"
+          className="text-muted relative shrink-0 text-[13px] leading-[16px] font-medium before:absolute before:-inset-2.5"
         />
       </div>
       {notes.map((note) => (
-        <Card key={note.id} as="article" className="flex flex-col gap-1.5">
+        <Card
+          key={note.id}
+          as="article"
+          className="relative flex flex-col gap-1.5 active:brightness-[0.98]"
+        >
           <p className="text-accent-deep text-[11px] leading-[13px] font-bold">{note.context}</p>
           <h3 className="text-[16px] leading-[19px] font-bold">
-            <HomeAction action={{ label: note.title, to: note.to }} className="text-left" />
+            <HomeAction
+              action={{ label: note.title, to: note.to }}
+              className="text-left before:absolute before:inset-0 before:rounded-2xl"
+            />
           </h3>
           <p className="text-muted text-[12px] leading-[14px]">{note.author}</p>
           {note.handwritten ? (
             <div className="pt-0.5">
               <img
                 src={note.handwrittenImage?.src ?? quote}
-                width={note.handwrittenImage?.width ?? 162}
-                height={note.handwrittenImage?.height ?? 24}
+                width={note.handwrittenImage?.width ?? 202}
+                height={note.handwrittenImage?.height ?? 30}
                 alt={note.excerpt}
               />
             </div>

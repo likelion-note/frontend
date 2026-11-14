@@ -1,4 +1,4 @@
-import { MOCK_COHORT, nextId, saveStore, store } from '@/features/admin/mock/store'
+import { MOCK_COHORT, nextId, saveStore, store, today } from '@/features/admin/mock/store'
 import { getProjectTimeline } from '@/features/admin/timeline'
 import {
   EVENT_TYPE_LABEL,
@@ -16,6 +16,7 @@ import {
   type UserType,
 } from '@/features/admin/types'
 import { readJournal, readJournals, writeJournal } from '@/features/journal/journalStore'
+import { pastTeamLabel } from '@/features/journal/labels'
 import type { MyJournal } from '@/features/journal/types'
 import { localDateString } from '@/features/meeting/meetingDates'
 import { phaseLabel } from '@/features/note/noteFilters'
@@ -80,12 +81,6 @@ export type PendingSort = 'oldest' | 'newest'
 
 const adminCount = () => store.members.filter((m) => m.type === 'ADMIN').length
 
-/** 다음 기수에게 보이는 팀 가명 (A팀, B팀…). 아기사자 팀 분류가 만들어진 순서예요 */
-function teamLetter(projectId: string | null): string | null {
-  const index = store.projects.filter((p) => p.kind === 'TEAM').findIndex((p) => p.id === projectId)
-  return index >= 0 ? String.fromCharCode(65 + index) : null
-}
-
 /** 공개되면 붙는 익명 표기. 작성자가 고른 범위 그대로 보여줘요 */
 function reviewLabel(journal: MyJournal): string {
   const owner = store.members.find((m) => m.id === journal.ownerId)
@@ -94,8 +89,7 @@ function reviewLabel(journal: MyJournal): string {
   }
   const part = journal.part ? PART_LABEL[journal.part] : null
   if (journal.scope === 'NEXT') {
-    const letter = teamLetter(journal.projectId)
-    return [letter ? `지난 기수 ${letter}팀` : '지난 기수', part].filter(Boolean).join(' · ')
+    return [pastTeamLabel(journal.projectId), part].filter(Boolean).join(' · ')
   }
   const when =
     journal.eventType && journal.phase
@@ -121,7 +115,7 @@ function toReview(journal: MyJournal): ReviewJournal | null {
       nextTime: organized.body.nextTime,
     },
     maskedCount: organized.maskedCount,
-    submittedAt: journal.submittedAt ?? journal.updatedAt.slice(0, 10),
+    submittedAt: journal.submittedAt ?? localDateString(new Date(journal.updatedAt)),
     status: journal.status,
     decidedAt: journal.decidedAt,
     rejectReason: journal.rejectReason,
@@ -152,7 +146,8 @@ export async function listPendingJournals(sort: PendingSort = 'oldest'): Promise
   return sort === 'oldest' ? list : list.reverse()
 }
 
-export async function listRecentDecisions(limit = 3): Promise<ReviewJournal[]> {
+/** 처리한 일지 (최근 처리한 것부터). 검토 홈은 앞의 몇 개만 보여주고 '전체 보기'로 펼쳐요 */
+export async function listRecentDecisions(limit = Infinity): Promise<ReviewJournal[]> {
   await delay(150)
   const decided = readJournals()
     .filter((j) => j.status === 'APPROVED' || j.status === 'REJECTED')
@@ -220,6 +215,17 @@ export async function assignMember(
   return clone(member)
 }
 
+/** 배정 풀기. 파트와 프로젝트를 비워서 '배정 전' 목록으로 돌려보내요. 쓴 일지는 그 분류에 남아요 */
+export async function unassignMember(memberId: string): Promise<Member> {
+  await delay(250)
+  const member = store.members.find((m) => m.id === memberId)
+  if (!member) throw notFound('멤버')
+  member.part = null
+  member.projectId = null
+  saveStore()
+  return clone(member)
+}
+
 export async function createProject(input: {
   title: string
   kind: ProjectKind
@@ -227,6 +233,9 @@ export async function createProject(input: {
   await delay(250)
   const title = input.title.trim()
   if (!title) throw new Error('분류 제목을 적어 주세요')
+  if (store.projects.some((p) => p.title.replace(/\s+/g, '') === title.replace(/\s+/g, ''))) {
+    throw new Error('같은 제목의 분류가 이미 있어요')
+  }
   const shortName = title.split('·').pop()?.trim() || title
   const project: ProjectCategory = {
     id: nextId('p'),
@@ -291,6 +300,7 @@ export async function createInviteCode(input: {
   expiresAt: string
 }): Promise<InviteCode> {
   await delay(250)
+  if (input.expiresAt < today()) throw new Error('만료일은 오늘 이후로 골라 주세요')
   const prefix = input.userType === 'MEMBER' ? 'LION' : 'STAF'
   let code = `${prefix}${input.cohort}`
   // 같은 코드가 있으면 뒤에 숫자를 붙여요 (6자리 유지)

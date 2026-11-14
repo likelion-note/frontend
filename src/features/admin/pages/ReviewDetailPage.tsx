@@ -1,8 +1,8 @@
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { useState, type ReactNode } from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router'
+import { Link, Navigate, useNavigate, useParams } from 'react-router'
 
-import { QuestionIcon } from '@/components/icons'
+import { ChevronIcon, QuestionIcon } from '@/components/icons'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Illust } from '@/components/ui/Illust'
@@ -60,7 +60,19 @@ export function ReviewDetailPage() {
 
   const cohort = me?.cohort ?? 14
   const position = pending ? pending.findIndex((j) => j.id === id) : -1
-  const counter = pending && position >= 0 ? `${position + 1} / ${pending.length}` : undefined
+  const prevId = pending && position > 0 ? pending[position - 1].id : null
+  const nextId = pending && position >= 0 ? (pending[position + 1]?.id ?? null) : null
+  // 대기 중인 일지끼리 앞 · 뒤로 넘겨 가며 볼 수 있어요
+  const counter =
+    pending && position >= 0 ? (
+      <span className="flex items-center gap-1">
+        <StepButton label="이전 일지" to={prevId} direction="prev" />
+        <span className="min-w-[38px] text-center">
+          {position + 1} / {pending.length}
+        </span>
+        <StepButton label="다음 일지" to={nextId} direction="next" />
+      </span>
+    ) : undefined
   const busy = approve.isPending || reject.isPending
 
   return (
@@ -127,26 +139,27 @@ export function ReviewDetailPage() {
             </div>
           </div>
 
-          <div className="h-1" />
-
-          {journal.status === 'PENDING' ? (
-            <div className="flex w-full items-center gap-2">
-              <Button
-                variant="ghost"
-                className="flex-1"
-                disabled={busy}
-                onClick={() => setRejectOpen(true)}
-              >
-                돌려보내기
-              </Button>
-              <Button className="flex-1" disabled={busy} onClick={() => approve.mutate()}>
-                승인하고 올리기
-              </Button>
-            </div>
-          ) : (
+          {journal.status !== 'PENDING' && (
             <p className="text-muted text-center text-[13px]">이미 처리한 일지예요.</p>
           )}
         </AdminContent>
+      )}
+
+      {/* 승인 · 돌려보내기는 본문을 다 내리지 않아도 누를 수 있게 아래에 붙여 둬요 */}
+      {journal?.status === 'PENDING' && (
+        <div className="border-header-line bg-paper/95 flex w-full shrink-0 items-center gap-2 border-t px-5 pt-3 pb-5">
+          <Button
+            variant="ghost"
+            className="flex-1"
+            disabled={busy}
+            onClick={() => setRejectOpen(true)}
+          >
+            돌려보내기
+          </Button>
+          <Button className="flex-1" disabled={busy} onClick={() => approve.mutate()}>
+            승인하고 올리기
+          </Button>
+        </div>
       )}
 
       <RejectSheet
@@ -170,5 +183,28 @@ function BodyBlock({ icon, label, text }: { icon: ReactNode; label: string; text
         {text}
       </p>
     </section>
+  )
+}
+
+/** 대기 중인 앞 · 뒤 일지로 넘기는 화살표. 끝이면 흐리게 꺼져요 */
+function StepButton({
+  label,
+  to,
+  direction,
+}: {
+  label: string
+  to: string | null
+  direction: 'prev' | 'next'
+}) {
+  const icon = <ChevronIcon size={18} className={direction === 'prev' ? 'rotate-180' : ''} />
+  const shape = 'relative flex size-6 items-center justify-center before:absolute before:-inset-1.5'
+  return to ? (
+    <Link to={`/admin/review/${to}`} replace aria-label={label} className={`${shape} text-ink`}>
+      {icon}
+    </Link>
+  ) : (
+    <span aria-hidden="true" className={`${shape} text-icon-muted opacity-40`}>
+      {icon}
+    </span>
   )
 }

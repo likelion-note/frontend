@@ -25,7 +25,7 @@ export const beforePartMockData: Omit<BeforePartHomeData, 'user'> = {
       author: '지난 기수 F팀 · PM · 중간발표 1~2주 전',
       excerpt: '발표보다 질문이 먼저 나왔어요',
       handwritten: true,
-      handwrittenImage: { src: presentationQuote, width: 155, height: 24 },
+      handwrittenImage: { src: presentationQuote, width: 194, height: 30 },
       readCount: 52,
       helpfulCount: 19,
       tag: '#발표 준비',
