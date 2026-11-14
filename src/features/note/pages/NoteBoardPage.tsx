@@ -6,6 +6,7 @@ import emptyGrid from '@/assets/note/empty-grid.svg'
 import headHandwriting from '@/assets/note/head-handwriting.svg'
 import { BottomNav } from '@/components/common/BottomNav'
 import { ScreenContent } from '@/components/layout/Screen'
+import { NoteBookmarkIcon } from '@/features/note/components/NoteBookmarkIcon'
 import { NoteCard } from '@/features/note/components/NoteCard'
 import { NoteEmptyState } from '@/features/note/components/NoteEmptyState'
 import { NoteFilterRow } from '@/features/note/components/NoteFilterRow'
@@ -23,6 +24,7 @@ import type { NoteFilters, NoteSort } from '@/features/note/types'
 import { useNoteState } from '@/features/note/useNoteState'
 import { useMyNotePart } from '@/features/note/useMyNotePart'
 import { useNotes } from '@/features/note/useNotes'
+import { cn } from '@/lib/cn'
 
 import '@/features/note/note.css'
 
@@ -58,14 +60,25 @@ export function NoteBoardPage() {
   const notes = useNotes()
   const noteState = useNoteState()
 
-  function update(patch: Partial<NoteFilters>) {
+  // 책갈피로 저장한 노트만 보기. 필터처럼 주소(?saved=1)에 남겨서 상세에 다녀와도 유지돼요.
+  const savedOnly = params.get('saved') === '1'
+
+  function update(patch: Partial<NoteFilters>, saved = savedOnly) {
     const next = { ...filters, query, ...patch }
     if (patch.query !== undefined) setQuery(patch.query)
-    setParams(writeFilters(params, next, myPart), { replace: true, preventScrollReset: true })
+    const nextParams = writeFilters(params, next, myPart)
+    if (saved) nextParams.set('saved', '1')
+    else nextParams.delete('saved')
+    setParams(nextParams, { replace: true, preventScrollReset: true })
   }
 
-  const visible = notes.data ? filterNotes(notes.data, { ...filters, query }) : []
+  const filtered = notes.data ? filterNotes(notes.data, { ...filters, query }) : []
+  const visible = savedOnly ? filtered.filter((note) => noteState.has('saved', note.id)) : filtered
+  const savedCount = notes.data?.filter((note) => noteState.has('saved', note.id)).length ?? 0
   const searching = query.trim().length > 0
+  // 파트는 사람마다 기본값이 달라서 빼고, 나머지 조건이 걸려 있으면 한 번에 풀 수 있게 해요.
+  const narrowed =
+    searching || filters.cohort !== 'all' || filters.phase !== 'all' || !!filters.tag || savedOnly
   const empty = notes.isSuccess && visible.length === 0
 
   return (
@@ -148,18 +161,48 @@ export function NoteBoardPage() {
               />
             ) : (
               <NoteEmptyState
-                title="이 조건의 노트가 아직 없어요"
+                title={savedOnly ? '저장한 노트 중에는 없어요' : '이 조건의 노트가 아직 없어요'}
                 description="필터를 바꾸거나 처음부터 다시 둘러보세요."
-                suggestions={[{ label: '필터 모두 풀기', onSelect: () => update(allFilters) }]}
+                suggestions={[
+                  { label: '필터 모두 풀기', onSelect: () => update(allFilters, false) },
+                ]}
               />
             )}
           </>
         ) : (
           <>
             <div className="flex items-center gap-2">
-              <h2 className="flex-1 text-[15px] leading-[18px] font-bold" aria-live="polite">
-                노트 {visible.length}개
+              <h2 className="text-[15px] leading-[18px] font-bold" aria-live="polite">
+                {savedOnly ? '저장한 노트' : '노트'} {visible.length}개
               </h2>
+              {narrowed && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    update({ query: '', cohort: 'all', phase: 'all', tag: null }, false)
+                  }
+                  className="text-accent-deep focus-visible:outline-accent relative shrink-0 rounded text-[12px] leading-[16px] font-bold before:absolute before:-inset-2 focus-visible:outline-2"
+                >
+                  조건 풀기
+                </button>
+              )}
+              <div className="flex-1" />
+              {(savedCount > 0 || savedOnly) && (
+                <button
+                  type="button"
+                  aria-pressed={savedOnly}
+                  onClick={() => update({}, !savedOnly)}
+                  className={cn(
+                    'focus-visible:outline-accent relative flex shrink-0 items-center gap-0.5 rounded-full border px-2.5 py-[3px] text-[12px] leading-[16px] font-bold before:absolute before:-inset-1.5 focus-visible:outline-2',
+                    savedOnly
+                      ? 'border-accent bg-accent-soft text-accent-deep'
+                      : 'border-border text-muted bg-white/70',
+                  )}
+                >
+                  <NoteBookmarkIcon filled={savedOnly} size={14} />
+                  저장 {savedCount}
+                </button>
+              )}
               <label className="text-muted focus-within:outline-accent relative shrink-0 rounded text-[13px] leading-[16px] font-medium focus-within:outline-2">
                 {sortLabels[filters.sort]} ▾
                 <select
