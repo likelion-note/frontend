@@ -3,6 +3,7 @@ import { useState } from 'react'
 
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/Button'
+import { DatePicker } from '@/components/ui/DatePicker'
 import { Field, UnderlineInput } from '@/components/ui/Field'
 import { Segment } from '@/components/ui/Segment'
 import * as api from '@/features/admin/api'
@@ -79,12 +80,12 @@ export function CreateInviteCodeSheet({ open, onClose, cohort }: Props) {
       <Segment options={TYPE_OPTIONS} value={userType} onChange={setUserType} />
 
       <Field label="만료일" htmlFor="code-expires" className="pt-1">
-        <UnderlineInput
+        <DatePicker
           id="code-expires"
-          type="date"
-          min={today()}
           value={expiresAt}
-          onChange={(e) => setExpiresAt(e.target.value)}
+          onChange={setExpiresAt}
+          today={today()}
+          min={today()}
         />
       </Field>
       {expired && (
