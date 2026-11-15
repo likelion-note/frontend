@@ -34,8 +34,6 @@ import { getSession } from '@/lib/authStorage'
 /**
  * 운영진 API (실제 서버). 함수 이름과 돌려주는 모양은 api.mock.ts 와 같아요.
  * 서버 응답(숫자 id · 대문자 코드)을 화면 타입으로 바꾸는 일만 해요.
- *
- * 서버에 아직 없는 기능: 일정 삭제. 화면은 adminCapabilities 를 보고 숨겨요.
  */
 
 export type PendingSort = 'oldest' | 'newest'
@@ -299,6 +297,7 @@ export async function createEvent(input: {
   )
 }
 
-export async function deleteEvent(): Promise<void> {
-  throw new Error('일정 지우기는 아직 준비 중이에요')
+/** 일정 지우기. DELETE /api/admin/events/{eventId} */
+export async function deleteEvent(id: string): Promise<void> {
+  await api.delete(`/api/admin/events/${id}`)
 }
