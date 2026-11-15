@@ -42,6 +42,11 @@ export function useJournalCache() {
     refreshPortfolio() {
       void client.invalidateQueries({ queryKey: ['journal', 'portfolio'] })
     },
+    /** 지운 일지를 캐시에서 빼고 목록 · 프로젝트 · 포트폴리오를 다시 불러요 */
+    remove(id: string) {
+      client.removeQueries({ queryKey: ['journal', 'detail', id] })
+      void client.invalidateQueries({ queryKey: ['journal'] })
+    },
   }
 }
 

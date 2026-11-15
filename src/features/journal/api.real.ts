@@ -231,7 +231,16 @@ const isBlankDraft = (journal: MyJournal) =>
 
 async function loadAllJournals(): Promise<MyJournal[]> {
   const list = await api.get<ListDto>('/api/journals/me')
-  return Promise.all(list.journals.map((item) => loadJournal(item.id)))
+  const journals = await Promise.all(
+    list.journals.map((item) =>
+      // 목록을 받은 직후에 지워진 일지는 상세가 404 로 와요. 그 일지만 빼고 나머지는 보여줘요.
+      loadJournal(item.id).catch((error: unknown) => {
+        if (error instanceof ApiError && error.status === 404) return null
+        throw error
+      }),
+    ),
+  )
+  return journals.filter((journal): journal is MyJournal => journal !== null)
 }
 
 /* ---------- 자동 저장 (모아서 보내기) ---------- */
@@ -411,6 +420,28 @@ export async function submitJournal(id: string): Promise<MyJournal> {
   await api.post<{ status: JournalStatus }>(`/api/journals/${id}/submit`, { tags })
   patchExtra(id, { followUp: null })
   return loadJournal(id)
+}
+
+/**
+ * 내 일지 지우기. DELETE /api/journals/{id} (작성 중 · 돌려받은 일지만. 나머지는 서버가 400 으로 막아요)
+ * 밀려 있던 자동 저장은 취소해요. 지운 뒤에 저장 요청이 나가면 안 되니까요.
+ */
+export async function deleteJournal(id: string): Promise<void> {
+  const entry = pending.get(id)
+  if (entry) {
+    window.clearTimeout(entry.timer)
+    pending.delete(id)
+    entry.waiters.forEach((waiter) => waiter.resolve(entry.journal))
+  }
+  await api.delete(`/api/journals/${id}`)
+  // 이 브라우저에 따로 두던 값도 같이 지워요
+  try {
+    const all = readExtras()
+    delete all[id]
+    localStorage.setItem(extrasKey(), JSON.stringify(all))
+  } catch {
+    /* 못 지워도 괜찮아요 */
+  }
 }
 
 /* ---------- 포트폴리오 ---------- */
