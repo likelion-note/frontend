@@ -3,7 +3,7 @@ import { MOCK_TODAY } from '@/features/admin/mock/data'
 import { MOCK_COHORT, nextId, saveStore, store } from '@/features/admin/mock/store'
 import type { UserType } from '@/features/admin/types'
 import type { InviteCodePreview, LoginResponse, MeResponse } from '@/features/onboarding/types'
-import type { Session, SessionUser } from '@/lib/authStorage'
+import { getSession, setSession, type Session, type SessionUser } from '@/lib/authStorage'
 import { delay } from '@/lib/delay'
 
 /**
@@ -191,4 +191,15 @@ export async function signup(input: SignupInput): Promise<Session> {
 
 export async function fetchMe(): Promise<MeResponse> {
   return api.get<MeResponse>('/api/me')
+}
+
+/**
+ * 내 정보를 새로 받아 세션에 덮어써요 (실제 모드). 운영진이 배정을 바꾼 뒤에도
+ * 다시 로그인하지 않고 홈 · 가이드 · 새 일지 기본값이 바뀌게 해요.
+ */
+export async function refreshSession(): Promise<MeResponse> {
+  const me = await fetchMe()
+  const session = getSession()
+  if (session) setSession(sessionFromMe(session.accessToken, me, session.user.email))
+  return me
 }
