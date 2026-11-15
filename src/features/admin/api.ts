@@ -19,8 +19,6 @@ export type { PendingSort } from '@/features/admin/api.mock'
 export const adminCapabilities = {
   /** 일정 지우기 */
   deleteEvent: USE_MOCK,
-  /** 초대코드 목록 · 켜기/끄기 · 새 코드 */
-  inviteCodes: USE_MOCK,
 }
 
 export const getMe = impl.getMe
@@ -38,6 +36,3 @@ export const createProject = impl.createProject
 export const listEvents = impl.listEvents
 export const createEvent = impl.createEvent
 export const deleteEvent = impl.deleteEvent
-export const listInviteCodes = impl.listInviteCodes
-export const toggleInviteCode = impl.toggleInviteCode
-export const createInviteCode = impl.createInviteCode

@@ -1,11 +1,10 @@
-import { MOCK_COHORT, nextId, saveStore, store, today } from '@/features/admin/mock/store'
+import { MOCK_COHORT, nextId, saveStore, store } from '@/features/admin/mock/store'
 import { getProjectTimeline } from '@/features/admin/timeline'
 import {
   EVENT_TYPE_LABEL,
   PART_LABEL,
   type AdminUser,
   type EventType,
-  type InviteCode,
   type Member,
   type Part,
   type ProjectCategory,
@@ -13,7 +12,6 @@ import {
   type ReviewJournal,
   type ReviewSummary,
   type ScheduleEvent,
-  type UserType,
 } from '@/features/admin/types'
 import { readJournal, readJournals, writeJournal } from '@/features/journal/journalStore'
 import { pastTeamLabel } from '@/features/journal/labels'
@@ -258,48 +256,4 @@ export async function deleteEvent(id: string): Promise<void> {
   if (index < 0) throw notFound('일정')
   store.events.splice(index, 1)
   saveStore()
-}
-
-/* ---------- 초대코드 ---------- */
-
-export async function listInviteCodes(): Promise<InviteCode[]> {
-  await delay(120)
-  return clone(store.inviteCodes)
-}
-
-export async function toggleInviteCode(id: string): Promise<InviteCode> {
-  await delay(200)
-  const code = store.inviteCodes.find((c) => c.id === id)
-  if (!code) throw notFound('초대코드')
-  code.enabled = !code.enabled
-  saveStore()
-  return clone(code)
-}
-
-export async function createInviteCode(input: {
-  cohort: number
-  userType: UserType
-  expiresAt: string
-}): Promise<InviteCode> {
-  await delay(250)
-  if (input.expiresAt < today()) throw new Error('만료일은 오늘 이후로 골라 주세요')
-  const prefix = input.userType === 'MEMBER' ? 'LION' : 'STAF'
-  let code = `${prefix}${input.cohort}`
-  // 같은 코드가 있으면 뒤에 숫자를 붙여요 (6자리 유지)
-  let n = 2
-  while (store.inviteCodes.some((c) => c.code === code)) {
-    code = `${prefix.slice(0, 3)}${input.cohort}${n++}`
-  }
-  const created: InviteCode = {
-    id: nextId('c'),
-    code,
-    userType: input.userType,
-    cohort: input.cohort,
-    enabled: true,
-    expiresAt: input.expiresAt,
-    usedCount: 0,
-  }
-  store.inviteCodes.unshift(created)
-  saveStore()
-  return clone(created)
 }

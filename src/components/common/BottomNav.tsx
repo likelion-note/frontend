@@ -27,7 +27,7 @@ export interface BottomNavItem {
   activeIcon?: string
   /** 목적지 화면 구현 후 경로를 지정해요. 없으면 비활성화해요. */
   to?: string
-  /** false면 하위 경로(/admin/ops/schedule)에서도 켜져요. 기본은 정확히 같은 경로만 */
+  /** false면 하위 경로에서도 켜져요. 기본은 정확히 같은 경로만 */
   end?: boolean
 }
 

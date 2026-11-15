@@ -13,7 +13,6 @@ export const adminKeys = {
   members: () => [...adminKeys.all, 'members'] as const,
   projects: () => [...adminKeys.all, 'projects'] as const,
   events: () => [...adminKeys.all, 'events'] as const,
-  inviteCodes: () => [...adminKeys.all, 'invite-codes'] as const,
 }
 
 export const meQuery = () => queryOptions({ queryKey: adminKeys.me(), queryFn: api.getMe })
@@ -38,6 +37,3 @@ export const projectsQuery = () =>
 
 export const eventsQuery = () =>
   queryOptions({ queryKey: adminKeys.events(), queryFn: api.listEvents })
-
-export const inviteCodesQuery = () =>
-  queryOptions({ queryKey: adminKeys.inviteCodes(), queryFn: api.listInviteCodes })
