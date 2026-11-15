@@ -59,8 +59,8 @@ export function ReviewHomePage() {
           <Illust name="lion-check" size={64} />
         </div>
 
-        {/* 요약 카드 3개 */}
-        <div className="flex w-full items-start gap-2">
+        {/* 요약 카드 3개. 행사 이름이 두 줄이 되어도 세 카드의 높이가 같아요 */}
+        <div className="flex w-full items-stretch gap-2">
           <StatCard label="검토 대기" value={String(summary?.pendingCount ?? '-')} accent />
           <StatCard
             label="미배정 멤버"
@@ -144,10 +144,13 @@ function StatCard({
   to?: string
 }) {
   const shape =
-    'bg-card shadow-card relative flex min-w-0 flex-1 flex-col gap-0.5 rounded-2xl px-3.5 py-3'
+    'bg-card shadow-card relative flex min-w-0 flex-1 flex-col justify-between gap-0.5 rounded-2xl px-3.5 py-3'
   const body = (
     <>
-      <p className="text-muted truncate text-[12px] leading-tight font-medium">{label}</p>
+      {/* 긴 행사 이름은 두 줄까지 보여줘요. 단어 중간에서 끊지 않아요 */}
+      <p className="text-muted line-clamp-2 text-[12px] leading-tight font-medium break-keep">
+        {label}
+      </p>
       <p
         className={`text-[24px] leading-tight font-bold whitespace-nowrap ${accent ? 'text-accent' : 'text-ink'}`}
       >
