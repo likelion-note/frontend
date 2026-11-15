@@ -1,6 +1,5 @@
 import { Link, useLocation, useNavigate, useParams } from 'react-router'
 
-import grid from '@/assets/journal/grid-bg.svg'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { Button } from '@/components/ui/Button'
 import { Pill } from '@/components/ui/Pill'
@@ -41,13 +40,10 @@ export function JournalDetailPage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="bg-paper shrink-0">
+      <div className="shrink-0">
         <BackHeader title="내 일지" backTo={backTo} />
       </div>
-      <ScreenContent
-        className="bg-paper [background-size:390px_auto] [background-position:top_center] [background-repeat:repeat-y] pt-2 pb-[max(28px,env(safe-area-inset-bottom))]"
-        style={{ backgroundImage: `url(${grid})` }}
-      >
+      <ScreenContent className="pt-2 pb-[max(28px,env(safe-area-inset-bottom))]">
         {query.isPending ? (
           <p role="status" className="text-muted text-[13px]">
             일지를 불러오고 있어요.

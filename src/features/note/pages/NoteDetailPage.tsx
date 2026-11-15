@@ -74,7 +74,7 @@ export function NoteDetailPage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="bg-paper shrink-0">
+      <div className="shrink-0">
         <BackHeader
           title={noteDetailTitle(note.data)}
           backTo={`/notes${location.search}`}

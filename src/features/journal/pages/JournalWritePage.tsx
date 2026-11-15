@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router'
 
-import grid from '@/assets/journal/grid-bg.svg'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { Dropdown } from '@/components/ui/Dropdown'
 import { Button } from '@/components/ui/Button'
@@ -152,7 +151,7 @@ export function JournalWritePage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="bg-paper shrink-0">
+      <div className="shrink-0">
         <BackHeader
           title="성장일지 쓰기"
           backTo="/me"
@@ -163,10 +162,7 @@ export function JournalWritePage() {
           }
         />
       </div>
-      <ScreenContent
-        className="bg-paper gap-4 [background-size:390px_auto] [background-position:top_center] [background-repeat:repeat-y] pt-2 pb-[max(28px,env(safe-area-inset-bottom))]"
-        style={{ backgroundImage: `url(${grid})` }}
-      >
+      <ScreenContent className="gap-4 pt-2 pb-[max(28px,env(safe-area-inset-bottom))]">
         {draft.status === 'REJECTED' && draft.rejectReason && (
           <div className="bg-rose-2 flex flex-col gap-1 rounded-2xl px-4 py-3">
             <p className="text-danger text-[12px] leading-[17px] font-bold">운영진이 남긴 한 줄</p>

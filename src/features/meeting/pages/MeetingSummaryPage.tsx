@@ -2,7 +2,6 @@ import { useQuery } from '@tanstack/react-query'
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router'
 
 import backIcon from '@/assets/meeting/history-back.svg'
-import grid from '@/assets/meeting/summary-grid.svg'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { useHomeMode } from '@/features/home/useHomeMode'
 import { canUseMeeting } from '@/features/home/state'
@@ -22,7 +21,7 @@ export function MeetingSummaryPage() {
   if (!canUseMeeting(mode)) return <Navigate to={`/home${location.search}`} replace />
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="bg-paper shrink-0">
+      <div className="shrink-0">
         <BackHeader
           title="회의 정리"
           backTo={`/meeting${location.search}`}
@@ -51,7 +50,6 @@ export function MeetingSummaryPage() {
         <MeetingSummaryForm
           key={id}
           initialDraft={draft.data}
-          background={grid}
           onSaved={(record) => navigate(`/meeting/summary/${record.id}/complete${location.search}`)}
         />
       )}

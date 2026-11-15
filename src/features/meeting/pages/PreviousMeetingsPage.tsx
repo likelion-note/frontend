@@ -1,7 +1,6 @@
 import { Navigate, useLocation } from 'react-router'
 
 import backIcon from '@/assets/meeting/history-back.svg'
-import grid from '@/assets/meeting/history-grid.svg'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { useHomeMode } from '@/features/home/useHomeMode'
 import { canUseMeeting } from '@/features/home/state'
@@ -17,17 +16,14 @@ export function PreviousMeetingsPage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="bg-paper shrink-0">
+      <div className="shrink-0">
         <BackHeader
           title="지난 회의"
           backTo={`/meeting${location.search}`}
           backIcon={<img src={backIcon} width={24} height={24} alt="" />}
         />
       </div>
-      <ScreenContent
-        className="bg-paper [background-size:390px_auto] [background-position:top_center] [background-repeat:repeat-y] pt-2 pb-[max(28px,env(safe-area-inset-bottom))]"
-        style={{ backgroundImage: `url(${grid})` }}
-      >
+      <ScreenContent className="pt-2 pb-[max(28px,env(safe-area-inset-bottom))]">
         <div className="flex items-center gap-1.5">
           <MeetingIllustration name="clip" size={22} />
           <p className="text-ink-2 min-w-0 flex-1 text-[13px] leading-[16px]">

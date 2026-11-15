@@ -32,7 +32,7 @@ Figma 02-4의 일곱 화면입니다. `/me`(내 기록), `/me/journal/:id/edit`(
 ## 화면 메모
 
 - 헤더 · 본문은 공통 `BackHeader` · `ScreenContent`, 탭 화면 헤더는 노트 게시판 · 회의 도우미와 같은 모양입니다.
-- 줄 노트 입력칸은 회의 정리와 같은 에셋(`meeting/summary-lines.svg`)과 `AutoGrowTextarea`를 씁니다. 모눈 배경은 화면마다 높이만 다른 에셋이라 하나(`journal/grid-bg.svg`)를 세로로 반복합니다.
+- 줄 노트 입력칸은 회의 정리와 같은 에셋(`meeting/summary-lines.svg`)과 `AutoGrowTextarea`를 씁니다. 모눈 배경은 따로 깔지 않고 폰 프레임의 모눈(`paper-grid`)이 헤더부터 본문까지 이어지게 둡니다(운영진 화면과 같은 방식).
 - 사자 · 문구류 일러스트는 홈의 원본 스프라이트 두 장을 Figma 크롭 그대로 씁니다(`JournalIllustration`).
 - 이번 주 회의 배너는 이번 주 회의 기록이 있을 때만 보입니다. 목 회의 기록은 10월 날짜라, 회의 도우미에서 오늘 회의를 정리하면 배너가 나타납니다.
 - 포트폴리오는 작성 중이 아닌 일지가 2개 이상인 프로젝트만 고를 수 있습니다.
