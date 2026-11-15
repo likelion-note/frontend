@@ -1,4 +1,5 @@
 import { currentCohort, noteParts, notePhases } from '@/features/note/mock/data'
+import { getSession } from '@/lib/authStorage'
 import type {
   Note,
   NoteCohortFilter,
@@ -7,6 +8,9 @@ import type {
   NotePhase,
   NoteSort,
 } from '@/features/note/types'
+
+/** 우리 기수. 로그인한 사람의 기수예요 (로그인 전이면 목 데이터의 기수) */
+export const myCohort = () => getSession()?.user.cohort ?? currentCohort
 
 const cohorts: NoteCohortFilter[] = ['all', 'past', 'current']
 const sorts: NoteSort[] = ['latest', 'helpful', 'read']
@@ -77,9 +81,7 @@ export function filterNotes(notes: Note[], filters: NoteFilters) {
     (note) =>
       matchesQuery(note, filters.query) &&
       (filters.cohort === 'all' ||
-        (filters.cohort === 'current'
-          ? note.cohort === currentCohort
-          : note.cohort < currentCohort)) &&
+        (filters.cohort === 'current' ? note.cohort === myCohort() : note.cohort < myCohort())) &&
       (filters.part === 'all' || note.part === filters.part) &&
       (filters.phase === 'all' || note.phase === filters.phase) &&
       (!filters.tag || note.tags.includes(filters.tag)),
@@ -102,7 +104,7 @@ export const phaseLabel = (phase: NotePhase) =>
 /** 카드 둘째 줄. '14기 · PM · 정기 세션 2주 이상 전' / '지난 기수 F팀 · PM · 해커톤 행사 주간' */
 export function formatNoteMeta(note: Note) {
   const cohort =
-    note.cohort === currentCohort
+    note.cohort === myCohort()
       ? `${note.cohort}기`
       : ['지난 기수', note.team].filter(Boolean).join(' ')
   return `${cohort} · ${partLabel(note.part)} · ${note.event} ${phaseLabel(note.phase)}`
@@ -112,7 +114,7 @@ export function formatNoteMeta(note: Note) {
 export const formatNoteTiming = (note: Note) => `${note.event} · ${phaseLabel(note.phase)}`
 
 /** 지난 기수가 쓴 노트인지. 같은 기수 노트는 '선배'라고 부르지 않아요 */
-export const isPastNote = (note: Note) => note.cohort < currentCohort
+export const isPastNote = (note: Note) => note.cohort < myCohort()
 
 /** 상세 맺음말의 작성자. 이름 없이 기수와 파트만 보여줘요. '13기 PM 선배' / '14기 PM' */
 export const formatNoteAuthor = (note: Note) =>
