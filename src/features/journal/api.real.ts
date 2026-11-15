@@ -191,7 +191,8 @@ function toJournal(dto: DetailDto, counts?: { readCount: number; helpCount: numb
 function toSaveBody(journal: MyJournal) {
   return {
     projectId: fromId(journal.projectId),
-    part: journal.part,
+    // 운영진 글의 파트는 항상 OPS (화면에서는 파트를 고르지 않아요)
+    part: getSession()?.user.userType === 'ADMIN' ? 'OPS' : journal.part,
     activity: journal.eventType,
     timing: fromPhase(journal.phase),
     scope: journal.scope,
