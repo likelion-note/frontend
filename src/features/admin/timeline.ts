@@ -14,7 +14,7 @@ export type ProjectTimeline = {
   today: string
   /** '10월 27일 화요일' */
   dateLabel: string
-  /** 프로젝트 시작일이 지났고 남은 일정이 있으면 진행 중 */
+  /** 프로젝트 시작일이 지났고 남은 큰 행사가 있으면 진행 중 (서버의 계산과 같아요) */
   isProjectActive: boolean
   /** 프로젝트 시작일 기준 주차 (1부터). 시작 전이면 null */
   week: number | null
@@ -46,7 +46,6 @@ function sessionLabel(name: string, date: string) {
 export function timelineFromEvents(list: ScheduleEvent[], now = realToday()): ProjectTimeline {
   const events = [...list].sort((a, b) => a.date.localeCompare(b.date))
   const start = events.find((e) => e.type === 'PROJECT_START')
-  const last = events.at(-1)
   const started = !!start && start.date <= now
   const week = started ? Math.floor(daysBetween(start.date, now) / 7) + 1 : null
 
@@ -56,11 +55,31 @@ export function timelineFromEvents(list: ScheduleEvent[], now = realToday()): Pr
   return {
     today: now,
     dateLabel: dateLabelOf(now),
-    isProjectActive: started && !!last && last.date >= now,
+    isProjectActive: started && !!major,
     week,
     nextMajor: major ? { name: major.name, dday: daysBetween(now, major.date) } : null,
     nextSessionLabel: session ? sessionLabel(session.name, session.date) : null,
   }
+}
+
+/**
+ * 일정만 보고 '지금 프로젝트 기간인지'와, 아니라면 무엇이 빠졌는지 알려줘요 (운영진 일정 화면의 안내용).
+ * - no-start: '프로젝트 시작' 일정이 없음
+ * - not-started: 시작일이 아직 안 됨
+ * - no-major: 오늘 이후의 큰 행사가 없음
+ */
+export type PeriodStatus =
+  | { state: 'active' }
+  | { state: 'no-start' }
+  | { state: 'not-started'; startDate: string }
+  | { state: 'no-major' }
+
+export function periodStatus(list: ScheduleEvent[], now = realToday()): PeriodStatus {
+  const start = list.find((e) => e.type === 'PROJECT_START')
+  if (!start) return { state: 'no-start' }
+  if (start.date > now) return { state: 'not-started', startDate: start.date }
+  const hasMajor = list.some((e) => MAJOR_EVENT_TYPES.includes(e.type) && e.date >= now)
+  return hasMajor ? { state: 'active' } : { state: 'no-major' }
 }
 
 /** GET /api/home 의 stage (서버가 계산한 현재 단계) */
