@@ -2,7 +2,7 @@
 
 `/guide` 또는 프로젝트 진행 중 홈의 오늘 할 일 → 전체 보기에서 확인합니다. Figma처럼 BottomNav는 추가하지 않았습니다. 접근 조건은 기존 useHomeMode를 공유합니다.
 
-- `mock/data.ts`: 4개 파트 × 1~6주차 가이드. 현재 주차는 기존 homeMockData.project.week를 재사용합니다. PM 2주차 할 일의 ID/텍스트/초기 상태도 기존 홈 데이터에서 가져옵니다. 나머지 23개 조합은 역할과 주차에 맞는 Mock 콘텐츠입니다.
+- `mock/data.ts`: 4개 파트 × 1~3주차 가이드 (4주차부터는 가이드가 없어서 주차 선택에도 나오지 않습니다). 현재 주차는 기존 homeMockData.project.week를 재사용합니다. PM 2주차 할 일의 ID/텍스트/초기 상태도 기존 홈 데이터에서 가져옵니다. 나머지 11개 조합은 역할과 주차에 맞는 Mock 콘텐츠입니다.
 - `types.ts`: 기존 Todo/HomeAction을 확장한 GuideTask, WeeklyGuide, GuideResource.
 - `api.ts`: getWeeklyGuide/getGuideResources/getGuideResourceById의 비동기 Mock 조회. 실제 API 도입 시 이 함수들의 내부와 홈의 현재 주차 조회를 교체하세요. Query 키는 파트·주차를 포함하여 빠른 전환에서도 이전 응답이 다른 선택에 표시되지 않습니다.
 - `completionStore.ts`, `useGuideCompletion.ts`: localStorage `likelion-guide-completion:v1`의 사용자·프로젝트·파트·주차·할 일 ID별 boolean override. useSyncExternalStore로 같은 화면·다른 탭의 변경을 구독합니다. 저장 실패 시 메모리에 유지하며 토스트를 표시합니다.
@@ -12,7 +12,7 @@
 ## 확인 방법
 
 - 기본 `/home` → 전체 보기: PM 2주차.
-- 페이지 상단에서 PM/디자인/프론트/백엔드를 탐색하고 주차 드롭다운으로 1~6주차를 선택합니다. 탐색 파트는 사용자의 실제 배정 정보를 바꾸지 않습니다.
+- 페이지 상단에서 PM/디자인/프론트/백엔드를 탐색하고 주차 드롭다운으로 1~3주차를 선택합니다. 탐색 파트는 사용자의 실제 배정 정보를 바꾸지 않습니다.
 - 개발에서 배정 파트별 홈을 확인하려면 `/home?userPart=DESIGN`, `FRONTEND`, `BACKEND`, `PM`을 사용합니다. 실제 사용자에게 개발용 UI는 표시하지 않으며 프로덕션에서는 userPart 쿼리를 무시합니다.
 - `/guide?part=FRONTEND&week=3`은 탐색 대상만 선택합니다. 잘못된 파트·주차는 현재 배정 파트·진행 주차로 돌아갑니다.
 - 홈과 가이드에서 같은 할 일을 체크한 뒤 왕복하거나 새로고침하여 상태 일치를 확인할 수 있습니다.

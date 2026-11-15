@@ -126,7 +126,7 @@ export function PartGuidePage() {
             value: String(value),
             label:
               (guide.data?.weekLabels?.[value - 1] ?? `${value}주차`) +
-              (value === context.currentWeek ? ' (이번 주)' : ''),
+              (value === context.thisWeek ? ' (이번 주)' : ''),
           }))}
           onChange={(value) => choose('week', value)}
           leading={<GuideIllustration name="calendar" size={24} />}
