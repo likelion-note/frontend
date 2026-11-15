@@ -31,14 +31,39 @@ type RequestOptions = Omit<RequestInit, 'body'> & {
 /** 로그인 전에 부르는 API 는 401 이 와도 로그아웃 처리하지 않아요 */
 const isAuthPath = (path: string) => path.startsWith('/api/auth/')
 
-/** 토큰이 만료됐을 때: 세션을 지우고 온보딩으로 보내요 */
-function handleUnauthorized() {
+/** 시작 화면에 한 번 보여줄 안내 문구를 넣어 두는 곳 (이 탭에서만) */
+const NOTICE_KEY = 'mutsa.notice'
+
+/**
+ * 지금 로그인으로는 더 쓸 수 없을 때: 세션을 지우고 시작 화면으로 보내요.
+ * 왜 로그아웃됐는지는 시작 화면이 한 줄로 알려줘요 (takeAuthNotice).
+ */
+export function expireSession(notice: string) {
   clearAuth()
+  try {
+    sessionStorage.setItem(NOTICE_KEY, notice)
+  } catch {
+    /* 저장이 막혀 있으면 안내 없이 넘어가요 */
+  }
   window.dispatchEvent(new Event(AUTH_EXPIRED_EVENT))
   if (!window.location.pathname.startsWith('/onboarding')) {
     window.location.replace('/onboarding')
   }
 }
+
+/** 시작 화면이 부르는 함수. 남겨 둔 안내 문구를 꺼내고 지워요 (없으면 null) */
+export function takeAuthNotice(): string | null {
+  try {
+    const notice = sessionStorage.getItem(NOTICE_KEY)
+    if (notice) sessionStorage.removeItem(NOTICE_KEY)
+    return notice
+  } catch {
+    return null
+  }
+}
+
+/** 내 정보를 받는 주소. 여기가 404 면 토큰은 유효한데 서버에 계정이 없다는 뜻이에요 */
+const ME_PATH = '/api/me'
 
 /**
  * fetch 래퍼. 공통 응답 형식을 풀어서 data 만 돌려주고, 실패는 ApiError 로 던져요.
@@ -70,8 +95,14 @@ export async function request<T>(path: string, options: RequestOptions = {}): Pr
   }
 
   if (!json.success) {
-    if (response.status === 401 && !skipAuthRedirect && !isAuthPath(path)) {
-      handleUnauthorized()
+    if (!skipAuthRedirect && !isAuthPath(path)) {
+      if (response.status === 401) {
+        // 토큰이 만료됐거나 틀려요
+        expireSession('로그인이 만료됐어요. 다시 로그인해 주세요')
+      } else if (response.status === 404 && path === ME_PATH) {
+        // 서버 데이터가 초기화되는 등으로 계정이 사라졌어요. 그대로 두면 모든 화면이 실패해요
+        expireSession('서버에서 계정을 찾을 수 없어요. 다시 로그인해서 가입해 주세요')
+      }
     }
     throw new ApiError(json.code, json.message, response.status)
   }

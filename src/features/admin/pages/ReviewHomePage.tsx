@@ -70,7 +70,6 @@ export function ReviewHomePage() {
           <StatCard
             label={summary?.nextEvent?.name ?? '다음 행사'}
             value={summary?.nextEvent ? formatDday(summary.nextEvent.dday) : '-'}
-            illust="calendar"
             to="/admin/ops"
           />
         </div>
@@ -136,13 +135,11 @@ function StatCard({
   label,
   value,
   accent = false,
-  illust,
   to,
 }: {
   label: string
   value: string
   accent?: boolean
-  illust?: 'calendar'
   /** 누르면 갈 곳. 없으면 숫자만 보여줘요 */
   to?: string
 }) {
@@ -156,7 +153,6 @@ function StatCard({
       >
         {value}
       </p>
-      {illust && <Illust name={illust} size={28} className="absolute top-2 right-2" />}
     </>
   )
   return to ? (
