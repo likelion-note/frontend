@@ -12,17 +12,10 @@ import type { GuidePart, GuideResource, GuideTask, WeeklyGuide } from '@/feature
 /* ---------- 실제 서버 ---------- */
 
 /**
- * 서버의 주차 구간. 4~5주차가 하나로 묶여 있어서 화면의 '몇 번째 칸'(1~6)과 이 순서로 맞춰요.
- * 칸 번호 n ↔ GUIDE_STAGES[n - 1]
+ * 서버의 주차 구간. 가이드는 1~3주차까지만 보여줘서 그 구간만 써요.
+ * n주차 ↔ GUIDE_STAGES[n - 1]
  */
-export const GUIDE_STAGES = ['W1', 'W2', 'W3', 'W4_5', 'W6', 'W7'] as const
-
-/** 실제 주차(1, 2, 3 …)가 몇 번째 칸인지. 4·5주차는 4번째, 6주차는 5번째, 7주차부터는 6번째 */
-export function guideSlotOfWeek(week: number) {
-  if (week <= 3) return Math.max(week, 1)
-  if (week <= 5) return 4
-  return week === 6 ? 5 : 6
-}
+const GUIDE_STAGES = ['W1', 'W2', 'W3'] as const
 
 type TaskDto = {
   key: string
