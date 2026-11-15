@@ -46,6 +46,13 @@ export function readSummary(projectId: string, format: PortfolioFormat) {
   return read().summaries[summaryKey(projectId, format)] ?? null
 }
 
+/** 서버에서 만든 요약을 그대로 보관해요 (실제 모드). 횟수는 서버가 세요 */
+export function saveSummary(projectId: string, format: PortfolioFormat, summary: PortfolioSummary) {
+  const state = read()
+  const key = summaryKey(projectId, format)
+  write({ ...state, summaries: { ...state.summaries, [key]: { ...summary, variant: 0 } } })
+}
+
 /**
  * 요약을 새로 만들어 저장해요. 같은 프로젝트 · 형식을 다시 만들면 variant가 1씩 올라가요.
  * 남은 횟수가 없으면 오류를 던지고, 성공하면 횟수를 하나 써요.

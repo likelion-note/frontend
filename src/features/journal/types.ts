@@ -37,6 +37,8 @@ export interface OrganizedJournal {
   /** 보완 질문. 충분히 썼으면 null */
   followUp: string | null
   body: Pick<JournalBody, 'stuck' | 'overcame' | 'nextTime'>
+  /** 서버가 알려준 공개 표기 (실제 모드, 예: '14기 · PM'). 없으면 화면에서 만들어요 */
+  authorLabel?: string
 }
 
 export interface MyJournal {

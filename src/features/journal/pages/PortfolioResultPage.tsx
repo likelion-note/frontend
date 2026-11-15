@@ -21,14 +21,18 @@ import { useToast } from '@/hooks/useToast'
 import { formatMonthDay } from '@/lib/date'
 
 /** '[결과 수치 입력]' 칸만 진한 붉은 글씨로 강조해요. */
+/** 직접 채울 칸: '[결과 수치 입력]'(목) · '[숫자 입력]' '[역할 입력]'(실제 서버) */
+const placeholderPattern = /(\[[^[\]]{1,14} 입력\])/
 function Highlighted({ text }: { text: string }) {
-  const parts = text.split(resultPlaceholder)
-  return parts.map((part, index) => (
-    <Fragment key={index}>
-      {part}
-      {index < parts.length - 1 && <strong className="text-danger">{resultPlaceholder}</strong>}
-    </Fragment>
-  ))
+  return text.split(placeholderPattern).map((part, index) =>
+    placeholderPattern.test(part) ? (
+      <strong key={index} className="text-danger">
+        {part}
+      </strong>
+    ) : (
+      <Fragment key={index}>{part}</Fragment>
+    ),
+  )
 }
 
 /**
@@ -66,13 +70,13 @@ export function PortfolioResultPage() {
     .filter((journal) => data.journalIds.includes(journal.id))
     .sort((left, right) => journalDate(left).localeCompare(journalDate(right)))
   const text = [summary.data.heading, ...summary.data.lines].join('\n')
-  const hasPlaceholder = text.includes(resultPlaceholder)
+  const hasPlaceholder = placeholderPattern.test(text)
   const left = quota.data ?? 0
 
   async function copy() {
     try {
       await navigator.clipboard.writeText(text)
-      toast(hasPlaceholder ? '복사했어요. [결과 수치 입력] 칸을 채워서 써 주세요.' : '복사했어요.')
+      toast(hasPlaceholder ? '복사했어요. [ ] 칸을 채워서 써 주세요.' : '복사했어요.')
     } catch {
       toast('복사하지 못했어요. 브라우저의 클립보드 권한을 확인해 주세요.')
     }
@@ -121,7 +125,8 @@ export function PortfolioResultPage() {
           <p className="bg-rose-2 text-danger flex items-center gap-1.5 rounded-[22px] px-[18px] py-4 text-[13px] leading-[19px] font-medium">
             <JournalIllustration name="bell" size={22} />
             <span className="min-w-0 flex-1">
-              {resultPlaceholder} 칸은 일지에 없던 성과예요. 직접 채워 주세요.
+              {text.includes(resultPlaceholder) ? resultPlaceholder : '빨간 [ ]'} 칸은 일지에 없던
+              성과예요. 직접 채워 주세요.
             </span>
           </p>
         )}

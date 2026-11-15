@@ -146,7 +146,9 @@ export function JournalPreviewPage() {
                 ? `이름 ${organized.maskedCount}곳을 가렸어요`
                 : '가릴 이름이 없었어요'}
             </h2>
-            <Pill className="text-[11px]">{organized.category} 자료로 쓰여요</Pill>
+            {organized.category && (
+              <Pill className="text-[11px]">{organized.category} 자료로 쓰여요</Pill>
+            )}
           </div>
           <div className="flex flex-col gap-1.5">
             <h3 className="text-muted text-[12px] leading-[17px] font-bold">이렇게 넘겼어요</h3>
