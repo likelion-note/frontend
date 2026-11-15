@@ -8,6 +8,7 @@ import emptyGrid from '@/assets/note/empty-grid.svg'
 import headHandwriting from '@/assets/note/head-handwriting.svg'
 import { BottomNav } from '@/components/common/BottomNav'
 import { ScreenContent } from '@/components/layout/Screen'
+import { Dropdown } from '@/components/ui/Dropdown'
 import { NoteBookmarkIcon } from '@/features/note/components/NoteBookmarkIcon'
 import { NoteCard } from '@/features/note/components/NoteCard'
 import { NoteEmptyState } from '@/features/note/components/NoteEmptyState'
@@ -214,21 +215,19 @@ export function NoteBoardPage() {
                   저장 {savedCount}
                 </button>
               )}
-              <label className="text-muted focus-within:outline-accent relative shrink-0 rounded text-[13px] leading-[16px] font-medium focus-within:outline-2">
-                {sortLabels[filters.sort]} ▾
-                <select
-                  aria-label="정렬"
-                  value={filters.sort}
-                  onChange={(event) => update({ sort: event.target.value as NoteSort })}
-                  className="absolute inset-0 cursor-pointer opacity-0"
-                >
-                  {Object.entries(sortLabels).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+              <Dropdown
+                ariaLabel="정렬"
+                value={filters.sort}
+                options={(Object.keys(sortLabels) as NoteSort[]).map((value) => ({
+                  value,
+                  label: sortLabels[value],
+                }))}
+                onChange={(sort) => update({ sort })}
+                align="right"
+                className="shrink-0"
+                triggerClassName="text-muted relative text-[13px] leading-[16px] font-medium before:absolute before:-inset-2"
+                menuClassName="w-[132px]"
+              />
             </div>
             {visible.map((note) => (
               <NoteCard

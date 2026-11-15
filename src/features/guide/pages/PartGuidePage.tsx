@@ -7,6 +7,7 @@ import grid from '@/assets/guide/grid-bg.svg'
 import { TaskChecklist } from '@/components/common/TaskChecklist'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { Card } from '@/components/ui/Card'
+import { Dropdown } from '@/components/ui/Dropdown'
 import { Chip } from '@/components/ui/Chip'
 import { getGuideResources, getWeeklyGuide } from '@/features/guide/api'
 import { GuideIllustration } from '@/features/guide/components/GuideIllustration'
@@ -122,28 +123,18 @@ export function PartGuidePage() {
             </Chip>
           ))}
         </div>
-        <label className="border-input-line relative flex h-[50px] items-center gap-1.5 border-b-[1.4px] px-0.5">
-          <GuideIllustration name="calendar" size={24} />
-          <select
-            aria-label="주차 선택"
-            value={week}
-            onChange={(event) => choose('week', event.target.value)}
-            className="focus-visible:outline-accent h-full min-w-0 flex-1 appearance-none bg-transparent pr-5 text-[14px] leading-[17px] outline-none focus-visible:outline-2"
-          >
-            {context.weeks.map((value) => (
-              <option key={value} value={value}>
-                {guide.data?.weekLabels?.[value - 1] ?? `${value}주차`}
-                {value === context.currentWeek ? ' (이번 주)' : ''}
-              </option>
-            ))}
-          </select>
-          <span
-            aria-hidden="true"
-            className="text-muted pointer-events-none absolute right-0.5 text-[13px] leading-[16px] font-bold"
-          >
-            ▾
-          </span>
-        </label>
+        <Dropdown
+          ariaLabel="주차 선택"
+          value={String(week)}
+          options={context.weeks.map((value) => ({
+            value: String(value),
+            label:
+              (guide.data?.weekLabels?.[value - 1] ?? `${value}주차`) +
+              (value === context.currentWeek ? ' (이번 주)' : ''),
+          }))}
+          onChange={(value) => choose('week', value)}
+          leading={<GuideIllustration name="calendar" size={24} />}
+        />
         {guide.isPending ? (
           <p role="status" className="text-muted text-[13px]">
             가이드를 불러오고 있어요.
