@@ -132,7 +132,8 @@ export function PartGuidePage() {
           >
             {context.weeks.map((value) => (
               <option key={value} value={value}>
-                {value}주차{value === context.currentWeek ? ' (이번 주)' : ''}
+                {guide.data?.weekLabels?.[value - 1] ?? `${value}주차`}
+                {value === context.currentWeek ? ' (이번 주)' : ''}
               </option>
             ))}
           </select>
@@ -164,7 +165,7 @@ export function PartGuidePage() {
           <>
             <Card
               as="section"
-              aria-label={`${guideParts.find((item) => item.id === part)?.label} ${week}주차 할 일`}
+              aria-label={`${guideParts.find((item) => item.id === part)?.label} ${guide.data.weekLabels?.[week - 1] ?? `${week}주차`} 할 일`}
             >
               {completion.tasks.length === 0 && (
                 <p className="text-muted text-[13px]">이번 주에 등록된 할 일이 없어요.</p>

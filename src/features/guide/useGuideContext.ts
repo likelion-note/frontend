@@ -1,4 +1,6 @@
+import { USE_MOCK } from '@/api/client'
 import { getProjectTimeline } from '@/features/admin/timeline'
+import { guideSlotOfWeek } from '@/features/guide/api'
 import { guideProject } from '@/features/guide/mock/data'
 import type { GuidePart } from '@/features/guide/types'
 import { PART_LABEL } from '@/features/admin/types'
@@ -20,7 +22,9 @@ export function normalizePart(value: string | null): GuidePart | null {
 
 /** 운영진이 등록한 프로젝트 시작일 기준 이번 주차. 가이드가 있는 주차 안으로 맞춰요. */
 export function currentGuideWeek() {
-  const week = getProjectTimeline().week ?? guideProject.weeks[0]
+  const actual = getProjectTimeline().week ?? guideProject.weeks[0]
+  // 실제 모드는 4~5주차가 한 칸이라, 실제 주차를 주차 선택의 칸 번호로 바꿔요.
+  const week = USE_MOCK ? actual : guideSlotOfWeek(actual)
   return Math.min(Math.max(week, guideProject.weeks[0]), guideProject.weeks.at(-1) ?? week)
 }
 

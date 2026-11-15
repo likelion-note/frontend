@@ -1,3 +1,4 @@
+import { USE_MOCK } from '@/api/client'
 import paw from '@/assets/home/paw.svg'
 import sticky from '@/assets/home/sticky.svg'
 import { HomeIllustration } from '@/features/home/components/HomeIllustration'
@@ -20,7 +21,14 @@ export function StaffMessage({
         <h2 className="pr-14 text-[12px] leading-[14px] font-bold">
           운영진 한마디 · {message.week}주차
         </h2>
-        <img src={sticky} width={136} height={56} alt={message.text} />
+        {/* 목 모드는 피그마의 손글씨 그림, 실제 모드는 서버가 준 이번 주 한마디를 글로 보여줘요 */}
+        {USE_MOCK ? (
+          <img src={sticky} width={136} height={56} alt={message.text} />
+        ) : (
+          <p className="min-h-[56px] pr-[58px] text-[15px] leading-[24px] [overflow-wrap:anywhere] whitespace-pre-wrap">
+            {message.text}
+          </p>
+        )}
         <button
           type="button"
           aria-pressed={message.isHelpful}
@@ -28,7 +36,7 @@ export function StaffMessage({
           className="border-note-ink focus-visible:outline-accent flex items-center gap-1 rounded-full border-[1.2px] px-3 py-[5px] text-[12px] leading-[14px] font-bold focus-visible:outline-2"
         >
           <img src={paw} width={13} height={13} alt="" />
-          도움돼요 {message.helpfulCount}
+          도움돼요{message.helpfulCount > 0 || USE_MOCK ? ` ${message.helpfulCount}` : ''}
         </button>
         <div className="absolute top-2 right-3">
           <HomeIllustration name="grad" size={58} />
