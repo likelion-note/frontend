@@ -20,7 +20,7 @@ import { pastTeamLabel } from '@/features/journal/labels'
 import type { MyJournal } from '@/features/journal/types'
 import { localDateString } from '@/features/meeting/meetingDates'
 import { phaseLabel } from '@/features/note/noteFilters'
-import { getSession, setSession } from '@/lib/authStorage'
+import { getSession } from '@/lib/authStorage'
 import { getCurrentUser } from '@/lib/currentUser'
 import { delay } from '@/lib/delay'
 
@@ -41,24 +41,6 @@ export async function getMe(): Promise<AdminUser> {
   const user = getCurrentUser()
   if (!session || !user) throw new Error('로그인이 필요해요')
   return { id: user.id, name: user.name, email: session.user.email ?? '', cohort: user.cohort }
-}
-
-/** 이름·닉네임 바꾸기. 멤버 목록의 내 이름도 같이 바뀌어요 */
-export async function updateMe(input: { name: string }): Promise<AdminUser> {
-  await delay(250)
-  const name = input.name.trim()
-  if (!name) throw new Error('이름이나 닉네임을 적어 주세요')
-  if (name.length > 30) throw new Error('30자 안으로 적어 주세요')
-  const session = getSession()
-  if (!session) throw new Error('로그인이 필요해요')
-  const id = String(session.user.id)
-  const row = store.members.find((m) => m.id === id)
-  if (row) row.name = name
-  const signup = store.signups.find((item) => item.userId === id)
-  if (signup) signup.name = name
-  saveStore()
-  setSession({ ...session, user: { ...session.user, name } })
-  return { id, name, email: session.user.email ?? '', cohort: session.user.cohort }
 }
 
 export async function getReviewSummary(): Promise<ReviewSummary> {

@@ -76,8 +76,13 @@ export function ProfileSetupPage() {
               if (e.key === 'Enter' && canStart) signup.mutate()
             }}
             placeholder="운영진이 멤버를 알아볼 이름"
+            aria-describedby="signup-name-fixed"
           />
         </Field>
+        {/* 이름은 가입한 뒤에 바꿀 수 없어요 (수정 기능이 없어요) */}
+        <p id="signup-name-fixed" className="text-accent-deep text-[13px] leading-normal font-bold">
+          가입한 뒤에는 바꿀 수 없어요. 신중하게 입력해 주세요.
+        </p>
         <p className="text-muted text-[12px] leading-normal">
           운영진의 멤버 목록에만 보여요. 성장일지와 노트에는 어디에도 나오지 않아요.
         </p>
