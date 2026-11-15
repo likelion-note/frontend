@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
 
-import { GOOGLE_CLIENT_ID, USE_MOCK } from '@/api/client'
+import { GOOGLE_CLIENT_ID, takeAuthNotice, USE_MOCK } from '@/api/client'
 import appIcon from '@/assets/brand/app-icon.png'
 import logo from '@/assets/brand/logo.svg'
 import { GoogleIcon } from '@/components/icons'
@@ -24,6 +24,14 @@ export function StartPage() {
   const toast = useToast()
   const queryClient = useQueryClient()
   const [picking, setPicking] = useState(false)
+
+  // 로그인이 풀려서 여기로 왔으면 이유를 알려줘요 (만료 · 서버에 계정 없음).
+  // 잠깐 떴다 사라지면 놓치기 쉬워서, 다시 로그인할 때까지 버튼 위에 보여줘요.
+  const [notice, setNotice] = useState<string | null>(null)
+  useEffect(() => {
+    const message = takeAuthNotice()
+    if (message) setNotice(message)
+  }, [])
 
   const login = useMutation({
     mutationFn: (input: api.LoginInput) => api.loginWithGoogle(input),
@@ -67,6 +75,15 @@ export function StartPage() {
         </div>
 
         <div className="flex-1" />
+
+        {notice && (
+          <p
+            role="status"
+            className="bg-rose-2 text-danger w-full rounded-2xl px-4 py-3 text-center text-[13px] leading-normal font-medium"
+          >
+            {notice}
+          </p>
+        )}
 
         {REAL_GOOGLE_LOGIN ? (
           <GoogleSignInButton
