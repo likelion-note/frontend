@@ -1,11 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router'
 
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { Dropdown } from '@/components/ui/Dropdown'
 import { Button } from '@/components/ui/Button'
-import { saveJournal } from '@/features/journal/api'
+import { deleteJournal, saveJournal } from '@/features/journal/api'
 import { ChoiceChips } from '@/features/journal/components/ChoiceChips'
+import { DeleteJournalButton } from '@/features/journal/components/DeleteJournalButton'
 import { JournalIllustration } from '@/features/journal/components/JournalIllustration'
 import { MeetingImportBanner } from '@/features/journal/components/MeetingImportBanner'
 import { RuledTextarea } from '@/features/journal/components/RuledTextarea'
@@ -71,11 +72,40 @@ export function JournalWritePage() {
   // 처음 불러온 값으로 한 번만 채우고, 그 뒤로는 화면 상태가 기준이에요.
   if (query.data && draft?.id !== query.data.id) setDraft(query.data)
 
+  /**
+   * 열기만 하고 아무것도 안 쓴 채 나가면 그 일지를 지워요. 빈 일지가 서버에 남으면
+   * 그 프로젝트 분류를 지울 수 없게 돼요. 이 화면에서 한 번이라도 고쳤으면(touched) 남겨요.
+   */
+  const touched = useRef(false)
+  const latest = useRef({ draft, cache })
+  useEffect(() => {
+    latest.current = { draft, cache }
+  })
+  useEffect(() => {
+    const mountedAt = Date.now()
+    return () => {
+      const { draft: journal, cache: journalCache } = latest.current
+      // 개발 모드는 화면을 한 번 붙였다 떼어 보는데, 그때는 지우지 않아요
+      if (!journal || touched.current || Date.now() - mountedAt < 400) return
+      const blank =
+        journal.status === 'DRAFT' &&
+        !journal.organized &&
+        !journal.eventType &&
+        journal.importedMeetingIds.length === 0 &&
+        Object.values(journal.body).every((text) => !text.trim())
+      if (!blank) return
+      deleteJournal(journal.id)
+        .then(() => journalCache.remove(journal.id))
+        .catch(() => undefined)
+    }
+  }, [])
+
   const weekly = meetings.data ? thisWeekMeetings(meetings.data) : []
   const allImported =
     weekly.length > 0 && weekly.every((record) => draft?.importedMeetingIds.includes(record.id))
 
   function update(next: MyJournal) {
+    touched.current = true
     setDraft(next)
     setErrors((current) => (Object.keys(current).length ? validate(next) : current))
     saveJournal(next)
@@ -330,6 +360,12 @@ export function JournalWritePage() {
         <Button onClick={organize} className="leading-[22px]">
           AI로 정리하기
         </Button>
+        <DeleteJournalButton
+          journal={draft}
+          onBeforeDelete={() => {
+            touched.current = true
+          }}
+        />
       </ScreenContent>
     </div>
   )

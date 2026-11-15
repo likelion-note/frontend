@@ -50,12 +50,24 @@ export const seedJournals: MyJournal[] = [
   ...otherJournals,
 ]
 
+/** 지운 일지의 id. 예시 일지는 코드에 들어 있어서, 지웠다는 표시를 따로 남겨요 */
+const deletedStorageKey = 'likelion-journals-deleted:v1'
+function deletedIds(): string[] {
+  try {
+    const value: unknown = JSON.parse(localStorage.getItem(deletedStorageKey) ?? '[]')
+    return Array.isArray(value) ? value.filter((id): id is string => typeof id === 'string') : []
+  } catch {
+    return []
+  }
+}
+
 /** 모든 사람의 일지. 최근에 쓴 일지가 위로 와요. 내 것만 볼 때는 api.ts의 getMyJournals를 써요. */
 export function readJournals(): MyJournal[] {
   const byId = new Map(seedJournals.map((journal) => [journal.id, journal]))
   for (const journal of savedJournals()) {
     byId.set(journal.id, { ...journal, ownerId: journal.ownerId ?? SEED_OWNER_ID })
   }
+  for (const id of deletedIds()) byId.delete(id)
   return structuredClone([...byId.values()]).sort(
     (left, right) =>
       (right.submittedAt ?? right.updatedAt).localeCompare(left.submittedAt ?? left.updatedAt) ||
@@ -77,4 +89,17 @@ export function writeJournal(journal: MyJournal): MyJournal {
     throw new Error('일지를 저장하지 못했어요. 저장 공간과 브라우저 권한을 확인해 주세요.')
   }
   return structuredClone(next)
+}
+
+/** 일지를 지워요. 저장에 실패하면 화면이 안내할 수 있게 오류를 던져요. */
+export function removeJournal(id: string) {
+  try {
+    localStorage.setItem(
+      journalsStorageKey,
+      JSON.stringify(savedJournals().filter((item) => item.id !== id)),
+    )
+    localStorage.setItem(deletedStorageKey, JSON.stringify([...new Set([...deletedIds(), id])]))
+  } catch {
+    throw new Error('일지를 지우지 못했어요. 저장 공간과 브라우저 권한을 확인해 주세요.')
+  }
 }

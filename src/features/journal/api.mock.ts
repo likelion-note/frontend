@@ -2,6 +2,7 @@ import { MOCK_COHORT, store } from '@/features/admin/mock/store'
 import {
   readJournal,
   readJournals,
+  removeJournal,
   SEED_OWNER_ID,
   writeJournal,
 } from '@/features/journal/journalStore'
@@ -159,6 +160,15 @@ export async function submitJournal(id: string): Promise<MyJournal> {
     decidedAt: undefined,
     rejectReason: undefined,
   })
+}
+
+/** 내 일지 지우기. 서버와 같이 작성 중 · 돌려받은 일지만 지울 수 있어요 */
+export async function deleteJournal(id: string): Promise<void> {
+  const journal = readJournal(id)
+  if (!journal || !mine(journal)) throw new Error('일지를 찾을 수 없어요')
+  if (journal.status === 'PENDING') throw new Error('검토 중인 일지는 지울 수 없어요')
+  if (journal.status === 'APPROVED') throw new Error('공개된 노트는 지울 수 없어요')
+  removeJournal(id)
 }
 
 export async function getPortfolioQuota() {

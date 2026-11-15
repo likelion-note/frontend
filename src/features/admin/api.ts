@@ -12,15 +12,6 @@ const impl: typeof mock = USE_MOCK ? mock : real
 
 export type { PendingSort } from '@/features/admin/api.mock'
 
-/**
- * 서버에 아직 API 가 없어서 실제 모드에서는 쓸 수 없는 기능. 화면이 이 값을 보고 버튼을 숨겨요.
- * 목 모드에서는 전부 돼요.
- */
-export const adminCapabilities = {
-  /** 일정 지우기 */
-  deleteEvent: USE_MOCK,
-}
-
 export const getMe = impl.getMe
 export const getReviewSummary = impl.getReviewSummary
 export const listPendingJournals = impl.listPendingJournals

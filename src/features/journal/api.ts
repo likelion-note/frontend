@@ -19,6 +19,7 @@ export const saveJournal = impl.saveJournal
 export const organizeMyJournal = impl.organizeMyJournal
 export const answerFollowUp = impl.answerFollowUp
 export const submitJournal = impl.submitJournal
+export const deleteJournal = impl.deleteJournal
 export const getPortfolioQuota = impl.getPortfolioQuota
 export const getPortfolioSummary = impl.getPortfolioSummary
 export const createPortfolioSummary = impl.createPortfolioSummary

@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate, useParams } from 'react-router'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { Button } from '@/components/ui/Button'
 import { Pill } from '@/components/ui/Pill'
+import { DeleteJournalButton } from '@/features/journal/components/DeleteJournalButton'
 import { JournalIllustration } from '@/features/journal/components/JournalIllustration'
 import {
   journalMeta,
@@ -90,6 +91,7 @@ export function JournalDetailPage() {
               </>
             )}
             <JournalBody journal={journal} />
+            <DeleteJournalButton journal={journal} />
           </>
         )}
       </ScreenContent>

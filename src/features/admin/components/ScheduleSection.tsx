@@ -31,6 +31,16 @@ export function ScheduleSection() {
     onError: (e: Error) => toast(e.message),
   })
 
+  /** 지우기 전에 한 번 물어봐요. 프로젝트 시작을 지우면 홈이 어떻게 바뀌는지도 알려줘요 */
+  const confirmRemove = (event: ScheduleEvent) => {
+    const message =
+      `"${event.name}" (${formatMonthDay(event.date)}) 일정을 지울까요?` +
+      (event.type === 'PROJECT_START'
+        ? "\n프로젝트 시작이 없으면 아기사자 홈이 '프로젝트 기간이 아니에요'로 보여요."
+        : '\n아기사자 홈의 주차와 D-day 가 바로 바뀌어요.')
+    if (window.confirm(message)) remove.mutate(event.id)
+  }
+
   // 목 모드는 목 달력의 오늘, 실제 모드는 진짜 오늘
   const today = getProjectTimeline().today
   const nextMajor = events.find((e) => MAJOR_EVENT_TYPES.includes(e.type) && e.date >= today)
@@ -92,7 +102,7 @@ export function ScheduleSection() {
           isPast={event.date < today}
           isNext={event.id === nextMajor?.id}
           dday={daysBetween(today, event.date)}
-          onDelete={() => remove.mutate(event.id)}
+          onDelete={() => confirmRemove(event)}
           deleting={remove.isPending}
         />
       ))}
@@ -155,17 +165,15 @@ function EventRow({
             )}
           </div>
         </div>
-        {api.adminCapabilities.deleteEvent && (
-          <button
-            type="button"
-            aria-label={`${event.name} 일정 삭제`}
-            onClick={onDelete}
-            disabled={deleting}
-            className="relative shrink-0 p-0.5 before:absolute before:-inset-2.5"
-          >
-            <CloseIcon size={18} />
-          </button>
-        )}
+        <button
+          type="button"
+          aria-label={`${event.name} 일정 삭제`}
+          onClick={onDelete}
+          disabled={deleting}
+          className="relative shrink-0 p-0.5 before:absolute before:-inset-2.5"
+        >
+          <CloseIcon size={18} />
+        </button>
       </div>
     </div>
   )
