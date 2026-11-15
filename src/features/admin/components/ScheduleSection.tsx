@@ -8,7 +8,7 @@ import { Pill } from '@/components/ui/Pill'
 import * as api from '@/features/admin/api'
 import { AddEventSheet } from '@/features/admin/components/AddEventSheet'
 import { useInvalidateAdmin } from '@/features/admin/hooks/useInvalidateAdmin'
-import { getProjectTimeline } from '@/features/admin/timeline'
+import { getProjectTimeline, periodStatus } from '@/features/admin/timeline'
 import { eventsQuery } from '@/features/admin/queries'
 import { EVENT_TYPE_LABEL, MAJOR_EVENT_TYPES, type ScheduleEvent } from '@/features/admin/types'
 import { cn } from '@/lib/cn'
@@ -19,7 +19,7 @@ import { useToast } from '@/hooks/useToast'
 export function ScheduleSection() {
   const toast = useToast()
   const invalidate = useInvalidateAdmin()
-  const { data: events = [] } = useQuery(eventsQuery())
+  const { data: events = [], isSuccess } = useQuery(eventsQuery())
   const [adding, setAdding] = useState(false)
 
   const remove = useMutation({
@@ -35,19 +35,52 @@ export function ScheduleSection() {
   const today = getProjectTimeline().today
   const nextMajor = events.find((e) => MAJOR_EVENT_TYPES.includes(e.type) && e.date >= today)
 
+  // 지금 일정으로 아기사자 홈이 '프로젝트 기간'으로 보이는지. 아니면 무엇을 등록해야 하는지 알려줘요.
+  const period = isSuccess ? periodStatus(events, today) : null
+  const warning =
+    period?.state === 'no-start'
+      ? {
+          title: "'프로젝트 시작' 일정이 없어요",
+          body: "유형을 '프로젝트 시작'으로 등록해야 아기사자 홈에 주차와 할 일이 나와요. 지금은 '프로젝트 기간이 아니에요'로 보여요.",
+        }
+      : period?.state === 'not-started'
+        ? {
+            title: `프로젝트 시작 전이에요 (${formatMonthDay(period.startDate)} 시작)`,
+            body: "시작일 전까지 아기사자 홈은 '프로젝트 기간이 아니에요'로 보여요.",
+          }
+        : period?.state === 'no-major'
+          ? {
+              title: '남은 큰 행사가 없어요',
+              body: '오늘 이후의 해커톤 · 중간발표 · 데모데이 같은 행사를 하나 이상 등록해야 프로젝트 기간으로 보여요. 정기 세션은 세지 않아요.',
+            }
+          : null
+
   return (
     <>
-      <div className="bg-note flex w-full items-center gap-3 rounded-2xl px-4 py-3.5">
-        <Illust name="bell" size={28} />
-        <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
-          <p className="text-ink text-[14px] leading-tight font-bold">
-            바꾸면 모든 아기사자 홈이 바로 바뀌어요
-          </p>
-          <p className="text-ink-2 text-[12px] leading-tight">
-            주차, D-day, 할 일, 추천 노트가 일정에 맞춰 달라져요
-          </p>
+      {warning ? (
+        <div
+          role="status"
+          className="bg-rose-2 flex w-full items-start gap-3 rounded-2xl px-4 py-3.5"
+        >
+          <Illust name="bell" size={28} />
+          <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
+            <p className="text-danger text-[14px] leading-tight font-bold">{warning.title}</p>
+            <p className="text-ink-2 text-[12px] leading-normal">{warning.body}</p>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="bg-note flex w-full items-center gap-3 rounded-2xl px-4 py-3.5">
+          <Illust name="bell" size={28} />
+          <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
+            <p className="text-ink text-[14px] leading-tight font-bold">
+              바꾸면 모든 아기사자 홈이 바로 바뀌어요
+            </p>
+            <p className="text-ink-2 text-[12px] leading-tight">
+              주차, D-day, 할 일, 추천 노트가 일정에 맞춰 달라져요
+            </p>
+          </div>
+        </div>
+      )}
 
       {events.length === 0 && (
         <p className="text-muted py-6 text-center text-[13px]">아직 등록한 일정이 없어요.</p>

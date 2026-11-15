@@ -1,11 +1,10 @@
-import { MOCK_COHORT, nextId, saveStore, store, today } from '@/features/admin/mock/store'
+import { MOCK_COHORT, nextId, saveStore, store } from '@/features/admin/mock/store'
 import { getProjectTimeline } from '@/features/admin/timeline'
 import {
   EVENT_TYPE_LABEL,
   PART_LABEL,
   type AdminUser,
   type EventType,
-  type InviteCode,
   type Member,
   type Part,
   type ProjectCategory,
@@ -13,14 +12,13 @@ import {
   type ReviewJournal,
   type ReviewSummary,
   type ScheduleEvent,
-  type UserType,
 } from '@/features/admin/types'
 import { readJournal, readJournals, writeJournal } from '@/features/journal/journalStore'
 import { pastTeamLabel } from '@/features/journal/labels'
 import type { MyJournal } from '@/features/journal/types'
 import { localDateString } from '@/features/meeting/meetingDates'
 import { phaseLabel } from '@/features/note/noteFilters'
-import { getSession, setSession } from '@/lib/authStorage'
+import { getSession } from '@/lib/authStorage'
 import { getCurrentUser } from '@/lib/currentUser'
 import { delay } from '@/lib/delay'
 
@@ -41,24 +39,6 @@ export async function getMe(): Promise<AdminUser> {
   const user = getCurrentUser()
   if (!session || !user) throw new Error('로그인이 필요해요')
   return { id: user.id, name: user.name, email: session.user.email ?? '', cohort: user.cohort }
-}
-
-/** 이름·닉네임 바꾸기. 멤버 목록의 내 이름도 같이 바뀌어요 */
-export async function updateMe(input: { name: string }): Promise<AdminUser> {
-  await delay(250)
-  const name = input.name.trim()
-  if (!name) throw new Error('이름이나 닉네임을 적어 주세요')
-  if (name.length > 30) throw new Error('30자 안으로 적어 주세요')
-  const session = getSession()
-  if (!session) throw new Error('로그인이 필요해요')
-  const id = String(session.user.id)
-  const row = store.members.find((m) => m.id === id)
-  if (row) row.name = name
-  const signup = store.signups.find((item) => item.userId === id)
-  if (signup) signup.name = name
-  saveStore()
-  setSession({ ...session, user: { ...session.user, name } })
-  return { id, name, email: session.user.email ?? '', cohort: session.user.cohort }
 }
 
 export async function getReviewSummary(): Promise<ReviewSummary> {
@@ -276,48 +256,4 @@ export async function deleteEvent(id: string): Promise<void> {
   if (index < 0) throw notFound('일정')
   store.events.splice(index, 1)
   saveStore()
-}
-
-/* ---------- 초대코드 ---------- */
-
-export async function listInviteCodes(): Promise<InviteCode[]> {
-  await delay(120)
-  return clone(store.inviteCodes)
-}
-
-export async function toggleInviteCode(id: string): Promise<InviteCode> {
-  await delay(200)
-  const code = store.inviteCodes.find((c) => c.id === id)
-  if (!code) throw notFound('초대코드')
-  code.enabled = !code.enabled
-  saveStore()
-  return clone(code)
-}
-
-export async function createInviteCode(input: {
-  cohort: number
-  userType: UserType
-  expiresAt: string
-}): Promise<InviteCode> {
-  await delay(250)
-  if (input.expiresAt < today()) throw new Error('만료일은 오늘 이후로 골라 주세요')
-  const prefix = input.userType === 'MEMBER' ? 'LION' : 'STAF'
-  let code = `${prefix}${input.cohort}`
-  // 같은 코드가 있으면 뒤에 숫자를 붙여요 (6자리 유지)
-  let n = 2
-  while (store.inviteCodes.some((c) => c.code === code)) {
-    code = `${prefix.slice(0, 3)}${input.cohort}${n++}`
-  }
-  const created: InviteCode = {
-    id: nextId('c'),
-    code,
-    userType: input.userType,
-    cohort: input.cohort,
-    enabled: true,
-    expiresAt: input.expiresAt,
-    usedCount: 0,
-  }
-  store.inviteCodes.unshift(created)
-  saveStore()
-  return clone(created)
 }

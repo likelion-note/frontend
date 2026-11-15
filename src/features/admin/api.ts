@@ -17,16 +17,11 @@ export type { PendingSort } from '@/features/admin/api.mock'
  * 목 모드에서는 전부 돼요.
  */
 export const adminCapabilities = {
-  /** 프로필에서 이름 · 닉네임 바꾸기 */
-  editName: USE_MOCK,
   /** 일정 지우기 */
   deleteEvent: USE_MOCK,
-  /** 초대코드 목록 · 켜기/끄기 · 새 코드 */
-  inviteCodes: USE_MOCK,
 }
 
 export const getMe = impl.getMe
-export const updateMe = impl.updateMe
 export const getReviewSummary = impl.getReviewSummary
 export const listPendingJournals = impl.listPendingJournals
 export const listRecentDecisions = impl.listRecentDecisions
@@ -41,6 +36,3 @@ export const createProject = impl.createProject
 export const listEvents = impl.listEvents
 export const createEvent = impl.createEvent
 export const deleteEvent = impl.deleteEvent
-export const listInviteCodes = impl.listInviteCodes
-export const toggleInviteCode = impl.toggleInviteCode
-export const createInviteCode = impl.createInviteCode

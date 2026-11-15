@@ -1,8 +1,9 @@
 import removeIcon from '@/assets/meeting/summary-close.svg'
+import { Dropdown } from '@/components/ui/Dropdown'
 import { UnderlineInput } from '@/components/ui/Field'
 import { AutoGrowTextarea } from '@/features/meeting/components/AutoGrowTextarea'
 import { weekdays, type SummaryErrors } from '@/features/meeting/summaryDraft'
-import type { SummaryActionItem, Weekday } from '@/features/meeting/types'
+import type { SummaryActionItem } from '@/features/meeting/types'
 import { cn } from '@/lib/cn'
 
 export function SummaryActionRow({
@@ -42,34 +43,22 @@ export function SummaryActionRow({
           minHeight={46}
           className="border-input-line text-ink placeholder:text-icon-muted focus:border-accent min-w-0 flex-1 rounded-none border-b-[1.4px] bg-transparent py-[12px] pr-2.5 pl-3 text-[14px] leading-[20px] outline-none"
         />
-        <div className="relative w-[62px] shrink-0">
-          <select
-            aria-label={`${index + 1}번 업무 요일`}
-            value={item.dueDay ?? ''}
-            onChange={(event) => onChange({ ...item, dueDay: event.target.value as Weekday })}
-            aria-invalid={!!errors[`${item.id}:dueDay`]}
-            aria-describedby={error ? descriptionId : undefined}
-            className={cn(
-              'border-input-line focus:border-accent h-[46px] w-full appearance-none rounded-none border-b-[1.4px] bg-transparent pr-5 pl-3 text-[14px] leading-[17px] outline-none',
-              !item.dueDay && 'text-icon-muted',
-            )}
-          >
-            <option value="" disabled>
-              선택
-            </option>
-            {weekdays.map((day) => (
-              <option key={day} value={day}>
-                {day}
-              </option>
-            ))}
-          </select>
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute top-1/2 right-2.5 -translate-y-1/2 text-[10px]"
-          >
-            ▾
-          </span>
-        </div>
+        <Dropdown
+          ariaLabel={`${index + 1}번 업무 요일`}
+          value={item.dueDay ?? null}
+          options={weekdays.map((day) => ({ value: day, label: day }))}
+          onChange={(dueDay) => onChange({ ...item, dueDay })}
+          placeholder="선택"
+          invalid={!!errors[`${item.id}:dueDay`]}
+          describedBy={error ? descriptionId : undefined}
+          align="right"
+          className="w-[62px] shrink-0"
+          triggerClassName={cn(
+            'border-input-line h-[46px] border-b-[1.4px] pr-1.5 pl-3 text-[14px] leading-[17px]',
+            !item.dueDay && 'text-icon-muted',
+          )}
+          menuClassName="w-[76px]"
+        />
         <button
           type="button"
           aria-label={`${index + 1}번 업무 삭제`}

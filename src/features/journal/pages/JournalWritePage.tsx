@@ -3,6 +3,7 @@ import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-r
 
 import grid from '@/assets/journal/grid-bg.svg'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
+import { Dropdown } from '@/components/ui/Dropdown'
 import { Button } from '@/components/ui/Button'
 import { saveJournal } from '@/features/journal/api'
 import { ChoiceChips } from '@/features/journal/components/ChoiceChips'
@@ -185,31 +186,18 @@ export function JournalWritePage() {
           <label htmlFor="journal-project" className={label}>
             프로젝트
           </label>
-          <div className="border-input-line focus-within:border-accent relative flex h-[50px] items-center border-b-[1.4px] px-0.5">
-            <select
-              id="journal-project"
-              value={draft.projectId ?? ''}
-              aria-invalid={!!errors.project}
-              aria-describedby={describe('project')}
-              onChange={(event) => update({ ...draft, projectId: event.target.value || null })}
-              className="text-ink min-w-0 flex-1 appearance-none bg-transparent pr-6 text-[14px] leading-[20px] outline-none"
-            >
-              <option value="" disabled>
-                프로젝트를 골라 주세요
-              </option>
-              {(projects.data ?? []).map((project) => (
-                <option key={project.id} value={project.id}>
-                  {project.title}
-                </option>
-              ))}
-            </select>
-            <span
-              aria-hidden="true"
-              className="text-muted pointer-events-none absolute right-0.5 text-[13px] font-bold"
-            >
-              ▾
-            </span>
-          </div>
+          <Dropdown
+            id="journal-project"
+            value={draft.projectId}
+            options={(projects.data ?? []).map((project) => ({
+              value: project.id,
+              label: project.title,
+            }))}
+            onChange={(projectId) => update({ ...draft, projectId })}
+            placeholder="프로젝트를 골라 주세요"
+            invalid={!!errors.project}
+            describedBy={describe('project')}
+          />
           {error('project')}
         </div>
         <p className="text-muted text-[12px] leading-[17px]">

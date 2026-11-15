@@ -18,8 +18,9 @@ export const adminRoutes: RouteObject[] = [
       { path: 'admin', element: <Navigate to="/admin/review" replace /> },
       { path: 'admin/review', element: <ReviewHomePage /> },
       { path: 'admin/members', element: <MembersPage /> },
-      { path: 'admin/ops', element: <Navigate to="/admin/ops/schedule" replace /> },
-      { path: 'admin/ops/:tab', element: <OpsPage /> },
+      { path: 'admin/ops', element: <OpsPage /> },
+      // 예전 주소(/admin/ops/schedule · /admin/ops/invite-codes)는 운영 화면으로 보내요
+      { path: 'admin/ops/*', element: <Navigate to="/admin/ops" replace /> },
     ],
   },
   {

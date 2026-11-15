@@ -1,38 +1,17 @@
-import { useNavigate, useParams } from 'react-router'
-
-import { Segment } from '@/components/ui/Segment'
 import { AdminPageHeader } from '@/features/admin/components/AdminHeader'
 import { AdminContent } from '@/features/admin/components/AdminLayout'
-import { InviteCodeSection } from '@/features/admin/components/InviteCodeSection'
 import { ScheduleSection } from '@/features/admin/components/ScheduleSection'
 
-export type OpsTab = 'schedule' | 'invite-codes'
-
-const TABS: { value: OpsTab; label: string }[] = [
-  { value: 'schedule', label: '일정' },
-  { value: 'invite-codes', label: '초대코드' },
-]
-
-/** SCR-ADM-07 · 08 운영 탭. 일정 / 초대코드 두 칸 */
+/**
+ * SCR-ADM-07 운영 탭. 일정을 관리해요.
+ * 초대코드 관리(SCR-ADM-08)는 이번에 하지 않기로 해서 화면이 없어요. 가입할 때 코드 확인은 그대로 돼요.
+ */
 export function OpsPage() {
-  const { tab = 'schedule' } = useParams<{ tab: OpsTab }>()
-  const navigate = useNavigate()
-  const isSchedule = tab === 'schedule'
-
   return (
     <>
-      <AdminPageHeader
-        title="운영"
-        illust={isSchedule ? 'lion-calendar' : 'lion-mail'}
-        illustSize={isSchedule ? 44 : 42}
-      />
+      <AdminPageHeader title="운영" illust="lion-calendar" illustSize={44} />
       <AdminContent>
-        <Segment
-          options={TABS}
-          value={tab}
-          onChange={(next) => navigate(`/admin/ops/${next}`, { replace: true })}
-        />
-        {isSchedule ? <ScheduleSection /> : <InviteCodeSection />}
+        <ScheduleSection />
       </AdminContent>
     </>
   )

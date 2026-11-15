@@ -1,45 +1,27 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useEffect, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router'
 
 import { USE_MOCK } from '@/api/client'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
-import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Field, UnderlineInput } from '@/components/ui/Field'
 import { Illust } from '@/components/ui/Illust'
-import * as api from '@/features/admin/api'
 import { resetMockData } from '@/features/admin/mock/store'
 import { meQuery } from '@/features/admin/queries'
 import { PART_LABEL } from '@/features/admin/types'
 import { clearAuth, homePathFor } from '@/features/onboarding/session'
-import { useToast } from '@/hooks/useToast'
 import { getCurrentUser } from '@/lib/currentUser'
 
 /**
  * 프로필 설정. 아기사자와 운영진이 같이 써요 (홈 · 검토 홈의 아바타에서 들어와요).
- * 이름·닉네임을 바꾸고 로그아웃할 수 있어요. 파트와 프로젝트는 운영진이 배정해요.
+ * 내 계정 정보를 보고 로그아웃할 수 있어요. 이름은 가입할 때 정한 그대로이고 바꿀 수 없어요.
+ * 파트와 프로젝트는 운영진이 배정해요.
  */
 export function ProfilePage() {
   const navigate = useNavigate()
-  const toast = useToast()
   const queryClient = useQueryClient()
   const { data: me } = useQuery(meQuery())
   const user = getCurrentUser()
-  const [name, setName] = useState('')
-
-  useEffect(() => {
-    if (me) setName(me.name)
-  }, [me])
-
-  const save = useMutation({
-    mutationFn: () => api.updateMe({ name }),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries()
-      toast('저장했어요')
-    },
-    onError: (e: Error) => toast(e.message),
-  })
 
   const logout = () => {
     clearAuth()
@@ -59,10 +41,6 @@ export function ProfilePage() {
     user?.part && user.project && !isAdminUser
       ? `${PART_LABEL[user.part]} · ${user.project.shortName}`
       : null
-  const trimmed = name.trim()
-  const canEdit = api.adminCapabilities.editName
-  const canSave =
-    canEdit && Boolean(me) && trimmed.length > 0 && trimmed !== me?.name && !save.isPending
 
   return (
     <>
@@ -84,21 +62,11 @@ export function ProfilePage() {
         </Card>
 
         <Field label="이름 또는 닉네임" htmlFor="profile-name" className="pt-1">
-          <UnderlineInput
-            id="profile-name"
-            value={name}
-            maxLength={30}
-            readOnly={!canEdit}
-            onChange={(e) => setName(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' && canSave) save.mutate()
-            }}
-            placeholder="운영진이 멤버를 알아볼 이름"
-          />
+          <UnderlineInput id="profile-name" value={me?.name ?? ''} readOnly />
         </Field>
         <p className="text-muted text-[12px] leading-normal">
-          운영진의 멤버 목록에만 보여요. 성장일지와 노트에는 어디에도 나오지 않아요.
-          {!canEdit && ' 이름 바꾸기는 아직 준비 중이에요.'}
+          이름은 가입할 때 정한 그대로예요. 바꿀 수 없어요. 운영진의 멤버 목록에만 보이고,
+          성장일지와 노트에는 어디에도 나오지 않아요.
         </p>
 
         <div className="bg-note flex w-full items-start gap-2.5 rounded-2xl px-[18px] py-4">
@@ -127,11 +95,6 @@ export function ProfilePage() {
 
         <div className="flex-1" />
 
-        {canEdit && (
-          <Button disabled={!canSave} onClick={() => save.mutate()}>
-            저장하기
-          </Button>
-        )}
         <div className="flex items-center justify-center gap-4 py-1">
           <button
             type="button"

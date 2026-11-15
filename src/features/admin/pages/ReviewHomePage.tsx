@@ -71,7 +71,7 @@ export function ReviewHomePage() {
             label={summary?.nextEvent?.name ?? '다음 행사'}
             value={summary?.nextEvent ? formatDday(summary.nextEvent.dday) : '-'}
             illust="calendar"
-            to="/admin/ops/schedule"
+            to="/admin/ops"
           />
         </div>
 

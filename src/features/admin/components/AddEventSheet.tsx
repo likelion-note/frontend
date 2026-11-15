@@ -4,9 +4,11 @@ import { useState } from 'react'
 import { BottomSheet } from '@/components/ui/BottomSheet'
 import { Button } from '@/components/ui/Button'
 import { Chip } from '@/components/ui/Chip'
+import { DatePicker } from '@/components/ui/DatePicker'
 import { Field, UnderlineInput } from '@/components/ui/Field'
 import * as api from '@/features/admin/api'
 import { useInvalidateAdmin } from '@/features/admin/hooks/useInvalidateAdmin'
+import { getProjectTimeline } from '@/features/admin/timeline'
 import { EVENT_TYPE_LABEL, type EventType } from '@/features/admin/types'
 import { useToast } from '@/hooks/useToast'
 
@@ -71,11 +73,11 @@ export function AddEventSheet({ open, onClose }: Props) {
       </div>
 
       <Field label="날짜" htmlFor="event-date" className="pt-1">
-        <UnderlineInput
+        <DatePicker
           id="event-date"
-          type="date"
           value={date}
-          onChange={(e) => setDate(e.target.value)}
+          onChange={setDate}
+          today={getProjectTimeline().today}
         />
       </Field>
 

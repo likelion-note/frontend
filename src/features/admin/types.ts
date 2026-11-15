@@ -28,8 +28,8 @@ export const EVENT_TYPE_LABEL: Record<EventType, string> = {
   ETC: '기타',
 }
 
-/** D-day 를 세는 큰 행사. 정기 세션은 빼요 */
-export const MAJOR_EVENT_TYPES: EventType[] = ['IDEATHON', 'HACKATHON', 'MIDTERM', 'DEMODAY']
+/** D-day 를 세는 큰 행사. 서버와 같이 '프로젝트 시작'과 '정기 세션'이 아닌 일정은 모두 큰 행사예요 */
+export const MAJOR_EVENT_TYPES: EventType[] = ['IDEATHON', 'HACKATHON', 'MIDTERM', 'DEMODAY', 'ETC']
 
 export type AdminUser = {
   id: string

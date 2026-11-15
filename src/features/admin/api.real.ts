@@ -16,7 +16,6 @@ import {
   EVENT_TYPE_LABEL,
   type AdminUser,
   type EventType,
-  type InviteCode,
   type JournalStatus,
   type Member,
   type Part,
@@ -36,7 +35,7 @@ import { getSession } from '@/lib/authStorage'
  * 운영진 API (실제 서버). 함수 이름과 돌려주는 모양은 api.mock.ts 와 같아요.
  * 서버 응답(숫자 id · 대문자 코드)을 화면 타입으로 바꾸는 일만 해요.
  *
- * 서버에 아직 없는 기능: 이름 수정, 일정 삭제, 초대코드 관리. 화면은 adminCapabilities 를 보고 숨겨요.
+ * 서버에 아직 없는 기능: 일정 삭제. 화면은 adminCapabilities 를 보고 숨겨요.
  */
 
 export type PendingSort = 'oldest' | 'newest'
@@ -153,10 +152,6 @@ export async function getMe(): Promise<AdminUser> {
     email: getSession()?.user.email ?? '',
     cohort: me.cohort,
   }
-}
-
-export async function updateMe(): Promise<AdminUser> {
-  throw new Error('이름 바꾸기는 아직 준비 중이에요')
 }
 
 export async function getReviewSummary(): Promise<ReviewSummary> {
@@ -289,18 +284,4 @@ export async function createEvent(input: {
 
 export async function deleteEvent(): Promise<void> {
   throw new Error('일정 지우기는 아직 준비 중이에요')
-}
-
-/* ---------- 초대코드 (서버에 관리 API 가 아직 없어요) ---------- */
-
-export async function listInviteCodes(): Promise<InviteCode[]> {
-  return []
-}
-
-export async function toggleInviteCode(): Promise<InviteCode> {
-  throw new Error('초대코드 관리는 아직 준비 중이에요')
-}
-
-export async function createInviteCode(): Promise<InviteCode> {
-  throw new Error('초대코드 관리는 아직 준비 중이에요')
 }
