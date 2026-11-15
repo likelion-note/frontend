@@ -1,0 +1,31 @@
+import type { HomeAction, Todo } from '@/features/home/types'
+
+export type { AssignedPart as GuidePart } from '@/features/assignment/types'
+import type { AssignedPart as GuidePart } from '@/features/assignment/types'
+export interface GuideTask extends Todo {
+  weekday: string
+  action?: HomeAction & { kind: 'meeting' | 'resources'; resourceIds?: string[] }
+}
+export interface WeeklyGuide {
+  id: string
+  part: GuidePart
+  week: number
+  tasks: GuideTask[]
+  featuredResourceIds: string[]
+  /** 주차 선택에 보여줄 이름 (실제 모드: '1주차' … '4~5주차' …). 없으면 'n주차' */
+  weekLabels?: string[]
+  operatorMessage: { text: string; image?: { src: string; width: number; height: number } }
+}
+export interface GuideResource {
+  id: string
+  part: GuidePart
+  week: number
+  title: string
+  description: string
+  teamName: string
+  fileType: 'pdf' | 'image' | 'link' | 'other'
+  fileUrl: string | null
+  previewTitle?: string
+  previewDescription?: string
+  previewItems?: string[]
+}

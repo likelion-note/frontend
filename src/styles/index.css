@@ -1,0 +1,208 @@
+@import 'tailwindcss';
+
+/*
+ * 공통 테마 토큰. 피그마 03-1 운영진 초안 기준이에요.
+ */
+@theme {
+  --font-sans:
+    'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Apple SD Gothic Neo',
+    'Malgun Gothic', sans-serif;
+
+  /* 모바일 프레임 폭 */
+  --container-mobile: 390px;
+
+  /* 바탕 */
+  --color-paper: #fffcf7;
+  --color-card: #fffdf8;
+  --color-unassigned: #fff4ec;
+
+  /* 글자 */
+  --color-ink: #3b2614;
+  --color-ink-2: #5d4632;
+  --color-muted: #97836e;
+  --color-icon-muted: #c6b4a0;
+
+  /* 포인트 (주황) */
+  --color-accent: #f07a1e;
+  --color-accent-deep: #b4520a;
+  --color-accent-soft: #ffefdf;
+
+  /* 베이지 필 */
+  --color-beige: #f3eadf;
+  --color-beige-ink: #7a5f48;
+
+  /* 붉은 필 (태그, 돌려보냄) */
+  --color-rose: #fce3d8;
+  --color-rose-ink: #b0553f;
+  --color-rose-2: #fbe3d8;
+  --color-danger: #c2502c;
+
+  /* 선 */
+  --color-line: #efe2d3;
+  --color-border: #f0e0cb;
+  --color-header-line: #efd3c8;
+  --color-tab-line: #f1dfd6;
+  --color-handle: #e3d3c2;
+  --color-rule: #ebd9c4;
+  --color-input-line: #d7bfa4;
+  --color-placeholder: #bba996;
+
+  /* 노란 안내 카드, 본문 하이라이트, 세그먼트 */
+  --color-note: #fdf0d2;
+  --color-note-ink: #7a5512;
+  --color-highlight: #fcebd6;
+  --color-segment: #f7eee7;
+
+  /* 딤, 형광펜 */
+  --color-dim: rgba(59, 38, 20, 0.38);
+  --color-marker: rgba(240, 122, 30, 0.22);
+
+  --shadow-card: 0 6px 14px -4px rgba(115, 77, 38, 0.08), 0 1px 2px 0 rgba(115, 77, 38, 0.06);
+  --shadow-segment: 0 1px 4px 0 rgba(77, 51, 26, 0.1);
+  --shadow-knob: 0 1px 2px rgba(77, 51, 26, 0.2);
+  --shadow-phone: 0 24px 60px -20px rgba(77, 51, 26, 0.35), 0 8px 20px -8px rgba(77, 51, 26, 0.18);
+
+  --animate-sheet-up: sheet-up 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-fade-in: fade-in 0.2s ease-out;
+  --animate-toast-in: toast-in 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  --animate-shake: shake 0.4s ease-in-out;
+
+  @keyframes sheet-up {
+    from {
+      transform: translateY(24px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes shake {
+    0%,
+    100% {
+      transform: translateX(0);
+    }
+    20%,
+    60% {
+      transform: translateX(-6px);
+    }
+    40%,
+    80% {
+      transform: translateX(6px);
+    }
+  }
+  @keyframes toast-in {
+    from {
+      transform: translateY(8px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply text-ink bg-[#efe4d8] font-sans antialiased;
+    word-break: keep-all;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+
+  input,
+  textarea {
+    @apply font-sans;
+  }
+}
+
+@utility paper-grid {
+  /* 색연필 모눈 배경. 피그마 에셋을 세로로 반복해요 */
+  background-image: url('../assets/brand/grid-bg.svg');
+  background-size: 390px auto;
+  background-repeat: repeat-y;
+  background-position: top center;
+}
+
+@utility marker-underline {
+  /* 제목 아래 형광펜 밑줄 */
+  position: relative;
+  z-index: 0;
+  &::after {
+    content: '';
+    position: absolute;
+    left: -2px;
+    right: -1px;
+    bottom: -2px;
+    height: 7px;
+    border-radius: 3px;
+    background: var(--color-marker);
+    z-index: -1;
+  }
+}
+
+@utility marker-underline-lg {
+  position: relative;
+  z-index: 0;
+  &::after {
+    content: '';
+    position: absolute;
+    left: -1px;
+    right: 0;
+    bottom: -1px;
+    height: 9px;
+    border-radius: 3px;
+    background: var(--color-marker);
+    z-index: -1;
+  }
+}
+
+@utility ruled-lines {
+  /* 입력칸 안의 공책 줄 */
+  background-image:
+    linear-gradient(var(--color-rule), var(--color-rule)),
+    linear-gradient(var(--color-rule), var(--color-rule));
+  background-size:
+    calc(100% - 20px) 1px,
+    calc(100% - 20px) 1px;
+  background-position:
+    10px 36px,
+    10px 62px;
+  background-repeat: no-repeat;
+}
+
+@utility no-scrollbar {
+  /* 스크롤은 되지만 스크롤바는 안 보이게 */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/*
+ * 폰 프레임 안의 화면은 세로로만 스크롤해요. 세로 스크롤 영역(overflow-y-auto)은 브라우저가
+ * 가로도 스크롤 가능하게 만들어서, 내용이 조금만 넘쳐도 화면이 옆으로 밀릴 수 있어요.
+ * 칩 줄처럼 일부러 가로로 미는 영역(overflow-x-auto)은 그대로 둬요.
+ */
+#mobile-frame .overflow-y-auto:not(.overflow-x-auto) {
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+  touch-action: pan-y;
+}

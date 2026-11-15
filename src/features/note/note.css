@@ -1,0 +1,65 @@
+/*
+ * 노트 열기 전환 (피그마 '노트 열기 전환' 프로토타입).
+ * 카드 탭 → 카드가 종이 한 장으로 커지고, 스프링이 왼쪽에서 붙어요. Smart Animate 320ms · ease-out
+ * 뒤로 가기는 반대로 종이가 카드로 접혀요.
+ *
+ * React Router의 viewTransition(View Transitions API)으로 움직여요.
+ * - 게시판 카드: 이동하는 동안만 view-transition-name: note-paper (NoteCard)
+ * - 상세 종이: 항상 note-paper, 스프링은 note-spring (NoteDiaryPaper)
+ * 지원하지 않는 브라우저에서는 효과 없이 바로 이동해요.
+ */
+
+::view-transition-group(note-paper),
+::view-transition-group(note-spring),
+::view-transition-old(note-paper),
+::view-transition-new(note-paper) {
+  animation-duration: 320ms;
+  animation-timing-function: ease-out;
+}
+
+/*
+ * 카드와 종이는 높이가 많이 달라요. 두 장면을 늘리지 않고 위에 맞춘 채
+ * 커지는 틀로 잘라서, 종이가 위에서부터 펼쳐지는 것처럼 보여요.
+ */
+::view-transition-group(note-paper) {
+  overflow: clip;
+  border-radius: 6px;
+}
+
+/* 열 때: 스프링이 왼쪽에서 붙어요 */
+::view-transition-new(note-spring):only-child {
+  animation: note-spring-in 320ms ease-out both;
+}
+/* 닫을 때: 스프링이 왼쪽으로 떨어져요 */
+::view-transition-old(note-spring):only-child {
+  animation: note-spring-out 200ms ease-in both;
+}
+
+@keyframes note-spring-in {
+  from {
+    transform: translateX(-18px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes note-spring-out {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-18px);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
