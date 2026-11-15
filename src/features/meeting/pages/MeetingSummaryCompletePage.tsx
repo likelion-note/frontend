@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate, useParams } from 'react-router'
 
 import backIcon from '@/assets/meeting/history-back.svg'
-import grid from '@/assets/meeting/complete-grid.svg'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { Button } from '@/components/ui/Button'
 import { useHomeMode } from '@/features/home/useHomeMode'
@@ -41,17 +40,14 @@ export function MeetingSummaryCompletePage({ onJournal }: { onJournal?: () => vo
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="bg-paper shrink-0">
+      <div className="shrink-0">
         <BackHeader
           title={record.data?.title ?? '회의 기록'}
           backTo={`/meeting/summary/${id}${location.search}`}
           backIcon={<img src={backIcon} width={24} height={24} alt="" />}
         />
       </div>
-      <ScreenContent
-        className="bg-paper gap-[18px] [background-size:390px_auto] [background-position:top_center] [background-repeat:repeat-y] pt-3.5 pb-[max(28px,env(safe-area-inset-bottom))]"
-        style={{ backgroundImage: `url(${grid})` }}
-      >
+      <ScreenContent className="gap-[18px] pt-3.5 pb-[max(28px,env(safe-area-inset-bottom))]">
         {record.isPending ? (
           <p role="status">저장한 회의를 불러오고 있어요.</p>
         ) : record.isError ? (

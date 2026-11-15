@@ -14,11 +14,9 @@ import type { MeetingRecord, MeetingSummaryDraft } from '@/features/meeting/type
 
 export function MeetingSummaryForm({
   initialDraft,
-  background,
   onSaved,
 }: {
   initialDraft: MeetingSummaryDraft
-  background: string
   onSaved: (record: MeetingRecord) => void
 }) {
   const [draft, setDraft] = useState(() => structuredClone(initialDraft))
@@ -73,10 +71,7 @@ export function MeetingSummaryForm({
       onSubmit={(event) => void save(event)}
       className="flex min-h-0 flex-1 flex-col"
     >
-      <ScreenContent
-        className="bg-paper [background-size:390px_auto] [background-position:top_center] [background-repeat:repeat-y] pt-2 pb-[max(28px,env(safe-area-inset-bottom))]"
-        style={{ backgroundImage: `url(${background})` }}
-      >
+      <ScreenContent className="pt-2 pb-[max(28px,env(safe-area-inset-bottom))]">
         <p className="text-ink-2 text-[13px] leading-[16px]">
           팀원과 같이 봐야 할 것만 적어요. 느낀 점과 시행착오는 성장일지에 따로 남겨요.
         </p>

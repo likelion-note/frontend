@@ -3,8 +3,6 @@ import { useLocation, useSearchParams } from 'react-router'
 
 import { USE_MOCK } from '@/api/client'
 import { ALL_HASH_TAGS } from '@/api/codes'
-import boardGrid from '@/assets/note/board-grid.svg'
-import emptyGrid from '@/assets/note/empty-grid.svg'
 import headHandwriting from '@/assets/note/head-handwriting.svg'
 import { BottomNav } from '@/components/common/BottomNav'
 import { ScreenContent } from '@/components/layout/Screen'
@@ -96,16 +94,13 @@ export function NoteBoardPage() {
   return (
     <div className="flex h-full min-h-0 flex-col">
       {/* 탭 화면 헤더. 회의 도우미와 같은 모양이고, 아래 본문만 스크롤돼요. */}
-      <header className="border-header-line bg-paper flex h-[52px] shrink-0 items-center gap-1.5 border-b px-5">
+      <header className="flex h-[58px] shrink-0 items-center gap-1.5 px-5">
         <h1 className="min-w-0 flex-1 text-[24px] leading-[29px] font-bold">
           <span className="marker-underline-lg">노트 게시판</span>
         </h1>
         <NoteIllustration name={searching ? 'search' : 'grad'} size={48} className="-mr-1" />
       </header>
-      <ScreenContent
-        className="bg-paper [background-size:390px_auto] [background-position:top_center] [background-repeat:repeat-y] pt-2"
-        style={{ backgroundImage: `url(${empty ? emptyGrid : boardGrid})` }}
-      >
+      <ScreenContent className="pt-2">
         {!searching && (
           <div className="flex">
             <img src={headHandwriting} width={115} height={30} alt="선배들이 남긴 한 줄" />

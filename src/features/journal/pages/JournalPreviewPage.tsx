@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react'
 import { Link, Navigate, useNavigate, useParams } from 'react-router'
 
-import grid from '@/assets/journal/grid-bg.svg'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -91,13 +90,10 @@ export function JournalPreviewPage() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <div className="bg-paper shrink-0">
+      <div className="shrink-0">
         <BackHeader title="AI 정리 미리보기" backTo={`/me/journal/${id}/edit`} />
       </div>
-      <ScreenContent
-        className="bg-paper [background-size:390px_auto] [background-position:top_center] [background-repeat:repeat-y] pt-2 pb-[max(28px,env(safe-area-inset-bottom))]"
-        style={{ backgroundImage: `url(${grid})` }}
-      >
+      <ScreenContent className="pt-2 pb-[max(28px,env(safe-area-inset-bottom))]">
         <p className="text-ink-2 text-[13px] leading-[19px]">{audience}</p>
 
         <Card as="article" aria-label="노트 미리보기" className="flex flex-col gap-1.5">

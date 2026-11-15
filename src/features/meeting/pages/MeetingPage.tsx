@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router'
-import grid from '@/assets/meeting/grid-bg.svg'
 import { BottomNav } from '@/components/common/BottomNav'
 import { Button } from '@/components/ui/Button'
 import { Segment } from '@/components/ui/Segment'
@@ -47,7 +46,7 @@ export function MeetingPage({ onFinish }: { onFinish?: () => void }) {
   }
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <header className="border-header-line bg-paper flex h-[52px] shrink-0 items-center gap-1.5 border-b px-5">
+      <header className="flex h-[58px] shrink-0 items-center gap-1.5 px-5">
         <h1 className="min-w-0 flex-1 text-[24px] leading-[29px] font-bold">
           <span className="marker-underline-lg">회의 도우미</span>
         </h1>
@@ -61,8 +60,7 @@ export function MeetingPage({ onFinish }: { onFinish?: () => void }) {
       <main
         aria-label="회의 도우미"
         {...swipe}
-        className="no-scrollbar bg-paper flex min-h-0 flex-1 touch-pan-y flex-col gap-3.5 overflow-y-auto overscroll-contain [background-size:390px_auto] [background-position:top_center] [background-repeat:repeat-y] px-5 pt-2 pb-7 [&>*]:shrink-0"
-        style={{ backgroundImage: `url(${grid})` }}
+        className="no-scrollbar flex min-h-0 flex-1 touch-pan-y flex-col gap-3.5 overflow-y-auto overscroll-contain px-5 pt-2 pb-7 [&>*]:shrink-0"
       >
         <div className="flex items-center gap-2">
           <MeetingIllustration name="headset" size={40} />

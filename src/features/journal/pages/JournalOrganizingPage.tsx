@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router'
 
-import grid from '@/assets/journal/grid-bg.svg'
 import { ScreenContent } from '@/components/layout/Screen'
 import { organizeMyJournal } from '@/features/journal/api'
 import { JournalIllustration } from '@/features/journal/components/JournalIllustration'
@@ -63,10 +62,7 @@ export function JournalOrganizingPage() {
   }, [id, attempt])
 
   return (
-    <ScreenContent
-      className="bg-paper gap-[18px] [background-size:390px_auto] [background-position:top_center] [background-repeat:repeat-y] pt-[18px]"
-      style={{ backgroundImage: `url(${grid})` }}
-    >
+    <ScreenContent className="gap-[18px] pt-[18px]">
       <div className="flex justify-center">
         <JournalIllustration name="write" size={132} />
       </div>
