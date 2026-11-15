@@ -1,3 +1,4 @@
+import { authorLabelText } from '@/api/codes'
 import { store } from '@/features/admin/mock/store'
 import { EVENT_TYPE_LABEL, PART_LABEL } from '@/features/admin/types'
 import type { AssignedPart } from '@/features/assignment/types'
@@ -85,11 +86,14 @@ export function pastTeamLabel(projectId: string | null | undefined) {
 
 /** 공개되면 노트 카드에 붙는 표기. '14기 · PM · 중간발표 1~2주 전' / '지난 기수 A팀 · PM · …' */
 export function anonymousLabel(journal: MyJournal) {
-  const who = journal.scope === 'NOW' ? `${journal.cohort}기` : pastTeamLabel(journal.projectId)
   const when =
     journal.eventType && journal.phase
       ? `${eventLabel(journal.eventType)} ${phaseLabel(journal.phase)}`
       : null
+  // 실제 모드: 서버가 정리할 때 알려준 표기('14기 · PM', '지난 기수 A팀 · PM')를 그대로 써요
+  const fromServer = journal.organized?.authorLabel
+  if (fromServer) return [authorLabelText(fromServer), when].filter(Boolean).join(' · ')
+  const who = journal.scope === 'NOW' ? `${journal.cohort}기` : pastTeamLabel(journal.projectId)
   return [who, journal.part && partLabel(journal.part), when].filter(Boolean).join(' · ')
 }
 

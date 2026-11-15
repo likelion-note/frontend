@@ -22,6 +22,7 @@ import { importMeetings, meetingsLabel, thisWeekMeetings } from '@/features/jour
 import type { MyJournal } from '@/features/journal/types'
 import { useJournalCache, useMyJournal, useMyProjects } from '@/features/journal/useJournals'
 import { useMeetingRecords } from '@/features/meeting/useMeetingRecords'
+import { isAdmin } from '@/lib/currentUser'
 
 type Field = 'project' | 'event' | 'phase' | 'part' | 'stuck' | 'overcame'
 /** 오류가 난 첫 칸으로 스크롤 · 포커스할 때 쓰는 요소 id (위에서 아래 순서) */
@@ -35,13 +36,16 @@ const fieldIds: Record<Field, string> = {
 }
 const fieldOrder = Object.keys(fieldIds) as Field[]
 
-/** AI 정리 전에 꼭 있어야 하는 칸. 선택 칸(다시 한다면 · 자유 메모)은 비어도 돼요. */
-function validate(journal: MyJournal) {
+/**
+ * AI 정리 전에 꼭 있어야 하는 칸. 선택 칸(다시 한다면 · 자유 메모)은 비어도 돼요.
+ * 운영진은 파트가 '운영진' 하나라서 파트 칸을 묻지 않아요.
+ */
+function validate(journal: MyJournal, staff = isAdmin()) {
   const errors: Partial<Record<Field, string>> = {}
   if (!journal.projectId) errors.project = '프로젝트를 골라 주세요.'
   if (!journal.eventType) errors.event = '어떤 활동이었는지 골라 주세요.'
   if (!journal.phase) errors.phase = '그때가 언제였는지 골라 주세요.'
-  if (!journal.part) errors.part = '이때 내 파트를 골라 주세요.'
+  if (!journal.part && !staff) errors.part = '이때 내 파트를 골라 주세요.'
   if (!journal.body.stuck.trim()) errors.stuck = '막힌 것을 한 줄이라도 적어 주세요.'
   if (!journal.body.overcame.trim()) errors.overcame = '어떻게 넘겼는지 적어 주세요.'
   return errors
@@ -62,6 +66,7 @@ export function JournalWritePage() {
   const [draft, setDraft] = useState<MyJournal | null>(null)
   const [saveState, setSaveState] = useState<'saved' | 'failed'>('saved')
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({})
+  const staff = isAdmin()
 
   // 처음 불러온 값으로 한 번만 채우고, 그 뒤로는 화면 상태가 기준이에요.
   if (query.data && draft?.id !== query.data.id) setDraft(query.data)
@@ -243,21 +248,24 @@ export function JournalWritePage() {
           {error('phase')}
         </section>
 
-        <section className="flex flex-col gap-2 pt-1">
-          <h2 id="journal-part" className={label}>
-            이때 내 파트
-          </h2>
-          <div id="journal-part-field" tabIndex={-1} className="outline-none">
-            <ChoiceChips
-              id="journal-part"
-              options={journalParts.map((part) => ({ value: part, label: partLabel(part) }))}
-              value={draft.part}
-              onChange={(part) => update({ ...draft, part })}
-              invalid={!!errors.part}
-            />
-          </div>
-          {error('part')}
-        </section>
+        {/* 운영진 글은 '14기 운영진'으로 올라가서 파트를 고르지 않아요 */}
+        {!staff && (
+          <section className="flex flex-col gap-2 pt-1">
+            <h2 id="journal-part" className={label}>
+              이때 내 파트
+            </h2>
+            <div id="journal-part-field" tabIndex={-1} className="outline-none">
+              <ChoiceChips
+                id="journal-part"
+                options={journalParts.map((part) => ({ value: part, label: partLabel(part) }))}
+                value={draft.part}
+                onChange={(part) => update({ ...draft, part })}
+                invalid={!!errors.part}
+              />
+            </div>
+            {error('part')}
+          </section>
+        )}
 
         <div className="flex flex-col gap-2">
           <label htmlFor="journal-stuck" className={`${label} flex items-center gap-2`}>
@@ -328,7 +336,7 @@ export function JournalWritePage() {
             value={draft.scope}
             onChange={(scope) => update({ ...draft, scope })}
             cohort={draft.cohort}
-            partLabel={draft.part ? partLabel(draft.part) : null}
+            partLabel={staff ? '운영진' : draft.part ? partLabel(draft.part) : null}
             pastLabel={pastTeamLabel(draft.projectId)}
           />
         </section>

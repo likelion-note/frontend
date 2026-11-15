@@ -12,6 +12,8 @@ export interface WeeklyGuide {
   week: number
   tasks: GuideTask[]
   featuredResourceIds: string[]
+  /** 주차 선택에 보여줄 이름 (실제 모드: '1주차' … '4~5주차' …). 없으면 'n주차' */
+  weekLabels?: string[]
   operatorMessage: { text: string; image?: { src: string; width: number; height: number } }
 }
 export interface GuideResource {

@@ -1,7 +1,10 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useEffect } from 'react'
 import { Link, useLocation, useParams, useSearchParams } from 'react-router'
 
+import { USE_MOCK } from '@/api/client'
 import { BackHeader, ScreenContent } from '@/components/layout/Screen'
+import { toggleNoteHelp } from '@/features/note/api'
 import { NoteBookmarkIcon } from '@/features/note/components/NoteBookmarkIcon'
 import { NoteDiaryPaper } from '@/features/note/components/NoteDiaryPaper'
 import { NoteNextCard } from '@/features/note/components/NoteNextCard'
@@ -26,6 +29,7 @@ export function NoteDetailPage() {
   const note = useNote(id)
   const notes = useNotes()
   const noteState = useNoteState()
+  const queryClient = useQueryClient()
 
   // 열어 본 노트는 게시판에서 '읽음'으로 흐리게 보여요.
   const found = note.data != null
@@ -54,6 +58,18 @@ export function NoteDetailPage() {
     const error = noteState.set(flag, id, on)
     if (error) toast(error)
     else if (flag === 'saved') toast(on ? '노트를 저장했어요.' : '저장을 취소했어요.')
+    // 실제 모드: 도움돼요는 서버에 저장해요. 실패하면 누르기 전으로 되돌려요.
+    if (flag === 'helpful' && !USE_MOCK) {
+      toggleNoteHelp(id)
+        .then((helped) => {
+          noteState.set('helpful', id, helped)
+          void queryClient.invalidateQueries({ queryKey: ['note', 'list'] })
+        })
+        .catch((e: Error) => {
+          noteState.set('helpful', id, !on)
+          toast(e.message)
+        })
+    }
   }
 
   return (

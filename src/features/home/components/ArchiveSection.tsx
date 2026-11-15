@@ -11,6 +11,8 @@ export function ArchiveSection({
   notes: HomeData['archiveNotes']
   action: HomeData['archiveAction']
 }) {
+  // 보여줄 노트가 아직 없으면(실제 모드에서 노트가 하나도 없을 때) 칸을 통째로 숨겨요
+  if (notes.length === 0) return null
   return (
     <section aria-labelledby="archive-heading" className="flex flex-col gap-3.5">
       <div className="flex items-center gap-2 pt-2">
@@ -53,9 +55,11 @@ export function ArchiveSection({
             <p className="text-muted flex-1 text-[12px] leading-[14px] font-medium">
               읽음 {note.readCount} · 도움돼요 {note.helpfulCount}
             </p>
-            <span className="bg-rose-2 text-danger rounded-full px-3 py-[5px] text-[12px] leading-[14px] font-bold">
-              {note.tag}
-            </span>
+            {note.tag && (
+              <span className="bg-rose-2 text-danger rounded-full px-3 py-[5px] text-[12px] leading-[14px] font-bold">
+                {note.tag}
+              </span>
+            )}
           </div>
         </Card>
       ))}

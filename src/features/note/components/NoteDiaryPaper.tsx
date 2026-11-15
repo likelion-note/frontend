@@ -78,8 +78,10 @@ export function NoteDiaryPaper({
           type="button"
           aria-pressed={helpful}
           onClick={onToggleHelpful}
+          disabled={note.mine}
+          title={note.mine ? '내 노트에는 누를 수 없어요' : undefined}
           className={cn(
-            'border-accent text-accent focus-visible:outline-accent flex shrink-0 items-center gap-1 rounded-full border-[1.3px] px-3.5 py-[7px] text-[13px] leading-[16px] font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2',
+            'border-accent text-accent focus-visible:outline-accent flex shrink-0 items-center gap-1 rounded-full border-[1.3px] px-3.5 py-[7px] text-[13px] leading-[16px] font-bold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-default disabled:opacity-60',
             helpful ? 'bg-accent-soft' : 'bg-white/60',
           )}
         >

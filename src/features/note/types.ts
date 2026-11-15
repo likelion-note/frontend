@@ -31,6 +31,8 @@ export interface Note {
   readCount: number
   helpfulCount: number
   createdAt: string
+  /** 내가 쓴 노트 (실제 모드). 내 노트에는 '도움돼요'를 누를 수 없어요 */
+  mine?: boolean
 }
 
 export interface NoteFilters {

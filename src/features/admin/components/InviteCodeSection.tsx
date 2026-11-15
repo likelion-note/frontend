@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { CopyIcon } from '@/components/icons'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { Illust } from '@/components/ui/Illust'
 import { Switch } from '@/components/ui/Switch'
 import * as api from '@/features/admin/api'
 import { CreateInviteCodeSheet } from '@/features/admin/components/CreateInviteCodeSheet'
@@ -39,6 +40,28 @@ export function InviteCodeSection() {
     } catch {
       toast('복사하지 못했어요. 직접 적어 주세요')
     }
+  }
+
+  // 서버에 초대코드 관리 API 가 아직 없으면 안내만 보여줘요 (가입할 때 코드 확인은 돼요)
+  if (!api.adminCapabilities.inviteCodes) {
+    return (
+      <>
+        <p className="text-ink-2 text-[13px] leading-normal">
+          구글 로그인 후 처음 한 번만 입력하는 코드예요. 코드가 기수와 계정 유형(아기사자·운영진)을
+          정해요.
+        </p>
+        <div className="bg-note flex w-full items-start gap-2.5 rounded-2xl px-[18px] py-4">
+          <Illust name="lion-mail" size={40} />
+          <div className="flex min-w-0 flex-1 flex-col gap-[3px] text-[13px] leading-normal">
+            <p className="text-note-ink font-bold">초대코드 관리는 준비 중이에요</p>
+            <p className="text-ink-2">
+              지금은 서버에 등록된 코드로만 가입할 수 있어요. 코드를 새로 만들거나 끄려면 백엔드
+              담당에게 요청해 주세요.
+            </p>
+          </div>
+        </div>
+      </>
+    )
   }
 
   return (

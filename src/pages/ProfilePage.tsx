@@ -60,7 +60,9 @@ export function ProfilePage() {
       ? `${PART_LABEL[user.part]} · ${user.project.shortName}`
       : null
   const trimmed = name.trim()
-  const canSave = Boolean(me) && trimmed.length > 0 && trimmed !== me?.name && !save.isPending
+  const canEdit = api.adminCapabilities.editName
+  const canSave =
+    canEdit && Boolean(me) && trimmed.length > 0 && trimmed !== me?.name && !save.isPending
 
   return (
     <>
@@ -86,6 +88,7 @@ export function ProfilePage() {
             id="profile-name"
             value={name}
             maxLength={30}
+            readOnly={!canEdit}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === 'Enter' && canSave) save.mutate()
@@ -95,6 +98,7 @@ export function ProfilePage() {
         </Field>
         <p className="text-muted text-[12px] leading-normal">
           운영진의 멤버 목록에만 보여요. 성장일지와 노트에는 어디에도 나오지 않아요.
+          {!canEdit && ' 이름 바꾸기는 아직 준비 중이에요.'}
         </p>
 
         <div className="bg-note flex w-full items-start gap-2.5 rounded-2xl px-[18px] py-4">
@@ -123,9 +127,11 @@ export function ProfilePage() {
 
         <div className="flex-1" />
 
-        <Button disabled={!canSave} onClick={() => save.mutate()}>
-          저장하기
-        </Button>
+        {canEdit && (
+          <Button disabled={!canSave} onClick={() => save.mutate()}>
+            저장하기
+          </Button>
+        )}
         <div className="flex items-center justify-center gap-4 py-1">
           <button
             type="button"

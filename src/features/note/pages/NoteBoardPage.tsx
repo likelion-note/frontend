@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { useLocation, useSearchParams } from 'react-router'
 
+import { USE_MOCK } from '@/api/client'
+import { ALL_HASH_TAGS } from '@/api/codes'
 import boardGrid from '@/assets/note/board-grid.svg'
 import emptyGrid from '@/assets/note/empty-grid.svg'
 import headHandwriting from '@/assets/note/head-handwriting.svg'
@@ -13,13 +15,18 @@ import { NoteFilterRow } from '@/features/note/components/NoteFilterRow'
 import { NoteIllustration } from '@/features/note/components/NoteIllustration'
 import { NoteSearchBar } from '@/features/note/components/NoteSearchBar'
 import {
-  currentCohort,
   noteParts,
   notePhases,
   noteSearchSuggestions,
   noteSituationTags,
 } from '@/features/note/mock/data'
-import { filterNotes, readFilters, sortLabels, writeFilters } from '@/features/note/noteFilters'
+import {
+  filterNotes,
+  myCohort,
+  readFilters,
+  sortLabels,
+  writeFilters,
+} from '@/features/note/noteFilters'
 import type { NoteFilters, NoteSort } from '@/features/note/types'
 import { useNoteState } from '@/features/note/useNoteState'
 import { useMyNotePart } from '@/features/note/useMyNotePart'
@@ -28,10 +35,10 @@ import { cn } from '@/lib/cn'
 
 import '@/features/note/note.css'
 
-const cohortOptions = [
+const cohortOptions = () => [
   { value: 'all' as const, label: '전체' },
   { value: 'past' as const, label: '지난 기수' },
-  { value: 'current' as const, label: `우리 기수 (${currentCohort}기)` },
+  { value: 'current' as const, label: `우리 기수 (${myCohort()}기)` },
 ]
 const partOptions = [
   { value: 'all' as const, label: '전체' },
@@ -41,7 +48,11 @@ const phaseOptions = [
   { value: 'all' as const, label: '전체' },
   ...notePhases.map(({ id, filterLabel }) => ({ value: id, label: filterLabel })),
 ]
-const tagOptions = noteSituationTags.map((tag) => ({ value: tag, label: tag }))
+// 실제 모드는 서버의 상황 태그 12개, 목 모드는 목 노트에 쓰인 태그를 보여줘요
+const tagOptions = (USE_MOCK ? noteSituationTags : ALL_HASH_TAGS).map((tag) => ({
+  value: tag,
+  label: tag,
+}))
 const allFilters: Omit<NoteFilters, 'sort'> = {
   query: '',
   cohort: 'all',
@@ -104,7 +115,7 @@ export function NoteBoardPage() {
         <div className="flex flex-col gap-2">
           <NoteFilterRow
             label="기수"
-            options={cohortOptions}
+            options={cohortOptions()}
             value={filters.cohort}
             onChange={(value) => update({ cohort: value ?? 'all' })}
           />
