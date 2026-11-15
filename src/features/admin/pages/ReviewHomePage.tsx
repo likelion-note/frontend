@@ -173,7 +173,9 @@ function RecentRow({ journal, cohort }: { journal: ReviewJournal; cohort: number
   const sub =
     journal.status === 'APPROVED'
       ? `${scopeLabel(journal.scope, cohort)} · ${formatMonthDay(journal.decidedAt ?? journal.submittedAt)}`
-      : `"${journal.rejectReason ?? ''}"`
+      : journal.rejectReason
+        ? `"${journal.rejectReason}"`
+        : formatMonthDay(journal.decidedAt ?? journal.submittedAt)
   return (
     <Link
       to={`/admin/review/${journal.id}`}

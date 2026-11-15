@@ -83,7 +83,7 @@ export function ReviewDetailPage() {
           <div className="flex w-full flex-wrap items-center gap-1.5">
             <Pill tone={scopeTone(journal.scope)}>{scopeLabel(journal.scope, cohort)}</Pill>
             <Pill tone="beige">{submittedLabel(journal.submittedAt)}</Pill>
-            <Pill tone="outline">{journal.category}</Pill>
+            {journal.category && <Pill tone="outline">{journal.category}</Pill>}
             {journal.status !== 'PENDING' && (
               <Pill tone={STATUS_TONE[journal.status]}>{STATUS_LABEL[journal.status]}</Pill>
             )}

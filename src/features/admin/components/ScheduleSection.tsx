@@ -8,7 +8,7 @@ import { Pill } from '@/components/ui/Pill'
 import * as api from '@/features/admin/api'
 import { AddEventSheet } from '@/features/admin/components/AddEventSheet'
 import { useInvalidateAdmin } from '@/features/admin/hooks/useInvalidateAdmin'
-import { MOCK_TODAY } from '@/features/admin/mock/data'
+import { getProjectTimeline } from '@/features/admin/timeline'
 import { eventsQuery } from '@/features/admin/queries'
 import { EVENT_TYPE_LABEL, MAJOR_EVENT_TYPES, type ScheduleEvent } from '@/features/admin/types'
 import { cn } from '@/lib/cn'
@@ -31,7 +31,8 @@ export function ScheduleSection() {
     onError: (e: Error) => toast(e.message),
   })
 
-  const today = MOCK_TODAY
+  // 목 모드는 목 달력의 오늘, 실제 모드는 진짜 오늘
+  const today = getProjectTimeline().today
   const nextMajor = events.find((e) => MAJOR_EVENT_TYPES.includes(e.type) && e.date >= today)
 
   return (
@@ -121,15 +122,17 @@ function EventRow({
             )}
           </div>
         </div>
-        <button
-          type="button"
-          aria-label={`${event.name} 일정 삭제`}
-          onClick={onDelete}
-          disabled={deleting}
-          className="relative shrink-0 p-0.5 before:absolute before:-inset-2.5"
-        >
-          <CloseIcon size={18} />
-        </button>
+        {api.adminCapabilities.deleteEvent && (
+          <button
+            type="button"
+            aria-label={`${event.name} 일정 삭제`}
+            onClick={onDelete}
+            disabled={deleting}
+            className="relative shrink-0 p-0.5 before:absolute before:-inset-2.5"
+          >
+            <CloseIcon size={18} />
+          </button>
+        )}
       </div>
     </div>
   )

@@ -11,12 +11,12 @@ import { AdminContent } from '@/features/admin/components/AdminLayout'
 import { AssignSheet } from '@/features/admin/components/AssignSheet'
 import { CreateProjectSheet } from '@/features/admin/components/CreateProjectSheet'
 import { MemberRow } from '@/features/admin/components/MemberRow'
-import { MOCK_TODAY } from '@/features/admin/mock/data'
+import { getProjectTimeline } from '@/features/admin/timeline'
 import { meQuery, membersQuery, projectsQuery } from '@/features/admin/queries'
 import { ASSIGNABLE_PARTS, type Member, type ProjectCategory } from '@/features/admin/types'
 
 /** 오늘 가입했으면 "방금 가입" */
-const isNewMember = (m: Member) => m.joinedAt.slice(0, 10) === MOCK_TODAY
+const isNewMember = (m: Member) => m.joinedAt.slice(0, 10) === getProjectTimeline().today
 
 const partOrder = (m: Member) => (m.part ? ASSIGNABLE_PARTS.indexOf(m.part) : 99)
 
