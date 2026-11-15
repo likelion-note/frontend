@@ -1,4 +1,4 @@
-import { api } from '@/api/client'
+import { api, ApiError } from '@/api/client'
 import {
   authorLabelText,
   dateOnly,
@@ -253,6 +253,23 @@ export async function createProject(input: {
     throw new Error('같은 제목의 분류가 이미 있어요')
   }
   return toProject(await api.post<ProjectDto>('/api/admin/projects', { title, kind: input.kind }))
+}
+
+/**
+ * 분류 지우기. DELETE /api/admin/projects/{projectId}
+ * 그 분류에 배정된 사람은 서버가 '배정 전'으로 돌려요. 그 분류로 쓴 일지나 요약이 있으면
+ * 400 "일지가 있는 분류는 지울 수 없어요" 가 와요 (문구를 그대로 보여줘요).
+ */
+export async function deleteProject(projectId: string): Promise<void> {
+  try {
+    await api.delete(`/api/admin/projects/${projectId}`)
+  } catch (error) {
+    // 이 서버는 없는 주소에 500 을 줘요. 지우기 API 가 배포되기 전이면 이쪽으로 와요.
+    if (error instanceof ApiError && error.status >= 500) {
+      throw new Error('분류 지우기가 서버에 아직 반영되지 않았어요. 잠시 후 다시 시도해 주세요')
+    }
+    throw error
+  }
 }
 
 /* ---------- 일정 ---------- */
