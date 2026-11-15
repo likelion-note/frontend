@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { Fragment, useState, type ReactNode } from 'react'
 
 import { Button } from '@/components/ui/Button'
@@ -6,14 +6,17 @@ import { Card, Divider } from '@/components/ui/Card'
 import { Illust } from '@/components/ui/Illust'
 import { Pill } from '@/components/ui/Pill'
 import { SectionTitle } from '@/components/ui/SectionTitle'
+import * as api from '@/features/admin/api'
 import { AdminPageHeader } from '@/features/admin/components/AdminHeader'
 import { AdminContent } from '@/features/admin/components/AdminLayout'
 import { AssignSheet } from '@/features/admin/components/AssignSheet'
 import { CreateProjectSheet } from '@/features/admin/components/CreateProjectSheet'
 import { MemberRow } from '@/features/admin/components/MemberRow'
+import { useInvalidateAdmin } from '@/features/admin/hooks/useInvalidateAdmin'
 import { getProjectTimeline } from '@/features/admin/timeline'
 import { meQuery, membersQuery, projectsQuery } from '@/features/admin/queries'
 import { ASSIGNABLE_PARTS, type Member, type ProjectCategory } from '@/features/admin/types'
+import { useToast } from '@/hooks/useToast'
 
 /** 오늘 가입했으면 "방금 가입" */
 const isNewMember = (m: Member) => m.joinedAt.slice(0, 10) === getProjectTimeline().today
@@ -31,8 +34,9 @@ export function MembersPage() {
 
   const cohort = me?.cohort ?? 14
   const lions = members.filter((m) => m.type === 'MEMBER')
-  const unassigned = lions
-    .filter((m) => !m.part || !m.projectId)
+  // 배정 전: 파트나 프로젝트가 없는 아기사자 + 운영 분류에 들어가지 않은 운영진
+  const unassigned = members
+    .filter((m) => (m.type === 'ADMIN' ? !m.projectId : !m.part || !m.projectId))
     .sort((a, b) => b.joinedAt.localeCompare(a.joinedAt))
   const teamProjects = projects.filter((p) => p.kind === 'TEAM')
   const opsProjects = projects.filter((p) => p.kind === 'OPS')
@@ -41,6 +45,29 @@ export function MembersPage() {
     lions.filter((m) => m.projectId === projectId).sort((a, b) => partOrder(a) - partOrder(b))
 
   const toggle = (id: string) => setExpanded((prev) => ({ ...prev, [id]: !prev[id] }))
+
+  const toast = useToast()
+  const invalidate = useInvalidateAdmin()
+  const remove = useMutation({
+    mutationFn: (project: ProjectCategory) => api.deleteProject(project.id),
+    onSuccess: async (_data, project) => {
+      await invalidate()
+      toast(`"${project.title}" 분류를 지웠어요`)
+    },
+    onError: (e: Error) => toast(e.message),
+  })
+  /** 지우기 전에 한 번 물어봐요. 팀에 사람이 있으면 배정이 풀린다는 것도 알려줘요 */
+  const confirmRemove = (project: ProjectCategory) => {
+    const count = members.filter((m) => m.projectId === project.id).length
+    const who = project.kind === 'TEAM' ? '아기사자' : '운영진'
+    const message =
+      `"${project.title}" 분류를 지울까요?` +
+      (count > 0 ? `\n이 분류의 ${who} ${count}명은 배정이 풀려요.` : '') +
+      '\n지운 분류는 되돌릴 수 없어요.'
+    if (window.confirm(message)) remove.mutate(project)
+  }
+  const removeLink =
+    'text-muted relative text-[13px] leading-none font-medium underline underline-offset-4 before:absolute before:-inset-2.5 disabled:opacity-50'
 
   // 접힌 프로젝트는 한 카드에 줄로 모으고, 펼친 프로젝트는 카드 하나를 차지해요
   const projectCards: ReactNode[] = []
@@ -88,6 +115,18 @@ export function MembersPage() {
               <MemberRow member={member} onClick={() => setSelected(member)} />
             </Fragment>
           ))}
+          <Divider />
+          <div className="flex justify-end py-3">
+            <button
+              type="button"
+              aria-label={`${project.title} 분류 지우기`}
+              disabled={remove.isPending}
+              onClick={() => confirmRemove(project)}
+              className={removeLink}
+            >
+              이 분류 지우기
+            </button>
+          </div>
         </Card>,
       )
     } else {
@@ -102,7 +141,7 @@ export function MembersPage() {
       <AdminContent>
         <p className="text-ink-2 text-[13px] leading-normal">
           {cohort}기 아기사자 {lions.length}명. 사람을 누르면 파트와 프로젝트를 배정해요. 이 분류로
-          일지와 포트폴리오가 묶여요.
+          일지와 포트폴리오가 묶여요. 운영진은 운영 분류에 넣어요.
         </p>
 
         {unassigned.length > 0 && (
@@ -141,26 +180,48 @@ export function MembersPage() {
         {projectCards}
 
         <SectionTitle title="운영 분류" />
-        <Card className="py-1">
-          {opsProjects.map((project, index) => {
-            const admins = members.filter((m) => m.projectId === project.id)
-            return (
-              <Fragment key={project.id}>
-                {index > 0 && <Divider />}
-                <div className="flex w-full items-center gap-2 py-3">
-                  <Illust name="gear" size={22} />
-                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                    <p className="text-ink text-[15px] leading-tight font-bold">{project.title}</p>
-                    <p className="text-muted text-[12px] leading-tight">
-                      운영진 {admins.length}명
-                      {admins.length > 0 && ` · ${admins.map((a) => a.name).join(', ')}`}
-                    </p>
-                  </div>
-                </div>
-              </Fragment>
-            )
-          })}
-        </Card>
+        {opsProjects.length === 0 && (
+          <Card className="text-muted text-[13px]">아직 운영 분류가 없어요.</Card>
+        )}
+        {opsProjects.map((project) => {
+          const admins = members.filter((m) => m.projectId === project.id)
+          return (
+            <Card key={project.id} className="pt-3.5 pb-1.5">
+              <div className="flex w-full items-center gap-1.5 pb-1">
+                <Illust name="gear" size={22} />
+                <span className="text-ink text-[15px] leading-tight font-bold">
+                  {project.title}
+                </span>
+                <span className="text-muted text-[13px] leading-none font-medium">
+                  {admins.length}명
+                </span>
+              </div>
+              {admins.length === 0 && (
+                <p className="text-muted py-3 text-[13px]">
+                  아직 배정된 운영진이 없어요. 배정 전 목록의 운영진을 눌러 넣어 주세요.
+                </p>
+              )}
+              {admins.map((member, index) => (
+                <Fragment key={member.id}>
+                  {index > 0 && <Divider />}
+                  <MemberRow member={member} onClick={() => setSelected(member)} />
+                </Fragment>
+              ))}
+              <Divider />
+              <div className="flex justify-end py-3">
+                <button
+                  type="button"
+                  aria-label={`${project.title} 분류 지우기`}
+                  disabled={remove.isPending}
+                  onClick={() => confirmRemove(project)}
+                  className={removeLink}
+                >
+                  이 분류 지우기
+                </button>
+              </div>
+            </Card>
+          )
+        })}
 
         <Button variant="soft" onClick={() => setCreating(true)}>
           + 프로젝트 분류 만들기

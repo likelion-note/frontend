@@ -33,6 +33,7 @@ export const listProjects = impl.listProjects
 export const assignMember = impl.assignMember
 export const unassignMember = impl.unassignMember
 export const createProject = impl.createProject
+export const deleteProject = impl.deleteProject
 export const listEvents = impl.listEvents
 export const createEvent = impl.createEvent
 export const deleteEvent = impl.deleteEvent

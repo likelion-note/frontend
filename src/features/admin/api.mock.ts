@@ -43,8 +43,9 @@ export async function getMe(): Promise<AdminUser> {
 
 export async function getReviewSummary(): Promise<ReviewSummary> {
   await delay(120)
-  const unassignedCount = store.members.filter(
-    (m) => m.type === 'MEMBER' && (!m.part || !m.projectId),
+  // 배정 전: 파트나 프로젝트가 없는 아기사자 + 운영 분류가 없는 운영진
+  const unassignedCount = store.members.filter((m) =>
+    m.type === 'ADMIN' ? !m.projectId : !m.part || !m.projectId,
   ).length
   return {
     pendingCount: reviewQueue().length,
@@ -227,6 +228,29 @@ export async function createProject(input: {
   store.projects.push(project)
   saveStore()
   return clone(project)
+}
+
+/**
+ * 잘못 만든 분류 지우기. 서버와 같은 규칙이에요.
+ * - 그 분류로 쓴 일지가 하나라도 있으면(임시 저장 포함) 지울 수 없어요. 노트의 팀원 숨김과 팀 가명이 분류에 기대요
+ * - 그 분류에 배정된 사람은 '배정 전'으로 돌아가요
+ */
+export async function deleteProject(projectId: string): Promise<void> {
+  await delay(250)
+  const index = store.projects.findIndex((p) => p.id === projectId)
+  if (index < 0) throw notFound('분류')
+  if (readJournals().some((journal) => journal.projectId === projectId)) {
+    throw new Error('일지가 있는 분류는 지울 수 없어요')
+  }
+  store.projects.splice(index, 1)
+  for (const member of store.members) {
+    if (member.projectId === projectId) {
+      member.projectId = null
+      // 운영진의 파트는 그대로 두고, 아기사자는 파트도 다시 배정받아요
+      if (member.type === 'MEMBER') member.part = null
+    }
+  }
+  saveStore()
 }
 
 /* ---------- 일정 ---------- */
